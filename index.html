@@ -97,6 +97,7 @@
                 <button type="button" data-go="dice"><span>⚄</span><b>Dados dos heróis</b><small>TN, Edge/Trouble e 3D</small></button>
                 <button type="button" data-go="villain-dice" data-master="true"><span>☠</span><b>Dados dos vilões</b><small>Rolagem separada do Mestre</small></button>
                 <button type="button" data-go="campaign" data-master="true"><span>▣</span><b>Campanha</b><small>8 sessões</small></button>
+                <button type="button" data-action="view-campaign-pdf" data-master="true"><span>▤</span><b>PDF da campanha</b><small>Visualizar as 24 páginas</small></button>
               </div>
             </article>
           </div>
@@ -119,6 +120,11 @@
             <div><small>PROGRESSO TOTAL</small><strong id="campaign-toolbar-percent">0%</strong></div>
             <div class="progress-track"><i id="campaign-toolbar-progress"></i></div>
             <span id="campaign-toolbar-summary">0 concluídas</span>
+          </div>
+          <div class="campaign-document panel">
+            <div class="campaign-document-icon" aria-hidden="true">▤</div>
+            <div><small>LIVRO COMPLETO</small><strong>RPG Marvel — Projeto Arachne</strong><span>Campanha completa em PDF, com 24 páginas e as oito sessões.</span></div>
+            <button type="button" data-action="view-campaign-pdf">VISUALIZAR PDF DA CAMPANHA →</button>
           </div>
           <div id="sessions" class="sessions"></div>
         </section>

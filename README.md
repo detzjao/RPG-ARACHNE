@@ -162,3 +162,14 @@ A próxima evolução natural é mover o estado hoje salvo em `localStorage` par
 - Health/Focus dos vilões sincronizados entre dispositivos;
 - histórico por sessão;
 - backup/restauração da campanha pelo servidor.
+
+
+## v6 — visualizador de fichas e campanha
+
+- Cada herói possui o botão **VISUALIZAR FICHA COMPLETA**, abrindo o PDF dentro do próprio site.
+- Cada vilão/capanga possui o mesmo visualizador, com opção de abrir em nova guia ou baixar.
+- Foram adicionados ao painel do Mestre os perfis editáveis de **Agente da Hydra** e **Agente da I.M.A.**, usando as fichas fornecidas.
+- A área **Campanha** ganhou um visualizador do PDF completo de 24 páginas.
+- Todos os PDFs estão em `assets/pdfs/`, de modo que o projeto continua estático e pode ser hospedado sem backend.
+- Em navegadores que não exibem PDF embutido, o modal oferece a opção **ABRIR EM NOVA GUIA**.
+- A versão usa chaves `arachne_v6_*` e migra automaticamente dados locais da v5 quando disponíveis.

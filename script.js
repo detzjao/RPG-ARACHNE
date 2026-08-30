@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = 5;
+  const APP_VERSION = 6;
   const STORAGE = {
     heroes: `arachne_v${APP_VERSION}_heroes`,
     notesPlayer: `arachne_v${APP_VERSION}_notes_player`,
@@ -17,21 +17,21 @@
   const ABILITIES = ['Melee', 'Agility', 'Resilience', 'Vigilance', 'Ego', 'Logic'];
   const DEFAULT_HEROES = [
     {
-      id:'spider', n:'Homem-Aranha', r:'Peter Parker', i:'🕷️', rank:4,
+      id:'spider', n:'Homem-Aranha', r:'Peter Parker', i:'🕷️', rank:4, pdf:'assets/pdfs/hero-homem-aranha.pdf',
       stats:[['Health',90],['Focus',90],['Karma',4]],
       abilities:{Melee:5,Agility:7,Resilience:3,Vigilance:3,Ego:0,Logic:4},
       traits:['Audience','Combat Reflexes','Connections: Sources','Free Running','Inventor','Pundit','Scientific Expertise','Weird'],
       tags:['Heroic','Obligation: Aunt May','Poor','Secret Identity']
     },
     {
-      id:'wolverine', n:'Wolverine', r:'James Howlett / Logan', i:'🗡️', rank:4,
+      id:'wolverine', n:'Wolverine', r:'James Howlett / Logan', i:'🗡️', rank:4, pdf:'assets/pdfs/hero-wolverine.pdf',
       stats:[['Health',150],['Focus',150],['Karma',4]],
       abilities:{Melee:7,Agility:2,Resilience:5,Vigilance:4,Ego:1,Logic:1},
       traits:['Battle Ready','Berserker','Combat Expert','Combat Reflexes','Connections: Military','Extraordinary Origin','Situational Awareness','Tech Reliance'],
       tags:['Extreme Appearance','Enemy: Sabretooth','Heroic','Hounded','Krakoan','Public Identity','X-Gene']
     },
     {
-      id:'cap', n:'Capitão América', r:'Steve Rogers', i:'🛡️', rank:4,
+      id:'cap', n:'Capitão América', r:'Steve Rogers', i:'🛡️', rank:4, pdf:'assets/pdfs/hero-capitao-america.pdf',
       stats:[['Health',90],['Focus',120],['Karma',4]],
       abilities:{Melee:6,Agility:4,Resilience:3,Vigilance:3,Ego:2,Logic:2},
       traits:['Battle Ready','Beguiling','Combat Expert','Combat Reflexes','Connections: Military','Public Speaking','Situational Awareness','Weird'],
@@ -41,7 +41,7 @@
 
   const DEFAULT_VILLAINS = [
     {
-      id:'octopus', n:'Doutor Octopus', r:'Otto Octavius', i:'🐙', rank:4, tier:'AMEAÇA',
+      id:'octopus', n:'Doutor Octopus', r:'Otto Octavius', i:'🐙', rank:4, tier:'AMEAÇA', pdf:'assets/pdfs/villain-doutor-octopus.pdf',
       role:'Cientista / primeiro grande suspeito', hook:'Ligado à parte científica do Projeto Arachne.',
       maxHealth:90, maxFocus:60, currentHealth:90, currentFocus:60, karma:'—', healthDR:'—', focusDR:'—', initiative:'+2',
       speed:'Correr 5 · Escalar 5 · Nadar 3 · Pular 5', occupation:'Cientista', origin:'Alta Tecnologia, Ciência Bizarra', teams:'Masters of Evil, Sinister Six', base:'Nova York',
@@ -51,7 +51,7 @@
       powers:['Membro Adicional','Brilhantismo 2','Poderoso 2','Alcance Estendido 1','Esquiva Aracnídea','Escalar Paredes','Golpear Cabeças','Agarrão Esmagador','Golpe Brutal','Pulo 1','Arremesso Rápido','Telepatia com Máquinas']
     },
     {
-      id:'sabretooth', n:'Dentes-de-Sabre', r:'Victor Creed', i:'🐯', rank:4, tier:'AMEAÇA',
+      id:'sabretooth', n:'Dentes-de-Sabre', r:'Victor Creed', i:'🐯', rank:4, tier:'AMEAÇA', pdf:'assets/pdfs/villain-dentes-de-sabre.pdf',
       role:'Rival pessoal de Wolverine', hook:'Enviado para capturar Logan e estudar seu fator de cura.',
       maxHealth:180, maxFocus:150, currentHealth:180, currentFocus:150, karma:'—', healthDR:'-1', focusDR:'—', initiative:'+4E',
       speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 5', occupation:'Militar', origin:'Alta Tecnologia: Cibernética, Mutante', teams:'1959 Avengers, Brotherhood of Evil Mutants, Hand, Marauders, Team X, X-Factor', base:'Krakoa',
@@ -61,7 +61,7 @@
       powers:['Luta de Rua','Truque de Combate','Fator de Cura','Sentidos Aguçados 1','Poderoso 1','Esqueleto Reforçado','Explorar Fraqueza','Ataques Rápidos','Fúria Focada','Ataques Furiosos','Bater e Correr','Ripostar','Ataque Imparável','Ataque Cruel','Frenesi Giratório','Pulo 1']
     },
     {
-      id:'crossbones', n:'Ossos Cruzados', r:'Brock Rumlow', i:'☠️', rank:3, tier:'AMEAÇA',
+      id:'crossbones', n:'Ossos Cruzados', r:'Brock Rumlow', i:'☠️', rank:3, tier:'AMEAÇA', pdf:'assets/pdfs/villain-ossos-cruzados.pdf',
       role:'Operação Hydra', hook:'Tenta roubar a amostra de Steve Rogers.',
       maxHealth:90, maxFocus:90, currentHealth:90, currentFocus:90, karma:'—', healthDR:'—', focusDR:'—', initiative:'+2E',
       speed:'Correr 6 · Escalar 3 · Nadar 3 · Pular 3', occupation:'Militar', origin:'Treinamento Especial', teams:'Hydra, Thunderbolts, Skeleton Crew', base:'Móvel',
@@ -71,7 +71,7 @@
       powers:['Precisão 2','Esquiva em Câmera Lenta','Golpear Cabeças','Técnica de Agarrão','Dança da Morte','Tiro Duplo','Mãos Rápidas','Aparar à Queima-Roupa','Esquiva de Tiro em Câmera Lenta','Tiro Instantâneo','Poder de Parada','Armas em Chamas']
     },
     {
-      id:'goblin', n:'Duende Verde', r:'Norman Osborn', i:'🎃', rank:4, tier:'AMEAÇA',
+      id:'goblin', n:'Duende Verde', r:'Norman Osborn', i:'🎃', rank:4, tier:'AMEAÇA', pdf:'assets/pdfs/villain-duende-verde.pdf',
       role:'Vilão intermediário', hook:'Invade o projeto para roubar a tecnologia.',
       maxHealth:120, maxFocus:60, currentHealth:120, currentFocus:60, karma:'—', healthDR:'-1', focusDR:'—', initiative:'+2',
       speed:'Correr 6 · Escalar 3 · Nadar 3 · Voo 24', occupation:'Criminoso, Magnata', origin:'Ciência Bizarra', teams:'Dark Avengers, Goblin Nation, Sinister Six, Thunderbolts', base:'Nova York',
@@ -81,7 +81,27 @@
       powers:['Precisão 1','Truque de Combate','Voo 2','Fator de Cura','Inspiração','Poderoso 2','Robusto 1','Rajada Elemental','Explosão Elemental','Golpear Cabeças','Golpe Brutal','Agarrão Esmagador','Arremesso Rápido','Plano de Batalha','Mudança de Planos']
     },
     {
-      id:'sinister', n:'Senhor Sinistro', r:'Nathaniel Essex', i:'🧬', rank:5, tier:'CHEFE FINAL',
+      id:'hydra-agent', n:'Agente da Hydra', r:'Identidade variável', i:'🐍', rank:1, tier:'CAPANGA', pdf:'assets/pdfs/villain-agente-hydra.pdf',
+      role:'Soldado / reforço da Hydra', hook:'Capanga para instalações da Hydra e para a Sessão 4.',
+      maxHealth:30, maxFocus:60, currentHealth:30, currentFocus:60, karma:'—', healthDR:'—', focusDR:'—', initiative:'+1E',
+      speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3', occupation:'Militar', origin:'Treinamento Especial', teams:'Hydra', base:'Secreta',
+      abilities:{Melee:1,Agility:1,Resilience:1,Vigilance:1,Ego:1,Logic:0},
+      traits:['Pronto para Batalha','Reflexos de Combate','Conexões: Militares (Hydra)','Determinação','Consciência Situacional'],
+      tags:['Identidade Secreta','Vilanesco'],
+      powers:['Disparo Duplo','Disparo Instintivo','Fogo Supressivo','Armas em Rajada']
+    },
+    {
+      id:'aim-agent', n:'Agente da I.M.A.', r:'Identidade variável', i:'🧪', rank:1, tier:'CAPANGA', pdf:'assets/pdfs/villain-agente-ima.pdf',
+      role:'Cientista / suporte tecnológico', hook:'Unidade científica extra para laboratórios, escoltas e encontros tecnológicos.',
+      maxHealth:10, maxFocus:60, currentHealth:10, currentFocus:60, karma:'—', healthDR:'—', focusDR:'—', initiative:'+1',
+      speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3', occupation:'Cientista', origin:'Alta Tecnologia', teams:'I.M.A.', base:'Q.G. da I.M.A.',
+      abilities:{Melee:0,Agility:1,Resilience:0,Vigilance:1,Ego:1,Logic:3},
+      traits:['Pronto para Batalha','Inventor','Dependência Tecnológica','Especialista Científico'],
+      tags:['Acesso a Laboratório','Identidade Secreta','Vilanesco'],
+      powers:['Precisão 1','Brilhantismo 1','Rajada Elemental']
+    },
+    {
+      id:'sinister', n:'Senhor Sinistro', r:'Nathaniel Essex', i:'🧬', rank:5, tier:'CHEFE FINAL', pdf:'assets/pdfs/villain-senhor-sinistro.pdf',
       role:'VILÃO FINAL', hook:'O verdadeiro cérebro por trás da coleta genética.',
       maxHealth:180, maxFocus:120, currentHealth:180, currentFocus:120, karma:'—', healthDR:'-1', focusDR:'—', initiative:'+4E',
       speed:'Correr 5 · Escalar 3 · Nadar 3 · Voo 25', occupation:'Cientista, Criminoso', origin:'Ciência Bizarra', teams:'Marauders, Conselho Silencioso, Nasty Boys', base:'Laboratórios secretos',
@@ -102,6 +122,8 @@
     {id:'07',title:'Madripoor',text:'A equipe segue o laboratório final. Investigação e uma nova aparição de Dentes-de-Sabre.'},
     {id:'08',title:'Projeto Arachne',text:'Senhor Sinistro revela o plano. Combate final com o laboratório entrando em colapso.'}
   ];
+
+  const CAMPAIGN_PDF = 'assets/pdfs/campanha-projeto-arachne.pdf';
 
   const DEFAULT_CHALLENGE = {
     action:'Ação sem título', tn:14, edge:0, trouble:0,
@@ -132,24 +154,27 @@
   }
   function saveJSON(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 
-  // Migração v4 -> v5 (com fallback v3). Não sobrescreve dados existentes na v5.
+  // Migração v5 -> v6 (com fallbacks anteriores). Não sobrescreve dados existentes na v6.
   const migrationCandidates = {
-    heroes:['arachne_v4_heroes','arachne_v3_heroes'],
-    campaign:['arachne_v4_campaign','arachne_v3_campaign'],
-    dice:['arachne_v4_dice','arachne_v3_dice'],
-    challenge:['arachne_v4_challenge']
+    heroes:['arachne_v5_heroes','arachne_v4_heroes','arachne_v3_heroes'],
+    campaign:['arachne_v5_campaign','arachne_v4_campaign','arachne_v3_campaign'],
+    dice:['arachne_v5_dice','arachne_v4_dice','arachne_v3_dice'],
+    challenge:['arachne_v5_challenge','arachne_v4_challenge']
   };
   Object.entries(migrationCandidates).forEach(([name, keys]) => {
     if (localStorage.getItem(STORAGE[name])) return;
     const oldKey = keys.find(key => localStorage.getItem(key) != null);
     if (oldKey) localStorage.setItem(STORAGE[name], localStorage.getItem(oldKey));
   });
+  [['villains','arachne_v5_villains'],['villainDice','arachne_v5_villain_dice'],['villainChallenge','arachne_v5_villain_challenge']].forEach(([name, oldKey]) => {
+    if (!localStorage.getItem(STORAGE[name]) && localStorage.getItem(oldKey) != null) localStorage.setItem(STORAGE[name], localStorage.getItem(oldKey));
+  });
   if (!localStorage.getItem(STORAGE.notesPlayer)) {
-    const oldNotes = localStorage.getItem('arachne_v4_notes_player') ?? localStorage.getItem('arachne_v3_notes') ?? localStorage.getItem('arachne_notes');
+    const oldNotes = localStorage.getItem('arachne_v5_notes_player') ?? localStorage.getItem('arachne_v4_notes_player') ?? localStorage.getItem('arachne_v3_notes') ?? localStorage.getItem('arachne_notes');
     if (oldNotes != null) localStorage.setItem(STORAGE.notesPlayer, oldNotes || '');
   }
   if (!localStorage.getItem(STORAGE.notesMaster)) {
-    const oldNotes = localStorage.getItem('arachne_v4_notes_master');
+    const oldNotes = localStorage.getItem('arachne_v5_notes_master') ?? localStorage.getItem('arachne_v4_notes_master');
     if (oldNotes != null) localStorage.setItem(STORAGE.notesMaster, oldNotes || '');
   }
 
@@ -190,8 +215,8 @@
   const state = {
     role:'player', page:'home', diceMode:'d616', rolling:false, currentRoll:null,
     villainRolling:false, villainCurrentRoll:null,
-    heroes: DEFAULT_HEROES.map((fallback, i) => normalizeHero(loadedHeroes[i] || fallback, fallback)),
-    villains: DEFAULT_VILLAINS.map((fallback, i) => normalizeVillain(loadedVillains[i] || fallback, fallback)),
+    heroes: DEFAULT_HEROES.map((fallback, i) => normalizeHero((Array.isArray(loadedHeroes) ? loadedHeroes.find(item => item?.id === fallback.id) : null) || loadedHeroes[i] || fallback, fallback)),
+    villains: DEFAULT_VILLAINS.map((fallback, i) => normalizeVillain((Array.isArray(loadedVillains) ? loadedVillains.find(item => item?.id === fallback.id) : null) || fallback, fallback)),
     campaign: loadJSON(STORAGE.campaign, Object.fromEntries(SESSIONS.map(s => [s.id, 'todo']))),
     diceHistory: loadJSON(STORAGE.dice, []),
     villainDiceHistory: loadJSON(STORAGE.villainDice, []),
@@ -271,7 +296,7 @@
             <span><small>Karma</small><b>${escapeHTML(statValue(hero,'Karma'))}</b></span>
           </div>
           <div class="chips">${hero.tags.slice(0,4).map(tag => `<span class="chip">${escapeHTML(tag)}</span>`).join('')}</div>
-          <div class="card-actions"><button class="primary" type="button" data-action="view-hero" data-index="${index}">VER FICHA</button><button type="button" data-action="edit-hero" data-index="${index}">EDITAR</button></div>
+          <div class="card-actions"><button class="primary" type="button" data-action="view-hero" data-index="${index}">VER RESUMO</button><button type="button" data-action="edit-hero" data-index="${index}">EDITAR</button><button class="sheet-button" type="button" data-action="view-hero-pdf" data-index="${index}">▣ VISUALIZAR FICHA COMPLETA</button></div>
         </div>
       </article>`).join('');
     renderActorOptions();
@@ -289,7 +314,7 @@
             <div class="resource-row focus"><span><small>FOCUS</small><b>${villain.currentFocus}/${villain.maxFocus}</b></span><i><u style="width:${fpPct}%"></u></i></div>
           </div>
           <div class="chips"><span class="chip">${escapeHTML(villain.role)}</span><span class="chip">Inic. ${escapeHTML(villain.initiative)}</span></div>
-          <div class="card-actions"><button class="primary" type="button" data-action="view-villain" data-index="${index}">ABRIR FICHA</button><button type="button" data-action="edit-villain" data-index="${index}">EDITAR</button></div>
+          <div class="card-actions"><button class="primary" type="button" data-action="view-villain" data-index="${index}">VER RESUMO</button><button type="button" data-action="edit-villain" data-index="${index}">EDITAR</button><button class="sheet-button" type="button" data-action="view-villain-pdf" data-index="${index}">▣ VISUALIZAR FICHA COMPLETA</button></div>
         </div>
       </article>`;
     }).join('');
@@ -345,23 +370,45 @@
     markSaved('Progresso salvo');
   }
 
-  function openModal(html) {
+  function openModal(html, mode = 'default') {
     lastFocusedElement = document.activeElement;
     $('modalbody').innerHTML = html;
+    $('modal').querySelector('.modalbox')?.classList.toggle('pdf-modalbox', mode === 'pdf');
     $('modal').classList.remove('hidden');
     $('close').focus();
   }
   function closeModal() {
     $('modal').classList.add('hidden');
+    $('modal').querySelector('.modalbox')?.classList.remove('pdf-modalbox');
     $('modalbody').innerHTML = '';
     lastFocusedElement?.focus?.();
+  }
+
+  function safePdfPath(path) {
+    const value = String(path || '');
+    return /^assets\/pdfs\/[a-z0-9._-]+\.pdf$/i.test(value) ? value : '';
+  }
+
+  function openPdfViewer(path, title, subtitle = '') {
+    const pdf = safePdfPath(path);
+    if (!pdf) { toast('PDF não configurado para esta ficha'); return; }
+    const safeTitle = escapeHTML(title || 'Documento');
+    const safeSubtitle = escapeHTML(subtitle || 'Visualizador de PDF');
+    const src = `${pdf}#toolbar=1&navpanes=0&scrollbar=1&view=FitH`;
+    openModal(`<div class="pdf-viewer"><div class="pdf-viewer-head"><div><small>${safeSubtitle}</small><h2 id="modal-title">${safeTitle}</h2></div><div class="pdf-viewer-actions"><a href="${pdf}" target="_blank" rel="noopener">ABRIR EM NOVA GUIA</a><a href="${pdf}" download>BAIXAR PDF</a></div></div><div class="pdf-frame-wrap"><iframe class="pdf-frame" src="${src}" title="${safeTitle}"></iframe></div><p class="pdf-fallback">Se o navegador não exibir PDFs incorporados, use <b>Abrir em nova guia</b>. O arquivo continua incluído dentro do projeto e funciona também quando o site é hospedado.</p></div>`, 'pdf');
   }
 
   function viewHero(index) {
     const hero = state.heroes[index];
     if (!hero) return;
     const abilityCards = ABILITIES.map(name => `<div><small>${name}</small><b>${signed(abilityValue(hero,name))}</b></div>`).join('');
-    openModal(`<h2 id="modal-title">${escapeHTML(hero.i)} ${escapeHTML(hero.n)}</h2><p class="muted">${escapeHTML(hero.r)} · Rank ${escapeHTML(hero.rank)}</p><div class="sheet">${hero.stats.map(([name,value]) => `<div><small>${escapeHTML(name)}</small><b>${escapeHTML(value)}</b></div>`).join('')}${abilityCards}</div><h3>Traits</h3><ul>${hero.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul><h3>Tags</h3><div class="chips">${hero.tags.map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div><div class="editbuttons"><button class="savebtn" type="button" data-action="edit-hero" data-index="${index}">EDITAR FICHA</button></div>`);
+    openModal(`<h2 id="modal-title">${escapeHTML(hero.i)} ${escapeHTML(hero.n)}</h2><p class="muted">${escapeHTML(hero.r)} · Rank ${escapeHTML(hero.rank)}</p><div class="sheet">${hero.stats.map(([name,value]) => `<div><small>${escapeHTML(name)}</small><b>${escapeHTML(value)}</b></div>`).join('')}${abilityCards}</div><h3>Traits</h3><ul>${hero.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul><h3>Tags</h3><div class="chips">${hero.tags.map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div><div class="editbuttons"><button class="savebtn" type="button" data-action="view-hero-pdf" data-index="${index}">VISUALIZAR FICHA COMPLETA</button><button type="button" data-action="edit-hero" data-index="${index}">EDITAR DADOS RÁPIDOS</button></div>`);
+  }
+
+  function viewHeroPdf(index) {
+    const hero = state.heroes[index];
+    if (!hero) return;
+    openPdfViewer(hero.pdf, `${hero.n} — Ficha Completa`, `${hero.r} · Rank ${hero.rank}`);
   }
 
   function editHero(index) {
@@ -409,7 +456,17 @@
       <div class="dossier-grid"><div><h3>Perfil</h3><p><b>Ocupação:</b> ${escapeHTML(villain.occupation)}</p><p><b>Origem:</b> ${escapeHTML(villain.origin)}</p><p><b>Equipes:</b> ${escapeHTML(villain.teams)}</p><p><b>Base:</b> ${escapeHTML(villain.base)}</p></div><div><h3>Função na campanha</h3><p>${escapeHTML(villain.role)}</p><p>${escapeHTML(villain.hook)}</p><p><b>Velocidade:</b> ${escapeHTML(villain.speed)}</p></div></div>
       <h3>Poderes</h3><div class="chips power-chips">${villain.powers.map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div>
       <div class="dossier-grid"><div><h3>Traits</h3><ul>${villain.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div><div><h3>Tags</h3><ul>${villain.tags.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div></div>
-      <div class="editbuttons"><button class="savebtn" type="button" data-action="edit-villain" data-index="${index}">EDITAR FICHA</button><button type="button" data-action="roll-with-villain" data-index="${index}">ROLAR COM ESTE VILÃO</button></div>`);
+      <div class="editbuttons"><button class="savebtn" type="button" data-action="view-villain-pdf" data-index="${index}">VISUALIZAR FICHA COMPLETA</button><button type="button" data-action="edit-villain" data-index="${index}">EDITAR DADOS</button><button type="button" data-action="roll-with-villain" data-index="${index}">ROLAR COM ESTE VILÃO</button></div>`);
+  }
+
+  function viewVillainPdf(index) {
+    const villain = state.villains[index];
+    if (!villain) return;
+    openPdfViewer(villain.pdf, `${villain.n} — Ficha Completa`, `${villain.r} · Rank ${villain.rank} · ${villain.tier}`);
+  }
+
+  function viewCampaignPdf() {
+    openPdfViewer(CAMPAIGN_PDF, 'Projeto Arachne — Campanha Completa', '24 páginas · livro da campanha');
   }
 
   function editVillain(index) {
@@ -963,9 +1020,12 @@
     if (!action) return;
     const index = Number(action.dataset.index);
     if (action.dataset.action === 'view-hero') viewHero(index);
+    if (action.dataset.action === 'view-hero-pdf') viewHeroPdf(index);
     if (action.dataset.action === 'edit-hero') editHero(index);
     if (action.dataset.action === 'save-hero') saveHero(index);
     if (action.dataset.action === 'view-villain') viewVillain(index);
+    if (action.dataset.action === 'view-villain-pdf') viewVillainPdf(index);
+    if (action.dataset.action === 'view-campaign-pdf') viewCampaignPdf();
     if (action.dataset.action === 'edit-villain') editVillain(index);
     if (action.dataset.action === 'save-villain') saveVillain(index);
     if (action.dataset.action === 'adjust-villain') adjustVillain(index, action.dataset.resource, Number(action.dataset.delta));
