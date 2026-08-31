@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = 6;
+  const APP_VERSION = 7;
   const STORAGE = {
     heroes: `arachne_v${APP_VERSION}_heroes`,
     notesPlayer: `arachne_v${APP_VERSION}_notes_player`,
@@ -10,8 +10,8 @@
     dice: `arachne_v${APP_VERSION}_dice`,
     challenge: `arachne_v${APP_VERSION}_challenge`,
     villains: `arachne_v${APP_VERSION}_villains`,
-    villainDice: `arachne_v${APP_VERSION}_villain_dice`,
-    villainChallenge: `arachne_v${APP_VERSION}_villain_challenge`
+    scenario: `arachne_v${APP_VERSION}_scenario`,
+    initiative: `arachne_v${APP_VERSION}_initiative`
   };
 
   const ABILITIES = ['Melee', 'Agility', 'Resilience', 'Vigilance', 'Ego', 'Logic'];
@@ -127,11 +127,37 @@
 
   const DEFAULT_CHALLENGE = {
     action:'Ação sem título', tn:14, edge:0, trouble:0,
-    actor:'spider', ability:'Agility', extra:0
+    source:'hero', actor:'spider', threatTier:'minion', threatChoice:'minion-melee', ability:'Agility', extra:0
   };
-  const DEFAULT_VILLAIN_CHALLENGE = {
-    action:'Ação do vilão', tn:14, edge:0, trouble:0,
-    actor:'octopus', ability:'Melee', extra:0
+
+
+
+  // v7 — biblioteca privada de ameaças. Só é renderizada quando o perfil Mestre está ativo.
+  const MINION_TEMPLATES = {
+    'minion-melee': {id:'minion-melee', n:'Capanga · Curta distância', i:'◆', abilities:{Melee:2,Agility:1,Resilience:2,Vigilance:1,Ego:0,Logic:0}, initiative:'+1', damage:{Melee:[2,2],Agility:[1,1],Ego:[1,0],Logic:[1,0]}},
+    'minion-ranged': {id:'minion-ranged', n:'Capanga · Longo alcance', i:'◇', abilities:{Melee:1,Agility:2,Resilience:1,Vigilance:2,Ego:0,Logic:0}, initiative:'+2', damage:{Melee:[1,1],Agility:[2,2],Ego:[1,0],Logic:[1,0]}},
+    'minion-support': {id:'minion-support', n:'Capanga · Suporte', i:'✦', abilities:{Melee:0,Agility:1,Resilience:1,Vigilance:2,Ego:1,Logic:2}, initiative:'+2', damage:{Melee:[1,0],Agility:[1,1],Ego:[1,1],Logic:[2,2]}}
+  };
+
+  const DAMAGE_PROFILES = {
+    spider:{Melee:[5,5],Agility:[4,7],Ego:[4,0],Logic:[5,4]},
+    wolverine:{Melee:[5,7],Agility:[5,2],Ego:[4,1],Logic:[4,1]},
+    cap:{Melee:[5,6],Agility:[5,4],Ego:[4,2],Logic:[4,2]},
+    octopus:{Melee:[6,4],Agility:[4,3],Ego:[4,4],Logic:[6,5]},
+    sabretooth:{Melee:[5,7],Agility:[4,4],Ego:[4,0],Logic:[4,0]},
+    crossbones:{Melee:[3,4],Agility:[5,5],Ego:[3,0],Logic:[3,1]},
+    goblin:{Melee:[6,5],Agility:[5,5],Ego:[4,1],Logic:[4,3]},
+    'hydra-agent':{Melee:[1,1],Agility:[1,1],Ego:[1,1],Logic:[1,0]},
+    'aim-agent':{Melee:[1,0],Agility:[2,1],Ego:[1,1],Logic:[2,3]},
+    sinister:{Melee:[7,3],Agility:[5,3],Ego:[5,2],Logic:[7,7]}
+  };
+
+  const DEFAULT_SCENARIO = {
+    preset:'empty', selectedTool:'select', selectedPiece:null, obstacles:{}, pieces:[
+      {id:'hero-spider',kind:'hero',name:'Homem-Aranha',short:'HA',color:'#ef4444',x:2,y:7},
+      {id:'hero-wolverine',kind:'hero',name:'Wolverine',short:'W',color:'#facc15',x:3,y:8},
+      {id:'hero-cap',kind:'hero',name:'Capitão América',short:'CA',color:'#3b82f6',x:1,y:8}
+    ]
   };
 
   const MASTER_PASSWORD = 'ARACHNE';
@@ -154,29 +180,29 @@
   }
   function saveJSON(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 
-  // Migração v5 -> v6 (com fallbacks anteriores). Não sobrescreve dados existentes na v6.
+  // Migração v6 -> v7 (com fallbacks anteriores). Não sobrescreve dados existentes na v7.
   const migrationCandidates = {
-    heroes:['arachne_v5_heroes','arachne_v4_heroes','arachne_v3_heroes'],
-    campaign:['arachne_v5_campaign','arachne_v4_campaign','arachne_v3_campaign'],
-    dice:['arachne_v5_dice','arachne_v4_dice','arachne_v3_dice'],
-    challenge:['arachne_v5_challenge','arachne_v4_challenge']
+    heroes:['arachne_v6_heroes','arachne_v5_heroes','arachne_v4_heroes','arachne_v3_heroes'],
+    campaign:['arachne_v6_campaign','arachne_v5_campaign','arachne_v4_campaign','arachne_v3_campaign'],
+    dice:['arachne_v6_dice','arachne_v5_dice','arachne_v4_dice','arachne_v3_dice'],
+    challenge:['arachne_v6_challenge','arachne_v5_challenge','arachne_v4_challenge']
   };
   Object.entries(migrationCandidates).forEach(([name, keys]) => {
     if (localStorage.getItem(STORAGE[name])) return;
     const oldKey = keys.find(key => localStorage.getItem(key) != null);
     if (oldKey) localStorage.setItem(STORAGE[name], localStorage.getItem(oldKey));
   });
-  [['villains','arachne_v5_villains'],['villainDice','arachne_v5_villain_dice'],['villainChallenge','arachne_v5_villain_challenge']].forEach(([name, oldKey]) => {
-    if (!localStorage.getItem(STORAGE[name]) && localStorage.getItem(oldKey) != null) localStorage.setItem(STORAGE[name], localStorage.getItem(oldKey));
-  });
+  if (!localStorage.getItem(STORAGE.villains) && localStorage.getItem('arachne_v6_villains') != null) localStorage.setItem(STORAGE.villains, localStorage.getItem('arachne_v6_villains'));
   if (!localStorage.getItem(STORAGE.notesPlayer)) {
-    const oldNotes = localStorage.getItem('arachne_v5_notes_player') ?? localStorage.getItem('arachne_v4_notes_player') ?? localStorage.getItem('arachne_v3_notes') ?? localStorage.getItem('arachne_notes');
+    const oldNotes = localStorage.getItem('arachne_v6_notes_player') ?? localStorage.getItem('arachne_v5_notes_player') ?? localStorage.getItem('arachne_v4_notes_player') ?? localStorage.getItem('arachne_v3_notes') ?? localStorage.getItem('arachne_notes');
     if (oldNotes != null) localStorage.setItem(STORAGE.notesPlayer, oldNotes || '');
   }
   if (!localStorage.getItem(STORAGE.notesMaster)) {
-    const oldNotes = localStorage.getItem('arachne_v5_notes_master') ?? localStorage.getItem('arachne_v4_notes_master');
+    const oldNotes = localStorage.getItem('arachne_v6_notes_master') ?? localStorage.getItem('arachne_v5_notes_master') ?? localStorage.getItem('arachne_v4_notes_master');
     if (oldNotes != null) localStorage.setItem(STORAGE.notesMaster, oldNotes || '');
   }
+  if (!localStorage.getItem(STORAGE.scenario) && localStorage.getItem('arachne_v6_scenario') != null) localStorage.setItem(STORAGE.scenario, localStorage.getItem('arachne_v6_scenario'));
+  if (!localStorage.getItem(STORAGE.initiative) && localStorage.getItem('arachne_v6_initiative') != null) localStorage.setItem(STORAGE.initiative, localStorage.getItem('arachne_v6_initiative'));
 
   function normalizeHero(hero, fallback) {
     const out = {...clone(fallback), ...hero};
@@ -214,14 +240,13 @@
   const loadedVillains = loadJSON(STORAGE.villains, DEFAULT_VILLAINS);
   const state = {
     role:'player', page:'home', diceMode:'d616', rolling:false, currentRoll:null,
-    villainRolling:false, villainCurrentRoll:null,
     heroes: DEFAULT_HEROES.map((fallback, i) => normalizeHero((Array.isArray(loadedHeroes) ? loadedHeroes.find(item => item?.id === fallback.id) : null) || loadedHeroes[i] || fallback, fallback)),
     villains: DEFAULT_VILLAINS.map((fallback, i) => normalizeVillain((Array.isArray(loadedVillains) ? loadedVillains.find(item => item?.id === fallback.id) : null) || fallback, fallback)),
     campaign: loadJSON(STORAGE.campaign, Object.fromEntries(SESSIONS.map(s => [s.id, 'todo']))),
     diceHistory: loadJSON(STORAGE.dice, []),
-    villainDiceHistory: loadJSON(STORAGE.villainDice, []),
     challenge: {...DEFAULT_CHALLENGE, ...loadJSON(STORAGE.challenge, DEFAULT_CHALLENGE)},
-    villainChallenge: {...DEFAULT_VILLAIN_CHALLENGE, ...loadJSON(STORAGE.villainChallenge, DEFAULT_VILLAIN_CHALLENGE)}
+    scenario: {...clone(DEFAULT_SCENARIO), ...loadJSON(STORAGE.scenario, DEFAULT_SCENARIO)},
+    initiativeParticipants: loadJSON(STORAGE.initiative, [])
   };
   saveJSON(STORAGE.heroes, state.heroes);
   saveJSON(STORAGE.villains, state.villains);
@@ -271,12 +296,12 @@
   }
 
   function goToPage(id) {
-    if ((id === 'home' || id === 'villains' || id === 'villain-dice' || id === 'campaign') && state.role !== 'master') id = 'heroes';
+    if ((id === 'home' || id === 'villains' || id === 'campaign' || id === 'dice' || id === 'scenario') && state.role !== 'master') id = 'heroes';
     state.page = id;
     qsa('.page').forEach(el => el.classList.remove('active'));
     $(id)?.classList.add('active');
     qsa('#nav button').forEach(el => el.classList.toggle('active', el.dataset.page === id));
-    $('title').textContent = {home:'Central da Campanha',heroes:'Heróis',villains:'Vilões',campaign:'Projeto Arachne',dice:'Dados dos Heróis','villain-dice':'Dados dos Vilões',notes:'Anotações'}[id] || 'Projeto Arachne';
+    $('title').textContent = {home:'Central da Campanha',heroes:'Heróis',villains:'Vilões',campaign:'Projeto Arachne',dice:'Dados do Mestre',scenario:'Montador de Cenário',notes:'Anotações'}[id] || 'Projeto Arachne';
     closeNav();
   }
 
@@ -500,7 +525,7 @@
     villain.occupation = $('v-e-occupation').value.trim(); villain.origin = $('v-e-origin').value.trim(); villain.teams = $('v-e-teams').value.trim(); villain.base = $('v-e-base').value.trim(); villain.role = $('v-e-role').value.trim(); villain.hook = $('v-e-hook').value.trim();
     ABILITIES.forEach(name => { villain.abilities[name] = clamp($(`v-e-ability-${name}`).value,-20,30); });
     villain.powers = $('v-e-powers').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,60); villain.traits = $('v-e-traits').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,40); villain.tags = $('v-e-tags').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,40);
-    saveJSON(STORAGE.villains,state.villains); renderVillains(); syncVillainChallengeInputs(); closeModal(); markSaved('Vilão salvo'); toast('Ficha do vilão atualizada');
+    saveJSON(STORAGE.villains,state.villains); renderVillains(); renderChallengeSummary(); renderDamageSelectors(); renderInitiativeThreatPicker(); renderScenarioThreatPicker(); closeModal(); markSaved('Vilão salvo'); toast('Ficha do vilão atualizada');
   }
 
   function adjustVillain(index, resource, delta) {
@@ -512,37 +537,81 @@
 
   function rollWithVillain(index) {
     const villain = state.villains[index]; if (!villain) return;
-    state.villainChallenge.actor = villain.id;
-    saveJSON(STORAGE.villainChallenge, state.villainChallenge);
-    closeModal(); syncVillainChallengeInputs(); goToPage('villain-dice');
+    state.challenge.source = 'threat';
+    state.challenge.threatTier = ['hydra-agent','aim-agent'].includes(villain.id) ? 'special' : 'main';
+    state.challenge.threatChoice = villain.id;
+    state.challenge.ability = 'Melee';
+    saveJSON(STORAGE.challenge, state.challenge);
+    closeModal(); syncChallengeInputs(); setMasterDiceTab('d616'); goToPage('dice');
   }
 
   // -------------------- D616
 
   // -------------------- D616 --------------------
+  function threatOptions(tier) {
+    if (tier === 'minion') return Object.values(MINION_TEMPLATES);
+    if (tier === 'special') return state.villains.filter(v => ['hydra-agent','aim-agent'].includes(v.id));
+    return state.villains.filter(v => !['hydra-agent','aim-agent'].includes(v.id));
+  }
+
+  function resolveThreat(tier, id) {
+    if (tier === 'minion') return MINION_TEMPLATES[id] || MINION_TEMPLATES['minion-melee'];
+    return state.villains.find(v => v.id === id) || threatOptions(tier)[0] || MINION_TEMPLATES['minion-melee'];
+  }
+
+  function fillThreatSelect(select, tier, current) {
+    if (!select) return '';
+    const options = threatOptions(tier);
+    select.innerHTML = options.map(item => `<option value="${escapeHTML(item.id)}">${escapeHTML(item.n)}</option>`).join('');
+    const valid = options.some(item => item.id === current) ? current : (options[0]?.id || '');
+    select.value = valid;
+    return valid;
+  }
+
   function renderActorOptions() {
     const select = $('roll-actor');
     if (!select) return;
     const current = state.challenge.actor;
     select.innerHTML = state.heroes.map(hero => `<option value="${escapeHTML(hero.id)}">${escapeHTML(hero.n)}</option>`).join('');
     if (state.heroes.some(h => h.id === current)) select.value = current;
-    else {
-      state.challenge.actor = state.heroes[0]?.id || '';
-      select.value = state.challenge.actor;
-    }
+    else { state.challenge.actor = state.heroes[0]?.id || ''; select.value = state.challenge.actor; }
   }
 
   function activeHero() { return state.heroes.find(hero => hero.id === state.challenge.actor) || state.heroes[0]; }
+  function activeRollEntity() {
+    if (state.challenge.source === 'threat') return resolveThreat(state.challenge.threatTier, state.challenge.threatChoice);
+    return activeHero();
+  }
+
+  function syncThreatPicker(prefix, tier, choice) {
+    const tierEl = $(`${prefix}-threat-tier`);
+    const choiceEl = $(`${prefix}-threat-choice`);
+    if (tierEl) tierEl.value = tier;
+    return fillThreatSelect(choiceEl, tier, choice);
+  }
 
   function syncChallengeInputs() {
     renderActorOptions();
+    state.challenge.source = state.challenge.source === 'threat' ? 'threat' : 'hero';
+    state.challenge.threatTier = ['minion','special','main'].includes(state.challenge.threatTier) ? state.challenge.threatTier : 'minion';
     $('action-name').value = state.challenge.action || 'Ação sem título';
     $('target-number').value = clamp(state.challenge.tn,1,99);
+    $('roll-source').value = state.challenge.source;
+    $('threat-tier').value = state.challenge.threatTier;
+    state.challenge.threatChoice = fillThreatSelect($('threat-choice'), state.challenge.threatTier, state.challenge.threatChoice);
     $('roll-ability').value = ABILITIES.includes(state.challenge.ability) ? state.challenge.ability : 'Agility';
     $('extra-modifier').value = clamp(state.challenge.extra,-30,30);
     $('edge-count').value = clamp(state.challenge.edge,0,6);
     $('trouble-count').value = clamp(state.challenge.trouble,0,6);
+    toggleChallengeSourceFields();
     renderChallengeSummary();
+  }
+
+  function toggleChallengeSourceFields() {
+    const threat = state.challenge.source === 'threat';
+    $('hero-roll-field')?.classList.toggle('hidden', threat);
+    $('threat-tier-field')?.classList.toggle('hidden', !threat);
+    $('threat-choice-field')?.classList.toggle('hidden', !threat);
   }
 
   function effectiveAdvantage() {
@@ -552,14 +621,14 @@
   }
 
   function renderChallengeSummary() {
-    const hero = activeHero();
+    const actor = activeRollEntity();
     const ability = ABILITIES.includes(state.challenge.ability) ? state.challenge.ability : 'Agility';
-    const mod = abilityValue(hero, ability);
+    const mod = abilityValue(actor, ability);
     const adv = effectiveAdvantage();
     $('challenge-title').textContent = state.challenge.action || 'Ação sem título';
     $('challenge-badge').textContent = `TN ${clamp(state.challenge.tn,1,99)}`;
     $('ability-modifier').textContent = signed(mod);
-    $('challenge-actor').textContent = `${hero?.n || 'Personagem'} · ${ability} ${signed(mod)} · extra ${signed(state.challenge.extra)}`;
+    $('challenge-actor').textContent = `${actor?.n || 'Personagem'} · ${ability} ${signed(mod)} · extra ${signed(state.challenge.extra)}`;
     const status = adv.netEdge ? `EDGE ×${adv.netEdge}` : adv.netTrouble ? `TROUBLE ×${adv.netTrouble}` : 'SEM EDGE / TROUBLE';
     $('advantage-state').textContent = status;
     $('advantage-state').className = adv.netEdge ? 'edge' : adv.netTrouble ? 'trouble' : '';
@@ -572,27 +641,35 @@
   function saveChallengeFromControls() {
     state.challenge.action = $('action-name').value.trim() || 'Ação sem título';
     state.challenge.tn = clamp($('target-number').value,1,99);
+    state.challenge.source = $('roll-source').value === 'threat' ? 'threat' : 'hero';
     state.challenge.actor = $('roll-actor').value;
+    state.challenge.threatTier = $('threat-tier').value;
+    state.challenge.threatChoice = $('threat-choice').value;
     state.challenge.ability = $('roll-ability').value;
     state.challenge.extra = clamp($('extra-modifier').value,-30,30);
     state.challenge.edge = clamp($('edge-count').value,0,6);
     state.challenge.trouble = clamp($('trouble-count').value,0,6);
     saveJSON(STORAGE.challenge, state.challenge);
+    toggleChallengeSourceFields();
     renderChallengeSummary();
     markSaved('Desafio salvo');
     clearCurrentRollVisual(false);
   }
 
-  function setDiceMode(mode) {
-    state.diceMode = mode;
-    qsa('[data-dice-mode]').forEach(button => {
-      const active = button.dataset.diceMode === mode;
+  function setMasterDiceTab(mode) {
+    const allowed = ['d616','generic','damage','initiative'];
+    const next = allowed.includes(mode) ? mode : 'd616';
+    state.diceMode = next;
+    qsa('[data-master-dice-tab]').forEach(button => {
+      const active = button.dataset.masterDiceTab === next;
       button.classList.toggle('active', active);
       button.setAttribute('aria-selected', String(active));
     });
-    $('d616-panel').classList.toggle('active', mode === 'd616');
-    $('generic-panel').classList.toggle('active', mode === 'generic');
+    allowed.forEach(name => $(`master-dice-${name}`)?.classList.toggle('active', name === next));
   }
+
+  // Compatibilidade com a v6: chamadas antigas passam a abrir as quatro abas novas.
+  function setDiceMode(mode) { setMasterDiceTab(mode === 'generic' ? 'generic' : 'd616'); }
 
   const ROTATIONS = {
     1:'rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
@@ -737,12 +814,12 @@
   async function rollD616() {
     if (state.rolling) return;
     saveChallengeFromControls();
-    const hero = activeHero();
+    const actor = activeRollEntity();
     const adv = effectiveAdvantage();
     const snapshot = {
       action:state.challenge.action, tn:state.challenge.tn, edge:state.challenge.edge, trouble:state.challenge.trouble,
-      actorId:hero?.id || '', actorName:hero?.n || 'Personagem', ability:state.challenge.ability,
-      abilityMod:abilityValue(hero,state.challenge.ability), extra:state.challenge.extra,
+      actorId:actor?.id || '', actorName:actor?.n || 'Personagem', ability:state.challenge.ability,
+      abilityMod:abilityValue(actor,state.challenge.ability), extra:state.challenge.extra,
       netEdge:adv.netEdge, netTrouble:adv.netTrouble
     };
     const roll = {
@@ -831,69 +908,242 @@
     }).join('');
   }
 
-  function rollGeneric() {
+  function polyDieHTML(sides, value = '?', rolling = false, index = 0) {
+    const klass = `poly-die d${sides}${rolling ? ' rolling' : ''}`;
+    return `<div class="${klass}" style="--delay:${index * 55}ms" aria-label="d${sides}: ${escapeHTML(value)}"><span>${escapeHTML(value)}</span><small>d${sides}</small></div>`;
+  }
+
+  async function rollGeneric() {
     const sides = clamp($('die').value,2,1000);
-    const quantity = clamp($('qty').value,1,20);
+    const quantity = clamp($('qty').value,1,12);
+    const modifier = clamp($('generic-mod').value,-99,99);
     $('qty').value = quantity;
+    const stage = $('generic-dice-stage');
+    stage.innerHTML = Array.from({length:quantity},(_,i)=>polyDieHTML(sides,'?',true,i)).join('');
+    $('generic-result').textContent = '…';
+    $('generic-detail').textContent = `Rolando ${quantity}d${sides}${modifier ? ` ${signed(modifier)}` : ''}...`;
+    await sleep(reducedMotion() ? 50 : 720 + Math.min(quantity,8)*55);
     const values = Array.from({length:quantity},() => rand(sides));
-    const total = values.reduce((sum,value)=>sum+value,0);
-    const result = $('generic-result');
-    const totalEl = result.querySelector('strong');
-    totalEl.textContent = '…';
-    result.classList.add('pulse');
-    setTimeout(() => {
-      totalEl.textContent = total;
-      $('generic-detail').textContent = `${quantity}d${sides} → [${values.join(', ')}]`;
-      result.classList.remove('pulse');
-      addHistory({type:'GEN',label:`${quantity}d${sides}`,detail:`[${values.join(', ')}]`,total,at:Date.now()});
-    }, reducedMotion() ? 10 : 180);
+    stage.innerHTML = values.map((value,i)=>polyDieHTML(sides,value,false,i)).join('');
+    const raw = values.reduce((sum,value)=>sum+value,0);
+    const total = raw + modifier;
+    $('generic-result').textContent = total;
+    $('generic-detail').textContent = `${quantity}d${sides} → [${values.join(', ')}]${modifier ? ` ${signed(modifier)} mod.` : ''} = ${total}`;
+    addHistory({type:'GEN',label:`${quantity}d${sides}`,detail:`[${values.join(', ')}]${modifier ? ` ${signed(modifier)}` : ''}`,total,at:Date.now()});
+  }
+
+  // -------------------- v7 · Dano com Marvel Die --------------------
+  function renderDamageSelectors() {
+    if (!$('damage-hero')) return;
+    $('damage-hero').innerHTML = state.heroes.map(h=>`<option value="${escapeHTML(h.id)}">${escapeHTML(h.n)}</option>`).join('');
+    if (!$('damage-hero').value) $('damage-hero').value = state.heroes[0]?.id || '';
+    syncThreatPicker('damage', $('damage-threat-tier').value || 'minion', $('damage-threat-choice').value || 'minion-melee');
+    toggleDamageSourceFields();
+    applyDamageProfile(false);
+  }
+
+  function toggleDamageSourceFields() {
+    const source = $('damage-source')?.value || 'hero';
+    $('damage-hero-field')?.classList.toggle('hidden', source !== 'hero');
+    $('damage-threat-tier-field')?.classList.toggle('hidden', source !== 'threat');
+    $('damage-threat-choice-field')?.classList.toggle('hidden', source !== 'threat');
+  }
+
+  function damageEntity() {
+    const source = $('damage-source')?.value || 'hero';
+    if (source === 'hero') return state.heroes.find(h=>h.id===$('damage-hero').value) || state.heroes[0];
+    if (source === 'threat') return resolveThreat($('damage-threat-tier').value, $('damage-threat-choice').value);
+    return null;
+  }
+
+  function damageProfileFor(entity, profile) {
+    if (!entity) return null;
+    if (MINION_TEMPLATES[entity.id]?.damage?.[profile]) return MINION_TEMPLATES[entity.id].damage[profile];
+    return DAMAGE_PROFILES[entity.id]?.[profile] || null;
+  }
+
+  function applyDamageProfile(showToast = true) {
+    if (!$('damage-multiplier')) return;
+    const entity = damageEntity();
+    const profile = $('damage-profile').value;
+    const values = damageProfileFor(entity, profile);
+    if (!values) {
+      if (showToast) toast('Esse perfil não tem dano pré-configurado. Ajuste manualmente.');
+      updateDamageFormula();
+      return;
+    }
+    $('damage-multiplier').value = values[0];
+    $('damage-bonus').value = values[1];
+    updateDamageFormula();
+    if (showToast) toast(`Dano de ${entity.n} carregado`);
+  }
+
+  function updateDamageFormula() {
+    if (!$('damage-formula')) return;
+    const mult = clamp($('damage-multiplier').value,0,30);
+    const bonus = clamp($('damage-bonus').value,-99,99);
+    const reduction = clamp($('damage-reduction').value,0,20);
+    const mode = $('damage-mode').value;
+    const effective = Math.max(0,mult-reduction);
+    $('damage-formula').textContent = `Marvel × ${mult}${bonus ? ` ${signed(bonus)}` : ' + 0'}${reduction ? ` · RED ${reduction} → ×${effective}` : ''}${mode==='fantastic'?' · ×2 Fantastic':''}`;
+  }
+
+  function setStandaloneCubeValue(cube, value) {
+    if (!cube) return;
+    cube.dataset.value = value;
+    cube.style.transform = ROTATIONS[value] || ROTATIONS[1];
+  }
+
+  async function animateStandaloneCube(cube, duration=760) {
+    if (!cube) return;
+    const ms = reducedMotion()?60:duration;
+    cube.style.setProperty('--spin-x',`${720+rand(4)*360}deg`);
+    cube.style.setProperty('--spin-y',`${720+rand(5)*360}deg`);
+    cube.style.setProperty('--spin-z',`${rand(3)*180}deg`);
+    cube.style.setProperty('--roll-duration',`${ms}ms`);
+    cube.classList.remove('rolling'); void cube.offsetWidth; cube.classList.add('rolling');
+    await sleep(ms); cube.classList.remove('rolling');
+  }
+
+  async function rollDamage() {
+    const cube = $('damage-cube');
+    $('roll-damage').disabled = true;
+    await animateStandaloneCube(cube,820);
+    const face = rand(6);
+    setStandaloneCubeValue(cube,face);
+    const marvel = face === 1 ? 6 : face;
+    const mult = clamp($('damage-multiplier').value,0,30);
+    const bonus = clamp($('damage-bonus').value,-99,99);
+    const reduction = clamp($('damage-reduction').value,0,20);
+    const effectiveMult = Math.max(0,mult-reduction);
+    let total = marvel * effectiveMult + bonus;
+    if ($('damage-mode').value === 'fantastic') total *= 2;
+    total = Math.max(0,total);
+    const entity = damageEntity();
+    $('damage-total').textContent = total;
+    $('damage-detail').textContent = `${face===1?'M (vale 6)':face} × ${effectiveMult} ${bonus?signed(bonus):'+0'}${$('damage-mode').value==='fantastic'?' · dobrado':''} = ${total}${entity?` · ${entity.n}`:''}`;
+    $('roll-damage').disabled = false;
+    addHistory({type:'DMG',label:`Dano · ${entity?.n || 'Personalizado'}`,detail:$('damage-detail').textContent,total,at:Date.now()});
+  }
+
+  // -------------------- v7 · Iniciativa com 1 Marvel Die --------------------
+  function initModifierFromEntity(entity) {
+    if (!entity) return 0;
+    const raw = String(entity.initiative ?? entity.abilities?.Vigilance ?? 0);
+    const match = raw.match(/[+-]?\d+/);
+    return match ? Number(match[0]) : Number(entity.abilities?.Vigilance || 0);
+  }
+
+  function saveInitiativeParticipants() { saveJSON(STORAGE.initiative,state.initiativeParticipants); }
+
+  function renderInitiativeThreatPicker() {
+    if (!$('init-threat-tier')) return;
+    fillThreatSelect($('init-threat-choice'),$('init-threat-tier').value||'minion',$('init-threat-choice').value);
+  }
+
+  function addInitiativeParticipant(entity, nameOverride='') {
+    if (!entity) return;
+    const baseName = nameOverride || entity.n || 'Participante';
+    const sameCount = state.initiativeParticipants.filter(p=>p.baseId===entity.id).length;
+    state.initiativeParticipants.push({id:`init-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,baseId:entity.id,name:sameCount?`${baseName} ${sameCount+1}`:baseName,modifier:initModifierFromEntity(entity),result:null,face:null});
+    saveInitiativeParticipants(); renderInitiativeParticipants();
+  }
+
+  function renderInitiativeParticipants() {
+    const wrap=$('initiative-participants'); if(!wrap)return;
+    if(!state.initiativeParticipants.length){wrap.innerHTML='<div class="history-empty">Nenhum participante adicionado.</div>';return;}
+    wrap.innerHTML=state.initiativeParticipants.map((p,i)=>`<div class="initiative-row"><span class="initiative-index">${i+1}</span><input data-init-name="${i}" value="${escapeHTML(p.name)}" maxlength="50" aria-label="Nome do participante"><label>MOD <input data-init-mod="${i}" type="number" min="-20" max="30" value="${escapeHTML(p.modifier)}"></label><span class="initiative-last">${p.result==null?'—':`${p.face===1?'M':p.face} ${signed(p.modifier)} = ${p.result}`}</span><button type="button" data-init-remove="${i}" aria-label="Remover ${escapeHTML(p.name)}">×</button></div>`).join('');
+  }
+
+  async function rollInitiative() {
+    if(!state.initiativeParticipants.length)return toast('Adicione pelo menos um participante');
+    const cube=$('initiative-cube'); $('roll-initiative').disabled=true;
+    const results=[];
+    for(let i=0;i<state.initiativeParticipants.length;i++){
+      const p=state.initiativeParticipants[i];
+      $('initiative-current').textContent=`Rolando para ${p.name}...`;
+      await animateStandaloneCube(cube,reducedMotion()?50:430);
+      const face=rand(6); setStandaloneCubeValue(cube,face);
+      const score=(face===1?6:face)+Number(p.modifier||0);
+      p.face=face;p.result=score;results.push({...p});
+      renderInitiativeParticipants();
+      if(!reducedMotion())await sleep(100);
+    }
+    results.sort((a,b)=>b.result-a.result || b.modifier-a.modifier || a.name.localeCompare(b.name));
+    const top=results[0]?.result;
+    const tied=results.filter(r=>r.result===top).length>1;
+    $('initiative-current').textContent=tied?`Empate no topo: ${top}`:`${results[0].name} começa com ${top}`;
+    $('initiative-order').innerHTML=results.map((r,i)=>`<div class="initiative-order-row ${i===0?'winner':''}"><span>${i+1}</span><div><b>${escapeHTML(r.name)}</b><small>${r.face===1?'Marvel M = 6':`Marvel ${r.face}`} ${signed(r.modifier)}</small></div><strong>${r.result}</strong></div>`).join('')+(tied?'<p class="initiative-tie">Empate no topo: ajuste um modificador ou role novamente para desempatar.</p>':'');
+    saveInitiativeParticipants(); $('roll-initiative').disabled=false;
+  }
+
+  // -------------------- v7 · Montador de cenário --------------------
+  const BOARD_W=12, BOARD_H=10;
+  const OBSTACLE_META={wall:{icon:'▰',label:'Parede'},crate:{icon:'▣',label:'Caixa'},terminal:{icon:'⌨',label:'Terminal'},barrel:{icon:'●',label:'Barril'},door:{icon:'▯',label:'Porta'}};
+  const SCENARIO_PRESETS={
+    empty:[],
+    lab:[['wall',5,1],['wall',5,2],['wall',5,3],['door',5,4],['wall',5,5],['terminal',8,2],['terminal',9,2],['crate',8,6],['crate',9,6],['barrel',7,6]],
+    hydra:[['wall',3,2],['wall',4,2],['wall',5,2],['door',6,2],['wall',7,2],['wall',8,2],['crate',3,6],['crate',4,6],['crate',8,5],['barrel',9,5],['terminal',10,2]],
+    rooftop:[['wall',1,1],['wall',2,1],['wall',3,1],['wall',8,1],['wall',9,1],['wall',10,1],['crate',5,4],['crate',6,4],['barrel',10,7],['door',0,8]],
+    madripoor:[['wall',4,1],['wall',4,2],['wall',4,3],['door',4,4],['wall',4,5],['wall',4,6],['terminal',8,1],['terminal',9,1],['crate',7,5],['crate',8,5],['barrel',9,5],['wall',10,7]]
+  };
+
+  function scenarioCellKey(x,y){return `${x},${y}`;}
+  function normalizeScenario(){
+    if(!state.scenario||typeof state.scenario!=='object')state.scenario=clone(DEFAULT_SCENARIO);
+    if(!Array.isArray(state.scenario.pieces))state.scenario.pieces=clone(DEFAULT_SCENARIO.pieces);
+    if(!state.scenario.obstacles||typeof state.scenario.obstacles!=='object')state.scenario.obstacles={};
+    const heroIds=new Set(state.scenario.pieces.filter(p=>p.kind==='hero').map(p=>p.id));
+    DEFAULT_SCENARIO.pieces.forEach(h=>{if(!heroIds.has(h.id))state.scenario.pieces.push(clone(h));});
+  }
+  function saveScenario(){saveJSON(STORAGE.scenario,state.scenario);markSaved('Cenário salvo');}
+  function renderScenarioThreatPicker(){if(!$('scenario-threat-tier'))return;fillThreatSelect($('scenario-threat-choice'),$('scenario-threat-tier').value||'minion',$('scenario-threat-choice').value);}
+  function scenarioPieceAt(x,y){return state.scenario.pieces.find(p=>p.x===x&&p.y===y);}
+  function renderScenario(){
+    const board=$('scenario-board');if(!board)return;normalizeScenario();
+    board.innerHTML='';
+    for(let y=0;y<BOARD_H;y++)for(let x=0;x<BOARD_W;x++){
+      const cell=document.createElement('button');cell.type='button';cell.className=`scenario-cell ${(x+y)%2?'cell-dark':'cell-light'}`;cell.dataset.x=x;cell.dataset.y=y;cell.setAttribute('role','gridcell');
+      const obs=state.scenario.obstacles[scenarioCellKey(x,y)];const piece=scenarioPieceAt(x,y);
+      if(obs&&OBSTACLE_META[obs]){cell.classList.add('has-obstacle',`obstacle-${obs}`);cell.innerHTML=`<span class="obstacle-token" title="${OBSTACLE_META[obs].label}">${OBSTACLE_META[obs].icon}</span>`;}
+      if(piece){cell.classList.add('has-piece');cell.innerHTML+=`<span class="board-piece ${piece.kind==='hero'?'hero-piece':'enemy-piece'}" style="--piece:${escapeHTML(piece.color)}" title="${escapeHTML(piece.name)}">${escapeHTML(piece.short||'E')}</span>`;if(state.scenario.selectedPiece===piece.id)cell.classList.add('selected');}
+      board.appendChild(cell);
+    }
+    $('scenario-count').textContent=`${state.scenario.pieces.length} peças`;
+    if ($('scenario-preset')) $('scenario-preset').value = state.scenario.preset || 'empty';
+    const selected=state.scenario.pieces.find(p=>p.id===state.scenario.selectedPiece);
+    $('scenario-selection').textContent=selected?`Selecionado: ${selected.name}. Clique em uma casa livre para mover.`:state.scenario.selectedTool!=='select'?`Ferramenta: ${OBSTACLE_META[state.scenario.selectedTool]?.label||'Apagar'}. Clique na grade.`:'Selecione uma peça ou ferramenta.';
+    qsa('[data-obstacle]').forEach(b=>b.classList.toggle('active',b.dataset.obstacle===state.scenario.selectedTool));
+  }
+  function applyScenarioPreset(){
+    const preset=$('scenario-preset').value;state.scenario.preset=preset;state.scenario.obstacles={};
+    (SCENARIO_PRESETS[preset]||[]).forEach(([type,x,y])=>state.scenario.obstacles[scenarioCellKey(x,y)]=type);
+    // reposiciona somente heróis, preservando inimigos para não destruir o encontro já montado.
+    const heroPos={spider:[1,8],wolverine:[2,8],cap:[1,7]};
+    state.scenario.pieces.forEach(p=>{if(p.id==='hero-spider')[p.x,p.y]=heroPos.spider;else if(p.id==='hero-wolverine')[p.x,p.y]=heroPos.wolverine;else if(p.id==='hero-cap')[p.x,p.y]=heroPos.cap;});
+    saveScenario();renderScenario();toast('Modelo de cenário aplicado');
+  }
+  function firstFreeScenarioCell(seed=0){
+    const spots=[];for(let y=0;y<BOARD_H;y++)for(let x=0;x<BOARD_W;x++)if(!scenarioPieceAt(x,y)&&!state.scenario.obstacles[scenarioCellKey(x,y)])spots.push({x,y});
+    return spots.length?spots[Math.min(seed,spots.length-1)]:null;
+  }
+  function addScenarioEnemies(){
+    const tier=$('scenario-threat-tier').value,choice=$('scenario-threat-choice').value,entity=resolveThreat(tier,choice),qty=clamp($('scenario-enemy-qty').value,1,30),color=$('scenario-enemy-color').value||'#7c3aed';
+    for(let i=0;i<qty;i++){const cell=firstFreeScenarioCell(Math.max(0,20-i));if(!cell)break;state.scenario.pieces.push({id:`enemy-${Date.now()}-${i}-${Math.random().toString(36).slice(2,5)}`,kind:'enemy',baseId:entity.id,name:qty>1?`${entity.n} ${i+1}`:entity.n,short:tier==='main'?'V':tier==='special'?'CE':'E',color,x:cell.x,y:cell.y});}
+    saveScenario();renderScenario();toast(`${qty} inimigo${qty===1?'':'s'} adicionado${qty===1?'':'s'}`);
+  }
+  function handleScenarioCell(cell){
+    const x=Number(cell.dataset.x),y=Number(cell.dataset.y),piece=scenarioPieceAt(x,y),tool=state.scenario.selectedTool||'select';
+    if(tool!=='select'){
+      if(tool==='erase'){delete state.scenario.obstacles[scenarioCellKey(x,y)];if(piece?.kind==='enemy')state.scenario.pieces=state.scenario.pieces.filter(p=>p.id!==piece.id);}
+      else if(!piece)state.scenario.obstacles[scenarioCellKey(x,y)]=tool;
+      saveScenario();renderScenario();return;
+    }
+    if(piece){state.scenario.selectedPiece=state.scenario.selectedPiece===piece.id?null:piece.id;renderScenario();return;}
+    if(state.scenario.selectedPiece&&!state.scenario.obstacles[scenarioCellKey(x,y)]){const selected=state.scenario.pieces.find(p=>p.id===state.scenario.selectedPiece);if(selected){selected.x=x;selected.y=y;state.scenario.selectedPiece=null;saveScenario();renderScenario();}}
   }
 
 
-  // -------------------- D616 dos vilões --------------------
-  function activeVillain() { return state.villains.find(v => v.id === state.villainChallenge.actor) || state.villains[0]; }
-  function renderVillainActorOptions() {
-    const select = $('v-roll-actor'); if (!select) return; const current = state.villainChallenge.actor;
-    select.innerHTML = state.villains.map(v => `<option value="${escapeHTML(v.id)}">${escapeHTML(v.n)}</option>`).join('');
-    if (state.villains.some(v=>v.id===current)) select.value=current; else { state.villainChallenge.actor=state.villains[0]?.id||''; select.value=state.villainChallenge.actor; }
-  }
-  function villainAdvantage() {
-    const edge=clamp(state.villainChallenge.edge,0,6), trouble=clamp(state.villainChallenge.trouble,0,6);
-    return {edge,trouble,netEdge:Math.max(edge-trouble,0),netTrouble:Math.max(trouble-edge,0),cancelled:Math.min(edge,trouble)};
-  }
-  function syncVillainChallengeInputs() {
-    if (!$('v-roll-actor')) return; renderVillainActorOptions();
-    $('v-action-name').value=state.villainChallenge.action||'Ação do vilão'; $('v-target-number').value=clamp(state.villainChallenge.tn,1,99);
-    $('v-roll-ability').value=ABILITIES.includes(state.villainChallenge.ability)?state.villainChallenge.ability:'Melee'; $('v-extra-modifier').value=clamp(state.villainChallenge.extra,-30,30); $('v-edge-count').value=clamp(state.villainChallenge.edge,0,6); $('v-trouble-count').value=clamp(state.villainChallenge.trouble,0,6); renderVillainChallengeSummary();
-  }
-  function renderVillainChallengeSummary() {
-    if (!$('v-challenge-title')) return; const villain=activeVillain(), ability=ABILITIES.includes(state.villainChallenge.ability)?state.villainChallenge.ability:'Melee', mod=abilityValue(villain,ability), adv=villainAdvantage();
-    $('v-challenge-title').textContent=state.villainChallenge.action||'Ação do vilão'; $('v-challenge-badge').textContent=`TN ${clamp(state.villainChallenge.tn,1,99)}`; $('v-ability-modifier').textContent=signed(mod); $('v-challenge-actor').textContent=`${villain?.n||'Vilão'} · ${ability} ${signed(mod)} · extra ${signed(state.villainChallenge.extra)}`;
-    const status=adv.netEdge?`EDGE ×${adv.netEdge}`:adv.netTrouble?`TROUBLE ×${adv.netTrouble}`:'SEM EDGE / TROUBLE'; $('v-advantage-state').textContent=status; $('v-advantage-state').className=adv.netEdge?'edge':adv.netTrouble?'trouble':'';
-    if(adv.cancelled)$('v-advantage-explain').textContent=`${adv.edge} Edge e ${adv.trouble} Trouble se cancelam; resta ${adv.netEdge?`${adv.netEdge} Edge`:adv.netTrouble?`${adv.netTrouble} Trouble`:'nenhum'}.`;
-    else if(adv.netEdge)$('v-advantage-explain').textContent=`Após a rolagem, escolha um dado para rerrolar e mantenha o melhor. Repita ${adv.netEdge} vez${adv.netEdge===1?'':'es'}.`;
-    else if(adv.netTrouble)$('v-advantage-explain').textContent=`O melhor dado será rerrolado automaticamente e o pior resultado será mantido, ${adv.netTrouble} vez${adv.netTrouble===1?'':'es'}.`;
-    else $('v-advantage-explain').textContent='Nenhum modificador de circunstância.';
-  }
-  function saveVillainChallengeFromControls() {
-    state.villainChallenge.action=$('v-action-name').value.trim()||'Ação do vilão'; state.villainChallenge.tn=clamp($('v-target-number').value,1,99); state.villainChallenge.actor=$('v-roll-actor').value; state.villainChallenge.ability=$('v-roll-ability').value; state.villainChallenge.extra=clamp($('v-extra-modifier').value,-30,30); state.villainChallenge.edge=clamp($('v-edge-count').value,0,6); state.villainChallenge.trouble=clamp($('v-trouble-count').value,0,6); saveJSON(STORAGE.villainChallenge,state.villainChallenge); renderVillainChallengeSummary(); markSaved('Rolagem do vilão salva'); clearCurrentVillainRollVisual(false);
-  }
-  function vCubeAt(index){return $('villain-dice').querySelector(`.cube[data-v-cube-index="${index}"]`)}
-  function vDieButtonAt(index){return $('villain-dice').querySelector(`.die-select[data-v-die-index="${index}"]`)}
-  function setVillainCubeValue(index,value){const cube=vCubeAt(index);if(!cube)return;cube.dataset.value=value;cube.style.transform=ROTATIONS[value]||ROTATIONS[1];vDieButtonAt(index)?.setAttribute('aria-label',`${dieName(index)}: ${formatDie(value,index)}`)}
-  function setVillainDiceInteraction(enabled){qsa('.die-select',$('villain-dice')).forEach(button=>{button.classList.toggle('edge-ready',enabled);button.disabled=!enabled})}
-  async function animateVillainCube(index,duration=700){const cube=vCubeAt(index);if(!cube)return;const ms=reducedMotion()?60:duration;cube.style.setProperty('--spin-x',`${720+rand(4)*360}deg`);cube.style.setProperty('--spin-y',`${720+rand(5)*360}deg`);cube.style.setProperty('--spin-z',`${rand(3)*180}deg`);cube.style.setProperty('--roll-duration',`${ms}ms`);cube.classList.remove('rolling');void cube.offsetWidth;cube.classList.add('rolling');await sleep(ms);cube.classList.remove('rolling')}
-  async function animateAllVillainDice(values){state.villainRolling=true;$('v-roll-d616').disabled=true;$('v-finalize-roll').disabled=true;setVillainDiceInteraction(false);$('v-roll-guidance').textContent='Rolando D616 do vilão...';await Promise.all(values.map((_,i)=>animateVillainCube(i,820+i*70)));values.forEach((v,i)=>setVillainCubeValue(i,v));state.villainRolling=false;$('v-roll-d616').disabled=false;$('v-finalize-roll').disabled=false}
-  function villainRollMath(roll){const diceTotal=roll.values.reduce((sum,value,index)=>sum+scoringValue(value,index),0),ability=Number(roll.snapshot.abilityMod)||0,extra=Number(roll.snapshot.extra)||0;return{diceTotal,ability,extra,total:diceTotal+ability+extra}}
-  function evaluateVillainRoll(roll){const math=villainRollMath(roll),tn=clamp(roll.snapshot.tn,1,99);if(isUltimate(roll.values))return{key:'ultimate',label:'ULTIMATE FANTASTIC SUCCESS',success:true,fantastic:true,detail:'6 · M · 6: sucesso automático, independentemente do TN.'};if(isFantastic(roll.values))return math.total>=tn?{key:'fantastic-success',label:'FANTASTIC SUCCESS',success:true,fantastic:true,detail:`Resultado ${math.total} alcançou o TN ${tn}.`}:{key:'fantastic-failure',label:'FANTASTIC FAILURE',success:false,fantastic:true,detail:`Resultado ${math.total} ficou abaixo do TN ${tn}, mas o Marvel Die gerou um resultado Fantastic.`};return math.total>=tn?{key:'success',label:'SUCESSO',success:true,fantastic:false,detail:`Resultado ${math.total} alcançou o TN ${tn}.`}:{key:'failure',label:'FALHA',success:false,fantastic:false,detail:`Resultado ${math.total} ficou abaixo do TN ${tn}.`}}
-  function villainRollDetail(roll){const dice=roll.values.map((v,i)=>formatDie(v,i)).join(' + '),marvelNote=roll.values[1]===1?'M=6':`Marvel=${roll.values[1]}`;return`${dice} (${marvelNote}) ${signed(roll.snapshot.abilityMod)} habilidade ${signed(roll.snapshot.extra)} extra`}
-  function renderCurrentVillainRoll(){const roll=state.villainCurrentRoll;if(!roll)return clearCurrentVillainRollVisual(false);roll.values.forEach((v,i)=>setVillainCubeValue(i,v));const math=villainRollMath(roll),outcome=evaluateVillainRoll(roll);$('v-d616-total').textContent=math.total;$('v-d616-detail').textContent=`${villainRollDetail(roll)} = ${math.total}`;const out=$('v-roll-outcome');out.className=`roll-outcome ${outcome.key}${roll.finalized?'':' provisional'}`;out.querySelector('b').textContent=roll.finalized?outcome.label:`${outcome.label} · PROVISÓRIO`;$('v-roll-outcome-detail').textContent=outcome.detail;$('v-reroll-log').innerHTML=roll.logs.map(item=>`<div class="reroll-event ${item.kind}"><b>${escapeHTML(item.title)}</b><span>${escapeHTML(item.text)}</span></div>`).join('');if(!roll.finalized&&roll.edgeRemaining>0&&!isUltimate(roll.values)){$('v-roll-guidance').textContent=`Edge restante: ${roll.edgeRemaining}. Clique em qualquer dado para rerrolá-lo e manter o melhor resultado — ou finalize sem gastar todos.`;$('v-finalize-roll').classList.remove('hidden');setVillainDiceInteraction(!state.villainRolling)}else{$('v-finalize-roll').classList.add('hidden');setVillainDiceInteraction(false);$('v-roll-guidance').textContent=roll.finalized?'Rolagem do vilão finalizada e registrada.':'Processando rolagem...'}}
-  function clearCurrentVillainRollVisual(resetCubes=true){state.villainCurrentRoll=null;if(!$('v-d616-total'))return;$('v-d616-total').textContent='—';$('v-d616-detail').textContent='D616 + habilidade + modificadores';$('v-roll-outcome').className='roll-outcome neutral';$('v-roll-outcome').querySelector('b').textContent='AGUARDANDO ROLAGEM';$('v-roll-outcome-detail').textContent='O resultado será comparado ao TN configurado.';$('v-roll-guidance').textContent='Configure a ação do vilão e role os dados.';$('v-reroll-log').innerHTML='';$('v-finalize-roll').classList.add('hidden');setVillainDiceInteraction(false);if(resetCubes)[1,1,1].forEach((v,i)=>setVillainCubeValue(i,v))}
-  async function applyVillainTroubleOnce(roll){let best=0;for(let i=1;i<3;i++)if(qualityValue(roll.values[i],i)>qualityValue(roll.values[best],best))best=i;const before=roll.values[best],rerolled=rand(6);await animateVillainCube(best,520);const kept=qualityValue(rerolled,best)<qualityValue(before,best)?rerolled:before;roll.values[best]=kept;setVillainCubeValue(best,kept);roll.logs.push({kind:'trouble',title:`Trouble · ${dieName(best)}`,text:`${formatDie(before,best)} → ${formatDie(rerolled,best)}; manteve o pior: ${formatDie(kept,best)}.`});renderCurrentVillainRoll()}
-  async function rollVillainD616(){if(state.villainRolling)return;saveVillainChallengeFromControls();const villain=activeVillain(),adv=villainAdvantage(),snapshot={action:state.villainChallenge.action,tn:state.villainChallenge.tn,edge:state.villainChallenge.edge,trouble:state.villainChallenge.trouble,actorId:villain?.id||'',actorName:villain?.n||'Vilão',ability:state.villainChallenge.ability,abilityMod:abilityValue(villain,state.villainChallenge.ability),extra:state.villainChallenge.extra,netEdge:adv.netEdge,netTrouble:adv.netTrouble},roll={id:Date.now(),values:[rand(6),rand(6),rand(6)],snapshot,edgeRemaining:adv.netEdge,troubleRemaining:adv.netTrouble,logs:[],finalized:false};state.villainCurrentRoll=roll;$('v-reroll-log').innerHTML='';await animateAllVillainDice(roll.values);if(roll.troubleRemaining>0){state.villainRolling=true;$('v-roll-d616').disabled=true;$('v-finalize-roll').disabled=true}if(isUltimate(roll.values)&&roll.troubleRemaining>0){roll.logs.push({kind:'fantastic',title:'Ultimate Fantastic',text:`6 · M · 6 ignora ${roll.troubleRemaining} Trouble.`});roll.troubleRemaining=0}else while(roll.troubleRemaining>0){roll.troubleRemaining-=1;await applyVillainTroubleOnce(roll)}state.villainRolling=false;$('v-roll-d616').disabled=false;$('v-finalize-roll').disabled=false;renderCurrentVillainRoll();if(roll.edgeRemaining===0||isUltimate(roll.values))finalizeCurrentVillainRoll()}
-  async function useVillainEdge(index){const roll=state.villainCurrentRoll;if(!roll||roll.finalized||roll.edgeRemaining<=0||state.villainRolling||isUltimate(roll.values))return;state.villainRolling=true;setVillainDiceInteraction(false);$('v-roll-d616').disabled=true;$('v-finalize-roll').disabled=true;const before=roll.values[index],rerolled=rand(6);await animateVillainCube(index,540);const kept=qualityValue(rerolled,index)>qualityValue(before,index)?rerolled:before;roll.values[index]=kept;roll.edgeRemaining-=1;roll.logs.push({kind:'edge',title:`Edge · ${dieName(index)}`,text:`${formatDie(before,index)} → ${formatDie(rerolled,index)}; manteve o melhor: ${formatDie(kept,index)}.`});setVillainCubeValue(index,kept);state.villainRolling=false;$('v-roll-d616').disabled=false;$('v-finalize-roll').disabled=false;renderCurrentVillainRoll();if(roll.edgeRemaining===0||isUltimate(roll.values))finalizeCurrentVillainRoll()}
-  function finalizeCurrentVillainRoll(){const roll=state.villainCurrentRoll;if(!roll||roll.finalized)return;roll.finalized=true;const outcome=evaluateVillainRoll(roll),math=villainRollMath(roll);state.villainDiceHistory.unshift({type:'D616',label:`${roll.snapshot.actorName} · ${roll.snapshot.ability}`,action:roll.snapshot.action,tn:roll.snapshot.tn,detail:`${roll.values.map((v,i)=>formatDie(v,i)).join(' · ')} | ${signed(roll.snapshot.abilityMod)} hab. | ${signed(roll.snapshot.extra)} extra | TN ${roll.snapshot.tn}`,total:math.total,outcome:outcome.label,outcomeKey:outcome.key,at:Date.now()});state.villainDiceHistory=state.villainDiceHistory.slice(0,50);saveJSON(STORAGE.villainDice,state.villainDiceHistory);renderVillainDiceHistory(true);renderCurrentVillainRoll()}
-  function renderVillainDiceHistory(markNewest=false){if(!$('v-history'))return;if(!state.villainDiceHistory.length){$('v-history').innerHTML='<div class="history-empty">Nenhuma rolagem de vilão registrada ainda.</div>';return}$('v-history').innerHTML=state.villainDiceHistory.map((entry,index)=>{const resultClass=entry.outcomeKey||'',action=entry.action?`<small>${escapeHTML(entry.action)} · ${escapeHTML(entry.detail||'')}</small>`:`<small>${escapeHTML(entry.detail||'')}</small>`,outcome=entry.outcome?`<span class="history-outcome ${escapeHTML(resultClass)}">${escapeHTML(entry.outcome)}</span>`:'';return`<div class="historyrow ${markNewest&&index===0?'new':''}"><span class="history-icon">☠</span><div><b>${escapeHTML(entry.label)}</b>${action}${outcome}</div><strong>${escapeHTML(entry.total)}</strong></div>`}).join('')}
 
   // -------------------- Notes / export --------------------
   function activeNotesKey() { return state.role === 'master' ? STORAGE.notesMaster : STORAGE.notesPlayer; }
@@ -969,7 +1219,7 @@
     const backup = {
       app:'Projeto Arachne', version:APP_VERSION, exportedAt:new Date().toISOString(), role:state.role,
       notes:$('notes-text').value, heroes:state.heroes, villains:state.villains, campaign:state.campaign,
-      challenge:state.challenge, diceHistory:state.diceHistory, villainChallenge:state.villainChallenge, villainDiceHistory:state.villainDiceHistory
+      challenge:state.challenge, diceHistory:state.diceHistory, scenario:state.scenario, initiativeParticipants:state.initiativeParticipants
     };
     downloadText(`projeto-arachne-backup_${exportStamp()}.json`, JSON.stringify(backup,null,2), 'application/json;charset=utf-8');
     $('notes-export-status').textContent = 'Backup completo exportado';
@@ -981,12 +1231,14 @@
     renderVillains();
     renderCampaign();
     renderDiceHistory();
-    renderVillainDiceHistory();
     syncChallengeInputs();
-    syncVillainChallengeInputs();
+    renderDamageSelectors();
+    renderInitiativeThreatPicker();
+    renderInitiativeParticipants();
+    renderScenarioThreatPicker();
+    renderScenario();
     updateNotesCount();
     clearCurrentRollVisual(true);
-    clearCurrentVillainRollVisual(true);
   }
 
   // Login
@@ -1047,30 +1299,55 @@
     else if (event.key === 'Escape') closeNav();
   });
 
-  // Challenge / dice
-  ['action-name','target-number','roll-actor','roll-ability','extra-modifier','edge-count','trouble-count'].forEach(id => {
-    $(id).addEventListener(id === 'action-name' ? 'input' : 'change', saveChallengeFromControls);
+  // Dados do Mestre — D616 / outros dados / dano / iniciativa
+  ['action-name','target-number','roll-source','roll-actor','threat-tier','threat-choice','roll-ability','extra-modifier','edge-count','trouble-count'].forEach(id => {
+    $(id).addEventListener(id === 'action-name' ? 'input' : 'change', () => {
+      if (id === 'threat-tier') state.challenge.threatChoice = fillThreatSelect($('threat-choice'),$('threat-tier').value,'');
+      saveChallengeFromControls();
+    });
   });
-  qsa('[data-dice-mode]').forEach(button => button.addEventListener('click', () => setDiceMode(button.dataset.diceMode)));
+  qsa('[data-master-dice-tab]').forEach(button => button.addEventListener('click', () => setMasterDiceTab(button.dataset.masterDiceTab)));
   $('roll-d616').addEventListener('click', rollD616);
   $('finalize-roll').addEventListener('click', finalizeCurrentRoll);
   qsa('.die-select', $('dice')).forEach(button => button.addEventListener('click', () => useEdge(Number(button.dataset.dieIndex))));
   $('roll-generic').addEventListener('click', rollGeneric);
-  $('clear-history').addEventListener('click', () => {
-    state.diceHistory = [];
-    saveJSON(STORAGE.dice, []);
-    renderDiceHistory();
-    toast('Histórico limpo');
-  });
+  $('clear-history').addEventListener('click', () => { state.diceHistory=[]; saveJSON(STORAGE.dice,[]); renderDiceHistory(); toast('Histórico limpo'); });
 
-  // Rolagens dos vilões (exclusivas do Mestre e persistidas separadamente).
-  ['v-action-name','v-target-number','v-roll-actor','v-roll-ability','v-extra-modifier','v-edge-count','v-trouble-count'].forEach(id => {
-    $(id).addEventListener(id === 'v-action-name' ? 'input' : 'change', saveVillainChallengeFromControls);
+  ['damage-source','damage-hero','damage-threat-tier','damage-threat-choice','damage-profile'].forEach(id => $(id).addEventListener('change', () => {
+    if (id === 'damage-source') toggleDamageSourceFields();
+    if (id === 'damage-threat-tier') fillThreatSelect($('damage-threat-choice'),$('damage-threat-tier').value,'');
+    applyDamageProfile(false);
+  }));
+  ['damage-multiplier','damage-bonus','damage-reduction','damage-mode'].forEach(id => $(id).addEventListener(id === 'damage-mode' ? 'change' : 'input', updateDamageFormula));
+  $('apply-damage-profile').addEventListener('click', () => applyDamageProfile(true));
+  $('roll-damage').addEventListener('click', rollDamage);
+
+  qsa('[data-init-add-hero]').forEach(button => button.addEventListener('click', () => addInitiativeParticipant(state.heroes.find(h=>h.id===button.dataset.initAddHero))));
+  $('init-threat-tier').addEventListener('change', renderInitiativeThreatPicker);
+  $('init-add-threat').addEventListener('click', () => {
+    const tier=$('init-threat-tier').value, entity=resolveThreat(tier,$('init-threat-choice').value), qty=clamp($('init-threat-qty').value,1,20);
+    for(let i=0;i<qty;i++) addInitiativeParticipant(entity, qty>1?`${entity.n} ${i+1}`:entity.n);
   });
-  $('v-roll-d616').addEventListener('click', rollVillainD616);
-  $('v-finalize-roll').addEventListener('click', finalizeCurrentVillainRoll);
-  qsa('.die-select', $('villain-dice')).forEach(button => button.addEventListener('click', () => useVillainEdge(Number(button.dataset.vDieIndex))));
-  $('v-clear-history').addEventListener('click', () => { state.villainDiceHistory=[]; saveJSON(STORAGE.villainDice,[]); renderVillainDiceHistory(); toast('Histórico dos vilões limpo'); });
+  $('initiative-participants').addEventListener('input', event => {
+    const nameIndex=event.target.dataset.initName, modIndex=event.target.dataset.initMod;
+    if(nameIndex!=null){state.initiativeParticipants[Number(nameIndex)].name=event.target.value.slice(0,50);saveInitiativeParticipants();}
+    if(modIndex!=null){state.initiativeParticipants[Number(modIndex)].modifier=clamp(event.target.value,-20,30);saveInitiativeParticipants();}
+  });
+  $('initiative-participants').addEventListener('click', event => {
+    const button=event.target.closest('[data-init-remove]'); if(!button)return;
+    state.initiativeParticipants.splice(Number(button.dataset.initRemove),1);saveInitiativeParticipants();renderInitiativeParticipants();
+  });
+  $('roll-initiative').addEventListener('click', rollInitiative);
+  $('clear-initiative').addEventListener('click', () => {state.initiativeParticipants=[];saveInitiativeParticipants();renderInitiativeParticipants();$('initiative-order').innerHTML='<div class="history-empty">Adicione participantes para montar a ordem.</div>';$('initiative-current').textContent='Aguardando rolagem';});
+
+  // Montador de cenário
+  $('scenario-threat-tier').addEventListener('change', renderScenarioThreatPicker);
+  $('apply-scenario-preset').addEventListener('click', applyScenarioPreset);
+  $('scenario-add-enemies').addEventListener('click', addScenarioEnemies);
+  qsa('[data-obstacle]').forEach(button => button.addEventListener('click', () => {state.scenario.selectedTool=button.dataset.obstacle;state.scenario.selectedPiece=null;renderScenario();}));
+  $('scenario-board').addEventListener('click', event => {const cell=event.target.closest('.scenario-cell');if(cell)handleScenarioCell(cell);});
+  $('scenario-reset').addEventListener('click', () => {if(!confirm('Resetar peças e obstáculos do cenário?'))return;state.scenario=clone(DEFAULT_SCENARIO);saveScenario();renderScenario();toast('Cenário resetado');});
+
 
   // Notes
   loadNotesForRole();

@@ -1,175 +1,102 @@
-# Projeto Arachne — Site v5
+# Projeto Arachne — Site v7
 
-Painel local para a campanha **Projeto Arachne / Marvel Multiverse Role-Playing Game**.
+Painel local para a campanha **Projeto Arachne** de Marvel Multiverse RPG.
 
-A v5 separa definitivamente o fluxo de **Heróis** e **Vilões**, mantendo o D616 em 3D e adicionando fichas completas e editáveis para o Mestre.
+## Principais mudanças da v7
 
-## Principais novidades da v5
+### Dados exclusivos do Mestre
+A área de dados não aparece no perfil Jogador. No perfil Mestre ela foi dividida em quatro módulos:
 
-### Painel de Vilões completo
+1. **D616** — Action Checks com TN, habilidade, modificador extra, Edge e Trouble.
+2. **Outros dados** — d4, d6, d8, d10, d12, d20 e d100 com animação visual e modificador.
+3. **Dano** — um único Marvel Die, multiplicador e bônus editáveis, redução do alvo e opção de Fantastic Success.
+4. **Iniciativa** — um Marvel Die por participante, modificadores individuais e ordenação automática do maior para o menor.
 
-Os cinco antagonistas principais da campanha já vêm cadastrados com os valores das fichas usadas no projeto:
+### Seleção privada de ameaças
+Os módulos de Mestre usam seleção hierárquica:
 
-- Doutor Octopus;
-- Dentes-de-Sabre;
-- Ossos Cruzados;
-- Duende Verde;
-- Senhor Sinistro.
+- **Capanga**
+  - Curta distância
+  - Longo alcance
+  - Suporte
+- **Capanga especial**
+  - Agente da Hydra
+  - Agente da I.M.A.
+- **Vilão principal**
+  - Doutor Octopus
+  - Dentes-de-Sabre
+  - Ossos Cruzados
+  - Duende Verde
+  - Senhor Sinistro
 
-Cada ficha inclui:
+Isso evita exibir listas de inimigos no perfil Jogador.
 
-- Rank;
-- Health máximo e atual;
-- Focus máximo e atual;
-- Damage Reduction;
-- iniciativa;
-- velocidade;
-- habilidades MARVEL;
-- defesa derivada da habilidade;
-- ocupação;
-- origem;
-- equipes;
-- base;
-- poderes;
-- Traits;
-- Tags;
-- função e gancho dentro da campanha.
+### Calculadora de dano
+A fórmula é baseada em:
 
-Tudo pode ser editado pelo Mestre e fica salvo no navegador.
+`Marvel Die × multiplicador efetivo + bônus`
 
-### Rastreador de combate dos vilões
+O Marvel Die mostra `M` na face 1 e essa face vale 6 no cálculo. O Mestre pode editar:
 
-Ao abrir uma ficha de vilão, o Mestre pode ajustar rapidamente:
+- origem do dano;
+- perfil Melee / Agility / Ego / Logic;
+- multiplicador;
+- bônus fixo;
+- redução do alvo;
+- dano normal ou Fantastic Success.
 
-- Health atual em `-10`, `-5`, `+5` ou `+10`;
-- Focus atual em `-10`, `-5`, `+5` ou `+10`.
+Perfis padrão foram incluídos para heróis e ameaças, mas qualquer valor pode ser alterado manualmente.
 
-Os cards exibem barras visuais de Health e Focus para acompanhar o combate sem abrir a ficha inteira.
+### Iniciativa
+É possível adicionar:
 
-### Dados dos Heróis e Dados dos Vilões separados
+- Homem-Aranha;
+- Wolverine;
+- Capitão América;
+- qualquer ameaça da biblioteca do Mestre;
+- várias cópias de um mesmo capanga.
 
-Agora existem dois fluxos distintos:
+Cada participante possui um modificador editável (`+1`, `+2`, `-1` etc.). O sistema rola um Marvel Die para cada participante e monta automaticamente a ordem.
 
-- **Dados dos Heróis** — usado pelos jogadores;
-- **Dados dos Vilões** — exclusivo do Mestre.
+### Montador de cenário
+Novo painel tático em grade, visto de cima, para referência rápida de posicionamento.
 
-Os dois usam o mesmo sistema D616 em 3D, mas possuem:
+Heróis padrão:
 
-- personagens diferentes;
-- configuração própria de ação/TN;
-- Edge/Trouble próprios;
-- histórico separado;
-- persistência separada.
+- Homem-Aranha — vermelho;
+- Wolverine — amarelo;
+- Capitão América — azul.
 
-Isso evita misturar rolagens do Mestre com as rolagens dos jogadores.
+O Mestre pode:
 
-## Rolador D616
+- escolher quantidade de inimigos;
+- escolher a ameaça;
+- definir a cor das peças inimigas;
+- mover peças clicando na peça e depois na casa;
+- adicionar paredes, caixas, terminais, barris e portas;
+- apagar inimigos/obstáculos;
+- usar modelos pré-montados.
 
-- três cubos 3D em CSS;
-- Marvel Die no centro;
-- TN configurável;
-- Edge;
-- Trouble;
-- modificador da habilidade puxado automaticamente da ficha;
-- modificador extra;
-- Fantastic Success;
-- Fantastic Failure;
-- Ultimate Fantastic Success (`6 · M · 6`);
-- histórico persistente.
+Modelos disponíveis:
 
-## Anotações e exportação
+- Sala vazia
+- Laboratório Arachne
+- Depósito Hydra
+- Telhado de Nova York
+- Laboratório de Madripoor
 
-- autosave local;
-- anotações separadas para Jogador e Mestre;
-- copiar tudo;
-- exportar `.md`;
-- exportar `.txt`;
-- backup completo `.json`.
+O cenário é salvo no navegador.
 
-O backup da v5 inclui:
+## PDFs
+Os PDFs de personagens e da campanha continuam em `assets/pdfs/` e podem ser visualizados dentro do site.
 
-- heróis;
-- vilões;
-- campanha;
-- desafio dos heróis;
-- desafio dos vilões;
-- histórico dos heróis;
-- histórico dos vilões;
-- anotações do perfil ativo.
+## Persistência
+A v7 utiliza `localStorage` e tenta migrar automaticamente os dados da v6/v5/v4/v3 sempre que possível.
 
-## Persistência e migração
+## Segurança
+O projeto continua sendo um site estático. A interface esconde ferramentas e ameaças do perfil Jogador, mas um site 100% estático não oferece sigilo forte contra alguém que abra o código-fonte ou as ferramentas de desenvolvimento do navegador. Para segurança real, a próxima evolução seria mover autenticação e dados secretos para um backend.
 
-A v5 usa chaves separadas no `localStorage` para:
+## Uso
+Abra `index.html` em um navegador moderno.
 
-- heróis;
-- vilões;
-- campanha;
-- desafio dos heróis;
-- desafio dos vilões;
-- histórico dos heróis;
-- histórico dos vilões;
-- notas do Jogador;
-- notas do Mestre.
-
-Dados da v4 são migrados automaticamente quando possível. Fichas de vilões novas são adicionadas sem sobrescrever os dados antigos dos heróis.
-
-## Executar
-
-O projeto continua 100% estático. Basta abrir `index.html`.
-
-Para desenvolvimento local:
-
-```bash
-python -m http.server 8000
-```
-
-Depois abra:
-
-```text
-http://localhost:8000
-```
-
-## Acesso do Mestre
-
-A senha padrão continua em `script.js`:
-
-```js
-const MASTER_PASSWORD = 'ARACHNE';
-```
-
-> Como o projeto é estático, a senha é apenas um bloqueio de interface. Para uso público/multiusuário, implemente autenticação em backend.
-
-## Estrutura
-
-```text
-arachne_v5/
-├── index.html
-├── style.css
-├── script.js
-└── README.md
-```
-
-## Caminho para escalar depois
-
-A próxima evolução natural é mover o estado hoje salvo em `localStorage` para uma API/banco de dados:
-
-- autenticação real;
-- Mestre e jogadores conectados simultaneamente;
-- ficha de cada jogador vinculada à conta;
-- fichas de vilões exclusivas do Mestre;
-- TN publicado em tempo real;
-- rolagens sincronizadas via WebSocket/SSE;
-- Health/Focus dos vilões sincronizados entre dispositivos;
-- histórico por sessão;
-- backup/restauração da campanha pelo servidor.
-
-
-## v6 — visualizador de fichas e campanha
-
-- Cada herói possui o botão **VISUALIZAR FICHA COMPLETA**, abrindo o PDF dentro do próprio site.
-- Cada vilão/capanga possui o mesmo visualizador, com opção de abrir em nova guia ou baixar.
-- Foram adicionados ao painel do Mestre os perfis editáveis de **Agente da Hydra** e **Agente da I.M.A.**, usando as fichas fornecidas.
-- A área **Campanha** ganhou um visualizador do PDF completo de 24 páginas.
-- Todos os PDFs estão em `assets/pdfs/`, de modo que o projeto continua estático e pode ser hospedado sem backend.
-- Em navegadores que não exibem PDF embutido, o modal oferece a opção **ABRIR EM NOVA GUIA**.
-- A versão usa chaves `arachne_v6_*` e migra automaticamente dados locais da v5 quando disponíveis.
+Senha padrão do Mestre: `ARACHNE`

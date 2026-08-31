@@ -43,9 +43,9 @@
         <button class="active" type="button" data-page="home" data-master="true"><span>⌂</span><em>Central</em></button>
         <button type="button" data-page="heroes"><span>♙</span><em>Heróis</em></button>
         <button type="button" data-page="villains" data-master="true"><span>☠</span><em>Vilões</em></button>
-        <button type="button" data-page="villain-dice" data-master="true"><span>⚄</span><em>Dados dos Vilões</em></button>
-        <button type="button" data-page="campaign" data-master="true"><span>▣</span><em>Campanha</em></button>
-        <button type="button" data-page="dice"><span>⚄</span><em>Dados dos Heróis</em></button>
+                <button type="button" data-page="campaign" data-master="true"><span>▣</span><em>Campanha</em></button>
+        <button type="button" data-page="dice" data-master="true"><span>⚄</span><em>Dados do Mestre</em></button>
+        <button type="button" data-page="scenario" data-master="true"><span>▦</span><em>Cenário</em></button>
         <button type="button" data-page="notes"><span>✎</span><em>Anotações</em></button>
       </nav>
       <footer><i></i> <span>dados salvos neste navegador</span></footer>
@@ -70,7 +70,7 @@
               <p>Três heróis. Um experimento. Uma mente por trás de tudo.</p>
               <div class="banner-actions">
                 <button type="button" data-go="heroes">ABRIR HERÓIS →</button>
-                <button type="button" class="ghost" data-go="dice">ROLAR D616</button>
+                <button type="button" class="ghost" data-go="dice" data-master="true">ABRIR DADOS</button>
               </div>
             </div>
             <div class="arachne-orb" aria-hidden="true"><span>A</span></div>
@@ -94,8 +94,8 @@
               <div class="quick-actions">
                 <button type="button" data-go="heroes"><span>♙</span><b>Fichas dos heróis</b><small>Consultar e editar</small></button>
                 <button type="button" data-go="notes"><span>✎</span><b>Anotações</b><small>Registro da sessão</small></button>
-                <button type="button" data-go="dice"><span>⚄</span><b>Dados dos heróis</b><small>TN, Edge/Trouble e 3D</small></button>
-                <button type="button" data-go="villain-dice" data-master="true"><span>☠</span><b>Dados dos vilões</b><small>Rolagem separada do Mestre</small></button>
+                <button type="button" data-go="dice" data-master="true"><span>⚄</span><b>Dados do Mestre</b><small>D616, dano e iniciativa</small></button>
+                <button type="button" data-go="scenario" data-master="true"><span>▦</span><b>Montador de cenário</b><small>Grade tática e obstáculos</small></button>
                 <button type="button" data-go="campaign" data-master="true"><span>▣</span><b>Campanha</b><small>8 sessões</small></button>
                 <button type="button" data-action="view-campaign-pdf" data-master="true"><span>▤</span><b>PDF da campanha</b><small>Visualizar as 24 páginas</small></button>
               </div>
@@ -110,7 +110,7 @@
 
         <section id="villains" class="page">
           <div class="intro"><div><small>AMEAÇAS IDENTIFICADAS</small><h2>Vilões</h2></div><p>Fichas completas, editáveis e com Health/Focus de combate.</p></div>
-          <div class="villain-toolbar panel"><div><small>PAINEL DO MESTRE</small><strong>Dados baseados nas fichas da campanha</strong></div><button type="button" data-go="villain-dice">ABRIR DADOS DOS VILÕES →</button></div>
+          <div class="villain-toolbar panel"><div><small>PAINEL DO MESTRE</small><strong>Dados baseados nas fichas da campanha</strong></div><button type="button" data-go="dice">ABRIR FERRAMENTAS DE DADOS →</button></div>
           <div id="villains-grid" class="cards"></div>
         </section>
 
@@ -129,147 +129,141 @@
           <div id="sessions" class="sessions"></div>
         </section>
 
-        <section id="dice" class="page">
-          <div class="intro"><div><small>FERRAMENTA DOS JOGADORES</small><h2>Dados dos Heróis</h2></div><p>Rolagens dos heróis separadas do painel de ameaças do Mestre.</p></div>
+        <section id="dice" class="page" data-master="true">
+          <div class="intro"><div><small>FERRAMENTAS EXCLUSIVAS DO MESTRE</small><h2>Dados do Mestre</h2></div><p>Quatro módulos separados para Action Checks, dados comuns, dano e iniciativa.</p></div>
 
-          <article class="challenge panel">
-            <div class="panel-head">
-              <div><small>DESAFIO ATUAL</small><h3 id="challenge-title">Ação sem título</h3></div>
-              <span id="challenge-badge">TN 14</span>
-            </div>
-            <div class="challenge-grid">
-              <label class="master-config" data-master="true">Nome da ação<input id="action-name" maxlength="80" placeholder="Ex.: Invadir o laboratório"></label>
-              <label class="master-config" data-master="true">TN<input id="target-number" type="number" min="0" max="99" value="14" inputmode="numeric"></label>
-              <label>Personagem<select id="roll-actor"></select></label>
-              <label>Habilidade<select id="roll-ability"><option>Melee</option><option>Agility</option><option>Resilience</option><option>Vigilance</option><option>Ego</option><option>Logic</option></select></label>
-              <label>Mod. da habilidade<div id="ability-modifier" class="readonly-field">+0</div></label>
-              <label>Mod. extra<input id="extra-modifier" type="number" min="-30" max="30" value="0" inputmode="numeric"></label>
-              <label class="master-config" data-master="true">Edge<input id="edge-count" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
-              <label class="master-config" data-master="true">Trouble<input id="trouble-count" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
-            </div>
-            <div class="challenge-summary" aria-live="polite">
-              <span id="challenge-actor">Homem-Aranha · Agility +7</span>
-              <strong id="advantage-state">SEM EDGE / TROUBLE</strong>
-              <small id="advantage-explain">Nenhum modificador de circunstância.</small>
-            </div>
-          </article>
+          <div class="master-dice-tabs panel" role="tablist" aria-label="Ferramentas de dados">
+            <button type="button" class="active" data-master-dice-tab="d616" role="tab" aria-selected="true"><span>⚄</span><b>D616</b><small>Action Check</small></button>
+            <button type="button" data-master-dice-tab="generic" role="tab" aria-selected="false"><span>◆</span><b>Outros dados</b><small>d4 até d100</small></button>
+            <button type="button" data-master-dice-tab="damage" role="tab" aria-selected="false"><span>✹</span><b>Dano</b><small>Marvel Die × multiplicador</small></button>
+            <button type="button" data-master-dice-tab="initiative" role="tab" aria-selected="false"><span>▶</span><b>Iniciativa</b><small>Quem começa o turno</small></button>
+          </div>
 
-          <div class="dice-layout">
-            <article class="dice panel">
-              <div class="dice-tabs" role="tablist" aria-label="Modo de rolagem">
-                <button type="button" class="active" data-dice-mode="d616" role="tab" aria-selected="true">D616</button>
-                <button type="button" data-dice-mode="generic" role="tab" aria-selected="false">Outros dados</button>
+          <div id="master-dice-d616" class="master-dice-panel active">
+            <article class="challenge panel">
+              <div class="panel-head"><div><small>ACTION CHECK</small><h3 id="challenge-title">Ação sem título</h3></div><span id="challenge-badge">TN 14</span></div>
+              <div class="challenge-grid threat-aware-grid">
+                <label>Nome da ação<input id="action-name" maxlength="80" placeholder="Ex.: Invadir o laboratório"></label>
+                <label>TN<input id="target-number" type="number" min="0" max="99" value="14" inputmode="numeric"></label>
+                <label>Rolagem de<select id="roll-source"><option value="hero">Herói</option><option value="threat">Ameaça</option></select></label>
+                <label id="hero-roll-field">Herói<select id="roll-actor"></select></label>
+                <label id="threat-tier-field" class="hidden">AMEAÇA<select id="threat-tier"><option value="minion">Capanga</option><option value="special">Capanga especial</option><option value="main">Vilão principal</option></select></label>
+                <label id="threat-choice-field" class="hidden">Tipo / identidade<select id="threat-choice"></select></label>
+                <label>Habilidade<select id="roll-ability"><option>Melee</option><option>Agility</option><option>Resilience</option><option>Vigilance</option><option>Ego</option><option>Logic</option></select></label>
+                <label>Mod. da habilidade<div id="ability-modifier" class="readonly-field">+0</div></label>
+                <label>Mod. extra<input id="extra-modifier" type="number" min="-30" max="30" value="0" inputmode="numeric"></label>
+                <label>Edge<input id="edge-count" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
+                <label>Trouble<input id="trouble-count" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
               </div>
-
-              <div id="d616-panel" class="dice-mode active">
-                <div class="dice-stage-3d" id="dice-stage" aria-live="polite">
-                  <button type="button" class="die-select" data-die-index="0" aria-label="Dado comum 1">
-                    <span class="die-label">D6</span>
-                    <span class="cube-wrap"><span class="cube" data-cube-index="0">
-                      <i class="face f1">1</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i>
-                    </span></span>
-                  </button>
-                  <span class="plus">+</span>
-                  <button type="button" class="die-select marvel-die" data-die-index="1" aria-label="Marvel Die">
-                    <span class="die-label">MARVEL DIE</span>
-                    <span class="cube-wrap"><span class="cube marvel-cube" data-cube-index="1">
-                      <i class="face f1">M</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i>
-                    </span></span>
-                  </button>
-                  <span class="plus">+</span>
-                  <button type="button" class="die-select" data-die-index="2" aria-label="Dado comum 2">
-                    <span class="die-label">D6</span>
-                    <span class="cube-wrap"><span class="cube" data-cube-index="2">
-                      <i class="face f1">1</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i>
-                    </span></span>
-                  </button>
-                </div>
-
-                <div id="roll-guidance" class="roll-guidance">Configure a ação e role os dados.</div>
-                <div class="dice-total">
-                  <small>RESULTADO DO ACTION CHECK</small>
-                  <strong id="d616-total">—</strong>
-                  <span id="d616-detail">D616 + habilidade + modificadores</span>
-                </div>
-                <div id="roll-outcome" class="roll-outcome neutral">
-                  <b>AGUARDANDO ROLAGEM</b><span id="roll-outcome-detail">O resultado será comparado ao TN configurado.</span>
-                </div>
-                <div class="roll-actions">
-                  <button id="roll-d616" class="roll-primary" type="button">ROLAR D616</button>
-                  <button id="finalize-roll" class="secondary-action hidden" type="button">FINALIZAR ROLAGEM</button>
-                </div>
-                <div id="reroll-log" class="reroll-log" aria-live="polite"></div>
-                <p class="dice-hint">No D616, o dado central é o Marvel Die. Quando ele mostra <b>M</b>, conta como 6 e gera um resultado Fantastic. Com Edge, escolha um dado para rerrolar e manter o melhor. Trouble é resolvido automaticamente no melhor dado, mantendo o pior resultado.</p>
-              </div>
-
-              <div id="generic-panel" class="dice-mode">
-                <div class="generic-result"><strong id="generic-result">—</strong><span id="generic-detail">Escolha os dados e role</span></div>
-                <div class="form">
-                  <label>Dado<select id="die"><option value="4">d4</option><option value="6" selected>d6</option><option value="8">d8</option><option value="10">d10</option><option value="12">d12</option><option value="20">d20</option><option value="100">d100</option></select></label>
-                  <label>Quantidade<input id="qty" type="number" min="1" max="20" value="1" inputmode="numeric"></label>
-                  <button id="roll-generic" type="button">ROLAR</button>
-                </div>
-              </div>
+              <div class="challenge-summary" aria-live="polite"><span id="challenge-actor">Homem-Aranha · Agility +7</span><strong id="advantage-state">SEM EDGE / TROUBLE</strong><small id="advantage-explain">Nenhum modificador de circunstância.</small></div>
             </article>
 
-            <aside class="dice-history panel" aria-label="Histórico de dados">
-              <div class="panel-head"><div><small>ÚLTIMAS ROLAGENS</small><h3>Histórico</h3></div><button id="clear-history" class="text-button" type="button">Limpar</button></div>
-              <div id="history" class="history" aria-live="polite"></div>
-            </aside>
+            <div class="dice-layout">
+              <article class="dice panel">
+                <div class="dice-stage-3d" id="dice-stage" aria-live="polite">
+                  <button type="button" class="die-select" data-die-index="0" aria-label="Dado comum 1"><span class="die-label">D6</span><span class="cube-wrap"><span class="cube" data-cube-index="0"><i class="face f1">1</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span></button>
+                  <span class="plus">+</span>
+                  <button type="button" class="die-select marvel-die" data-die-index="1" aria-label="Marvel Die"><span class="die-label">MARVEL DIE</span><span class="cube-wrap"><span class="cube marvel-cube" data-cube-index="1"><i class="face f1">M</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span></button>
+                  <span class="plus">+</span>
+                  <button type="button" class="die-select" data-die-index="2" aria-label="Dado comum 2"><span class="die-label">D6</span><span class="cube-wrap"><span class="cube" data-cube-index="2"><i class="face f1">1</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span></button>
+                </div>
+                <div id="roll-guidance" class="roll-guidance">Configure a ação e role os dados.</div>
+                <div class="dice-total"><small>RESULTADO DO ACTION CHECK</small><strong id="d616-total">—</strong><span id="d616-detail">D616 + habilidade + modificadores</span></div>
+                <div id="roll-outcome" class="roll-outcome neutral"><b>AGUARDANDO ROLAGEM</b><span id="roll-outcome-detail">O resultado será comparado ao TN configurado.</span></div>
+                <div class="roll-actions"><button id="roll-d616" class="roll-primary" type="button">ROLAR D616</button><button id="finalize-roll" class="secondary-action hidden" type="button">FINALIZAR ROLAGEM</button></div>
+                <div id="reroll-log" class="reroll-log" aria-live="polite"></div>
+              </article>
+              <aside class="dice-history panel" aria-label="Histórico de dados"><div class="panel-head"><div><small>ÚLTIMAS ROLAGENS</small><h3>Histórico</h3></div><button id="clear-history" class="text-button" type="button">Limpar</button></div><div id="history" class="history" aria-live="polite"></div></aside>
+            </div>
+          </div>
+
+          <div id="master-dice-generic" class="master-dice-panel">
+            <article class="panel generic-master-panel">
+              <div class="panel-head"><div><small>DADOS POLIÉDRICOS</small><h3>Outros dados</h3></div><span>ANIMADOS</span></div>
+              <div class="generic-controls">
+                <label>Dado<select id="die"><option value="4">d4</option><option value="6" selected>d6</option><option value="8">d8</option><option value="10">d10</option><option value="12">d12</option><option value="20">d20</option><option value="100">d100</option></select></label>
+                <label>Quantidade<input id="qty" type="number" min="1" max="12" value="1" inputmode="numeric"></label>
+                <label>Modificador<input id="generic-mod" type="number" min="-99" max="99" value="0" inputmode="numeric"></label>
+                <button id="roll-generic" class="roll-primary" type="button">ROLAR DADOS</button>
+              </div>
+              <div id="generic-dice-stage" class="poly-dice-stage" aria-live="polite"><div class="poly-empty">Escolha o dado e role.</div></div>
+              <div class="generic-result master-generic-result"><small>TOTAL</small><strong id="generic-result">—</strong><span id="generic-detail">Resultado dos dados + modificador</span></div>
+            </article>
+          </div>
+
+          <div id="master-dice-damage" class="master-dice-panel">
+            <article class="panel damage-panel">
+              <div class="panel-head"><div><small>CÁLCULO DE DANO</small><h3>1 Marvel Die</h3></div><span>EDITÁVEL</span></div>
+              <div class="damage-grid">
+                <label>Origem<select id="damage-source"><option value="hero">Herói</option><option value="threat">Ameaça</option><option value="custom">Personalizado</option></select></label>
+                <label id="damage-hero-field">Herói<select id="damage-hero"></select></label>
+                <label id="damage-threat-tier-field" class="hidden">AMEAÇA<select id="damage-threat-tier"><option value="minion">Capanga</option><option value="special">Capanga especial</option><option value="main">Vilão principal</option></select></label>
+                <label id="damage-threat-choice-field" class="hidden">Tipo / identidade<select id="damage-threat-choice"></select></label>
+                <label>Perfil de dano<select id="damage-profile"><option value="Melee">Melee</option><option value="Agility">Agility</option><option value="Ego">Ego</option><option value="Logic">Logic</option></select></label>
+                <label>Multiplicador ×<input id="damage-multiplier" type="number" min="0" max="30" value="4" inputmode="numeric"></label>
+                <label>Bônus fixo<input id="damage-bonus" type="number" min="-99" max="99" value="0" inputmode="numeric"></label>
+                <label>Redução do alvo<input id="damage-reduction" type="number" min="0" max="20" value="0" inputmode="numeric"></label>
+                <label>Modo<select id="damage-mode"><option value="normal">Normal</option><option value="fantastic">Fantastic Success (×2)</option></select></label>
+              </div>
+              <div class="single-marvel-zone">
+                <div class="single-marvel-die" id="damage-marvel-die"><span class="cube-wrap"><span class="cube marvel-cube" id="damage-cube"><i class="face f1">M</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span><small>MARVEL DIE</small></div>
+                <div class="damage-equation"><small>FÓRMULA</small><b id="damage-formula">M × 4 + 0</b><strong id="damage-total">—</strong><span id="damage-detail">Role o Marvel Die para calcular o dano.</span></div>
+              </div>
+              <div class="roll-actions"><button id="roll-damage" class="roll-primary" type="button">ROLAR DANO</button><button id="apply-damage-profile" class="secondary-action" type="button">CARREGAR VALORES DA FICHA</button></div>
+            </article>
+          </div>
+
+          <div id="master-dice-initiative" class="master-dice-panel">
+            <div class="initiative-layout">
+              <article class="panel initiative-builder">
+                <div class="panel-head"><div><small>ORDEM DE TURNO</small><h3>Participantes</h3></div><span>1 MARVEL DIE</span></div>
+                <div class="initiative-quick"><button type="button" data-init-add-hero="spider">+ Homem-Aranha</button><button type="button" data-init-add-hero="wolverine">+ Wolverine</button><button type="button" data-init-add-hero="cap">+ Capitão América</button></div>
+                <div class="initiative-threat-add">
+                  <label>AMEAÇA<select id="init-threat-tier"><option value="minion">Capanga</option><option value="special">Capanga especial</option><option value="main">Vilão principal</option></select></label>
+                  <label>Tipo / identidade<select id="init-threat-choice"></select></label>
+                  <label>Quantidade<input id="init-threat-qty" type="number" min="1" max="20" value="1"></label>
+                  <button id="init-add-threat" type="button">ADICIONAR</button>
+                </div>
+                <div id="initiative-participants" class="initiative-participants"></div>
+                <div class="roll-actions"><button id="roll-initiative" class="roll-primary" type="button">ROLAR INICIATIVA</button><button id="clear-initiative" class="secondary-action" type="button">LIMPAR</button></div>
+              </article>
+              <article class="panel initiative-result-panel">
+                <div class="panel-head"><div><small>ROLAGEM ATUAL</small><h3>Quem começa?</h3></div></div>
+                <div class="initiative-cube-stage"><span class="cube-wrap"><span class="cube marvel-cube" id="initiative-cube"><i class="face f1">M</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span><div id="initiative-current">Aguardando rolagem</div></div>
+                <div id="initiative-order" class="initiative-order"><div class="history-empty">Adicione participantes para montar a ordem.</div></div>
+              </article>
+            </div>
           </div>
         </section>
 
-        <section id="villain-dice" class="page">
-          <div class="intro"><div><small>FERRAMENTA EXCLUSIVA DO MESTRE</small><h2>Dados dos Vilões</h2></div><p>D616 3D com TN, Edge/Trouble e modificadores puxados das fichas dos vilões.</p></div>
-
-          <article class="challenge panel villain-challenge">
-            <div class="panel-head">
-              <div><small>AÇÃO DO VILÃO</small><h3 id="v-challenge-title">Ação do vilão</h3></div>
-              <span id="v-challenge-badge">TN 14</span>
-            </div>
-            <div class="challenge-grid">
-              <label>Nome da ação<input id="v-action-name" maxlength="80" placeholder="Ex.: Rajada telecinética"></label>
-              <label>TN<input id="v-target-number" type="number" min="1" max="99" value="14" inputmode="numeric"></label>
-              <label>Vilão<select id="v-roll-actor"></select></label>
-              <label>Habilidade<select id="v-roll-ability"><option>Melee</option><option>Agility</option><option>Resilience</option><option>Vigilance</option><option>Ego</option><option>Logic</option></select></label>
-              <label>Mod. da habilidade<div id="v-ability-modifier" class="readonly-field">+0</div></label>
-              <label>Mod. extra<input id="v-extra-modifier" type="number" min="-30" max="30" value="0" inputmode="numeric"></label>
-              <label>Edge<input id="v-edge-count" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
-              <label>Trouble<input id="v-trouble-count" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
-            </div>
-            <div class="challenge-summary" aria-live="polite">
-              <span id="v-challenge-actor">Doutor Octopus · Melee +4</span>
-              <strong id="v-advantage-state">SEM EDGE / TROUBLE</strong>
-              <small id="v-advantage-explain">Nenhum modificador de circunstância.</small>
-            </div>
-          </article>
-
-          <div class="dice-layout">
-            <article class="dice panel villain-dice-panel">
-              <div class="villain-dice-head"><span>☠</span><div><small>ROLAGEM DE AMEAÇA</small><b>D616 DOS VILÕES</b></div></div>
-              <div class="dice-mode active">
-                <div class="dice-stage-3d" aria-live="polite">
-                  <button type="button" class="die-select" data-v-die-index="0" aria-label="Dado comum 1">
-                    <span class="die-label">D6</span><span class="cube-wrap"><span class="cube" data-v-cube-index="0"><i class="face f1">1</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span>
-                  </button>
-                  <span class="plus">+</span>
-                  <button type="button" class="die-select marvel-die" data-v-die-index="1" aria-label="Marvel Die">
-                    <span class="die-label">MARVEL DIE</span><span class="cube-wrap"><span class="cube marvel-cube" data-v-cube-index="1"><i class="face f1">M</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span>
-                  </button>
-                  <span class="plus">+</span>
-                  <button type="button" class="die-select" data-v-die-index="2" aria-label="Dado comum 2">
-                    <span class="die-label">D6</span><span class="cube-wrap"><span class="cube" data-v-cube-index="2"><i class="face f1">1</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span>
-                  </button>
-                </div>
-                <div id="v-roll-guidance" class="roll-guidance">Configure a ação do vilão e role os dados.</div>
-                <div class="dice-total"><small>RESULTADO DO ACTION CHECK</small><strong id="v-d616-total">—</strong><span id="v-d616-detail">D616 + habilidade + modificadores</span></div>
-                <div id="v-roll-outcome" class="roll-outcome neutral"><b>AGUARDANDO ROLAGEM</b><span id="v-roll-outcome-detail">O resultado será comparado ao TN configurado.</span></div>
-                <div class="roll-actions"><button id="v-roll-d616" class="roll-primary" type="button">ROLAR PELO VILÃO</button><button id="v-finalize-roll" class="secondary-action hidden" type="button">FINALIZAR ROLAGEM</button></div>
-                <div id="v-reroll-log" class="reroll-log" aria-live="polite"></div>
-                <p class="dice-hint">Este histórico e esta configuração são exclusivos dos vilões. As rolagens dos heróis continuam no painel próprio dos jogadores.</p>
+        <section id="scenario" class="page" data-master="true">
+          <div class="intro"><div><small>MONTADOR TÁTICO</small><h2>Cenário</h2></div><p>Grade de visão superior com heróis, inimigos e obstáculos. Não é um mapa real: é uma referência de posicionamento para a mesa.</p></div>
+          <div class="scenario-layout">
+            <aside class="panel scenario-controls">
+              <div class="panel-head"><div><small>CONFIGURAÇÃO</small><h3>Montar encontro</h3></div><span id="scenario-count">3 peças</span></div>
+              <label>Modelo de cenário<select id="scenario-preset"><option value="empty">Sala vazia</option><option value="lab">Laboratório Arachne</option><option value="hydra">Depósito Hydra</option><option value="rooftop">Telhado de Nova York</option><option value="madripoor">Laboratório de Madripoor</option></select></label>
+              <button id="apply-scenario-preset" type="button" class="scenario-primary">APLICAR MODELO</button>
+              <div class="scenario-divider"></div>
+              <small class="control-label">ADICIONAR INIMIGOS</small>
+              <label>AMEAÇA<select id="scenario-threat-tier"><option value="minion">Capanga</option><option value="special">Capanga especial</option><option value="main">Vilão principal</option></select></label>
+              <label>Tipo / identidade<select id="scenario-threat-choice"></select></label>
+              <label>Quantidade<input id="scenario-enemy-qty" type="number" min="1" max="30" value="1"></label>
+              <label>Cor da peça<input id="scenario-enemy-color" type="color" value="#7c3aed"></label>
+              <button id="scenario-add-enemies" type="button" class="scenario-primary">ADICIONAR INIMIGOS</button>
+              <div class="scenario-divider"></div>
+              <small class="control-label">OBSTÁCULOS</small>
+              <div class="obstacle-palette">
+                <button type="button" data-obstacle="select">↔ Mover peça</button><button type="button" data-obstacle="wall">▰ Parede</button><button type="button" data-obstacle="crate">▣ Caixa</button><button type="button" data-obstacle="terminal">⌨ Terminal</button><button type="button" data-obstacle="barrel">● Barril</button><button type="button" data-obstacle="door">▯ Porta</button><button type="button" data-obstacle="erase">⌫ Apagar</button>
               </div>
+              <div class="scenario-divider"></div>
+              <button id="scenario-reset" type="button" class="secondary-action">RESETAR CENÁRIO</button>
+              <p class="scenario-help">Clique em uma peça e depois em uma casa para movê-la. Com um obstáculo selecionado, clique nas casas para posicioná-lo.</p>
+            </aside>
+            <article class="panel scenario-board-panel">
+              <div class="scenario-legend"><span><i style="--piece:#ef4444"></i>Homem-Aranha</span><span><i style="--piece:#facc15"></i>Wolverine</span><span><i style="--piece:#3b82f6"></i>Capitão América</span><span><i class="enemy-dot"></i>Inimigos</span></div>
+              <div class="board-scroll"><div id="scenario-board" class="scenario-board" role="grid" aria-label="Grade tática do cenário"></div></div>
+              <div id="scenario-selection" class="scenario-selection">Selecione uma peça ou ferramenta.</div>
             </article>
-            <aside class="dice-history panel" aria-label="Histórico de rolagens dos vilões"><div class="panel-head"><div><small>AMEAÇAS</small><h3>Histórico dos Vilões</h3></div><button id="v-clear-history" class="text-button" type="button">Limpar</button></div><div id="v-history" class="history" aria-live="polite"></div></aside>
           </div>
         </section>
 
