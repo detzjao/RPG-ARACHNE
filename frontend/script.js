@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = 12;
+  const APP_VERSION = 13;
   const STORAGE = {
     heroes: `arachne_v${APP_VERSION}_heroes`,
     notesPlayer: `arachne_v${APP_VERSION}_notes_player`,
@@ -16,27 +16,53 @@
   };
 
   const ABILITIES = ['Melee', 'Agility', 'Resilience', 'Vigilance', 'Ego', 'Logic'];
+
+  const CHARACTER_ART = {
+    spider:{src:'assets/portraits/hero-spider.jpg', position:'center 18%'},
+    wolverine:{src:'assets/portraits/hero-wolverine.jpg', position:'center 20%'},
+    cap:{src:'assets/portraits/hero-cap.jpg', position:'center 26%'},
+    octopus:{src:'assets/portraits/villain-octopus.jpg', position:'center 24%'},
+    sabretooth:{src:'assets/portraits/villain-sabretooth.jpg', position:'center 24%'},
+    crossbones:{src:'assets/portraits/villain-crossbones.jpg', position:'center 28%'},
+    goblin:{src:'assets/portraits/villain-goblin.jpg', position:'center 24%'},
+    'hydra-agent':{src:'assets/portraits/villain-hydra-agent.jpg', position:'center 22%'},
+    'aim-agent':{src:'assets/portraits/villain-aim-agent.jpg', position:'center 28%'},
+    sinister:{src:'assets/portraits/villain-sinister.jpg', position:'center 18%'}
+  };
+
   const DEFAULT_HEROES = [
     {
-      id:'spider', n:'Homem-Aranha', r:'Peter Parker', i:'🕷️', rank:4, pdf:'assets/pdfs/hero-homem-aranha.pdf',
+      id:'spider', n:'Homem-Aranha', r:'Peter Parker', i:'🕷️', rank:4, tier:'HERÓI', pdf:'assets/pdfs/hero-homem-aranha.pdf',
+      role:'Herói principal / investigador', hook:'Investiga os roubos científicos e as pistas ligadas ao Projeto Arachne.',
+      maxHealth:90, maxFocus:90, currentHealth:90, currentFocus:90, karma:4, healthDR:'—', focusDR:'—', initiative:'+3E',
+      speed:'Correr 6 · Escalar 6 · Nadar 3 · Pular 6 · Planar 12 · Balanço com teia 18', movement:{run:6,climb:6,swim:3,jump:6,glide:12,swingline:18}, occupation:'Fotógrafo / Estudante', origin:'Humano Alterado', teams:'Avengers, Fantastic Four, Web-Warriors', base:'Nova York',
       stats:[['Health',90],['Focus',90],['Karma',4]],
-      abilities:{Melee:5,Agility:7,Resilience:3,Vigilance:3,Ego:0,Logic:4}, movement:{run:6,climb:6,swim:3,jump:6,glide:12,swingline:18},
+      abilities:{Melee:5,Agility:7,Resilience:3,Vigilance:3,Ego:0,Logic:4},
       traits:['Audience','Combat Reflexes','Connections: Sources','Free Running','Inventor','Pundit','Scientific Expertise','Weird'],
-      tags:['Heroic','Obligation: Aunt May','Poor','Secret Identity']
+      tags:['Heroic','Obligation: Aunt May','Poor','Secret Identity'],
+      powers:['Sentido Aranha','Escalar Paredes','Balanço com Teia','Agarrão com Teia','Golpe Brutal','Ataques Rápidos','Arremesso Rápido']
     },
     {
-      id:'wolverine', n:'Wolverine', r:'James Howlett / Logan', i:'🗡️', rank:4, pdf:'assets/pdfs/hero-wolverine.pdf',
+      id:'wolverine', n:'Wolverine', r:'James Howlett / Logan', i:'🗡️', rank:4, tier:'HERÓI', pdf:'assets/pdfs/hero-wolverine.pdf',
+      role:'Herói principal / rastreador', hook:'A rivalidade com Dentes-de-Sabre coloca Logan no centro da caçada genética.',
+      maxHealth:150, maxFocus:150, currentHealth:150, currentFocus:150, karma:4, healthDR:'—', focusDR:'—', initiative:'+4E',
+      speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3', movement:{run:5,climb:3,swim:3,jump:3}, occupation:'Aventureiro / X-Men', origin:'Mutante', teams:'X-Men, X-Force, Avengers', base:'Krakoa / móvel',
       stats:[['Health',150],['Focus',150],['Karma',4]],
-      abilities:{Melee:7,Agility:2,Resilience:5,Vigilance:4,Ego:1,Logic:1}, movement:{run:5,climb:3,swim:3,jump:3},
+      abilities:{Melee:7,Agility:2,Resilience:5,Vigilance:4,Ego:1,Logic:1},
       traits:['Battle Ready','Berserker','Combat Expert','Combat Reflexes','Connections: Military','Extraordinary Origin','Situational Awareness','Tech Reliance'],
-      tags:['Extreme Appearance','Enemy: Sabretooth','Heroic','Hounded','Krakoan','Public Identity','X-Gene']
+      tags:['Extreme Appearance','Enemy: Sabretooth','Heroic','Hounded','Krakoan','Public Identity','X-Gene'],
+      powers:['Garras de Adamantium','Fator de Cura','Sentidos Aguçados 1','Ataque Imparável','Ataques Furiosos','Bater e Correr','Frenesi Giratório','Pulo 1']
     },
     {
-      id:'cap', n:'Capitão América', r:'Steve Rogers', i:'🛡️', rank:4, pdf:'assets/pdfs/hero-capitao-america.pdf',
+      id:'cap', n:'Capitão América', r:'Steve Rogers', i:'🛡️', rank:4, tier:'HERÓI', pdf:'assets/pdfs/hero-capitao-america.pdf',
+      role:'Herói principal / líder tático', hook:'A Hydra e Ossos Cruzados estão diretamente ligados ao passado e aos ideais de Steve Rogers.',
+      maxHealth:90, maxFocus:120, currentHealth:90, currentFocus:120, karma:4, healthDR:'—', focusDR:'—', initiative:'+2E',
+      speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3', movement:{run:5,climb:3,swim:3,jump:3}, occupation:'Soldado', origin:'Humano Aprimorado', teams:'Avengers, Invaders, S.H.I.E.L.D.', base:'Nova York / EUA',
       stats:[['Health',90],['Focus',120],['Karma',4]],
-      abilities:{Melee:6,Agility:4,Resilience:3,Vigilance:3,Ego:2,Logic:2}, movement:{run:5,climb:3,swim:3,jump:3},
+      abilities:{Melee:6,Agility:4,Resilience:3,Vigilance:3,Ego:2,Logic:2},
       traits:['Battle Ready','Beguiling','Combat Expert','Combat Reflexes','Connections: Military','Public Speaking','Situational Awareness','Weird'],
-      tags:['Enemy: Hydra','Enemy: Red Skull','Heroic','Public Identity']
+      tags:['Enemy: Hydra','Enemy: Red Skull','Heroic','Public Identity'],
+      powers:['Escudo Ricochete','Bloqueio com Escudo','Liderança Inspiradora','Truque de Combate','Golpe Brutal','Arremesso Rápido','Poderoso 1']
     }
   ];
 
@@ -167,6 +193,23 @@
   const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
   const clone = value => typeof structuredClone === 'function' ? structuredClone(value) : JSON.parse(JSON.stringify(value));
   const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+
+  function characterArt(id) {
+    return CHARACTER_ART[id]?.src || '';
+  }
+
+  function characterArtPosition(id) {
+    return CHARACTER_ART[id]?.position || 'center center';
+  }
+
+  function characterArtMarkup(id, label, extraClass = '') {
+    const src = characterArt(id);
+    const pos = characterArtPosition(id);
+    return src
+      ? `<img class="character-art-image ${extraClass}" src="${escapeHTML(src)}" alt="${escapeHTML(label)}" loading="lazy" style="object-position:${escapeHTML(pos)}">`
+      : `<span class="hero-glyph">${escapeHTML(label)}</span>`;
+  }
+
   const clamp = (value, min, max) => Math.min(max, Math.max(min, Number(value) || 0));
   const rand = sides => Math.floor(Math.random() * sides) + 1;
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -217,19 +260,49 @@
   if (!localStorage.getItem(STORAGE.initiative)) { const oldInit = localStorage.getItem('arachne_v11_initiative') ?? localStorage.getItem('arachne_v10_initiative') ?? localStorage.getItem('arachne_v9_initiative') ?? localStorage.getItem('arachne_v8_initiative') ?? localStorage.getItem('arachne_v7_initiative') ?? localStorage.getItem('arachne_v6_initiative'); if (oldInit != null) localStorage.setItem(STORAGE.initiative, oldInit); }
 
   function normalizeHero(hero, fallback) {
-    const out = {...clone(fallback), ...hero};
+    const out = {...clone(fallback), ...(hero || {})};
     out.id = hero?.id || fallback.id;
-    out.stats = Array.isArray(hero?.stats) ? hero.stats : clone(fallback.stats);
     out.traits = Array.isArray(hero?.traits) ? hero.traits : clone(fallback.traits);
     out.tags = Array.isArray(hero?.tags) ? hero.tags : clone(fallback.tags);
+    out.powers = Array.isArray(hero?.powers) ? hero.powers : clone(fallback.powers || []);
     out.abilities = {...fallback.abilities, ...(hero?.abilities || {})};
     out.movement = {...(fallback.movement||{}), ...(hero?.movement||{})};
+    const rawHealth = Number(hero?.maxHealth ?? statValueRaw(hero,'Health') ?? fallback.maxHealth ?? statValueRaw(fallback,'Health') ?? 0);
+    const rawFocus = Number(hero?.maxFocus ?? statValueRaw(hero,'Focus') ?? fallback.maxFocus ?? statValueRaw(fallback,'Focus') ?? 0);
+    const rawKarma = Number(hero?.karma ?? statValueRaw(hero,'Karma') ?? fallback.karma ?? statValueRaw(fallback,'Karma') ?? 0);
+    out.maxHealth = clamp(rawHealth,0,9999);
+    out.maxFocus = clamp(rawFocus,0,9999);
+    out.currentHealth = Math.min(clamp(hero?.currentHealth ?? out.maxHealth,0,9999), out.maxHealth);
+    out.currentFocus = Math.min(clamp(hero?.currentFocus ?? out.maxFocus,0,9999), out.maxFocus);
+    out.karma = clamp(rawKarma,0,99);
+    out.tier = String(out.tier || fallback.tier || 'HERÓI');
+    out.healthDR = out.healthDR || '—';
+    out.focusDR = out.focusDR || '—';
+    out.initiative = String(out.initiative || fallback.initiative || '+0');
+    out.speed = out.speed || fallback.speed || '';
+    out.occupation = out.occupation || fallback.occupation || '';
+    out.origin = out.origin || fallback.origin || '';
+    out.teams = out.teams || fallback.teams || '';
+    out.base = out.base || fallback.base || '';
+    out.role = out.role || fallback.role || '';
+    out.hook = out.hook || fallback.hook || '';
+    out.stats = [['Health',out.maxHealth],['Focus',out.maxFocus],['Karma',out.karma]];
     // Corrige apenas os valores-padrão errados da v3; valores personalizados permanecem intactos.
     if (out.id === 'spider' && statValueRaw(out,'Health') === 80 && statValueRaw(out,'Focus') === 100) {
-      out.stats = [['Health',90],['Focus',90],['Karma',statValueRaw(out,'Karma') || 4]];
+      out.maxHealth = 90;
+      out.maxFocus = 90;
+      out.currentHealth = Math.min(out.currentHealth || 90, out.maxHealth);
+      out.currentFocus = Math.min(out.currentFocus || 90, out.maxFocus);
+      out.karma = out.karma || 4;
+      out.stats = [['Health',90],['Focus',90],['Karma',out.karma]];
     }
     if (out.id === 'wolverine' && statValueRaw(out,'Health') === 100 && statValueRaw(out,'Focus') === 130) {
-      out.stats = [['Health',150],['Focus',150],['Karma',statValueRaw(out,'Karma') || 4]];
+      out.maxHealth = 150;
+      out.maxFocus = 150;
+      out.currentHealth = Math.min(out.currentHealth || 150, out.maxHealth);
+      out.currentFocus = Math.min(out.currentFocus || 150, out.maxFocus);
+      out.karma = out.karma || 4;
+      out.stats = [['Health',150],['Focus',150],['Karma',out.karma]];
     }
     return out;
   }
@@ -338,6 +411,11 @@
   function statValue(hero, name) { return statValueRaw(hero, name); }
   function abilityValue(hero, ability) { return Number(hero?.abilities?.[ability] ?? 0); }
   function signed(value) { const n = Number(value) || 0; return n >= 0 ? `+${n}` : String(n); }
+  function heroMaxHealth(hero) { return clamp(hero?.maxHealth ?? statValue(hero,'Health'), 0, 9999); }
+  function heroMaxFocus(hero) { return clamp(hero?.maxFocus ?? statValue(hero,'Focus'), 0, 9999); }
+  function heroCurrentHealth(hero) { return Math.min(clamp(hero?.currentHealth ?? heroMaxHealth(hero), 0, 9999), heroMaxHealth(hero)); }
+  function heroCurrentFocus(hero) { return Math.min(clamp(hero?.currentFocus ?? heroMaxFocus(hero), 0, 9999), heroMaxFocus(hero)); }
+  function heroKarma(hero) { return clamp(hero?.karma ?? statValue(hero,'Karma'), 0, 99); }
 
   function selectedHero() {
     return state.heroes.find(hero => hero.id === state.selectedHero) || null;
@@ -357,6 +435,7 @@
     state.role = role;
     state.selectedHero = role === 'player' ? heroId : null;
     if (role === 'player' && !selectedHero()) { toast('Escolha um personagem'); return; }
+    document.body.dataset.role = role;
     try {
       if (state.selectedHero) sessionStorage.setItem('arachne_selected_hero', state.selectedHero);
       else sessionStorage.removeItem('arachne_selected_hero');
@@ -377,6 +456,7 @@
     state.role = 'player';
     state.selectedHero = null;
     state.currentRoll = null;
+    document.body.dataset.role = 'guest';
     try { sessionStorage.removeItem('arachne_selected_hero'); } catch {}
     $('app').classList.add('hidden');
     $('app').classList.remove('nav-open');
@@ -389,12 +469,12 @@
   }
 
   function goToPage(id) {
-    if ((id === 'villains' || id === 'campaign' || id === 'dice' || id === 'scenario' || id === 'notes') && state.role !== 'master') id = 'heroes';
+    if ((id === 'villains' || id === 'campaign' || id === 'dice' || id === 'notes') && state.role !== 'master') id = 'heroes';
     state.page = id;
     qsa('.page').forEach(el => el.classList.remove('active'));
     $(id)?.classList.add('active');
     qsa('#nav button').forEach(el => el.classList.toggle('active', el.dataset.page === id));
-    $('title').textContent = {home:'Central da Campanha',heroes:'Heróis',villains:'Vilões',campaign:'Projeto Arachne',dice:'Dados do Mestre',scenario:'Montador de Cenário',notes:'Anotações do Mestre'}[id] || 'Projeto Arachne';
+    $('title').textContent = {home:'Central da Campanha',heroes:'Heróis',villains:'Vilões',campaign:'Projeto Arachne',dice:'Dados do Mestre',scenario:'Cenário de Combate',notes:'Anotações do Mestre'}[id] || 'Projeto Arachne';
     closeNav();
     if(id==='scenario')requestAnimationFrame(()=>fitScenarioBoard());
     if(id==='heroes')renderPlayerNotes();
@@ -409,25 +489,27 @@
     const badge = $('selected-player-badge');
     if (badge) {
       badge.classList.toggle('hidden', state.role !== 'player' || !chosen);
-      badge.innerHTML = chosen ? `<span>${escapeHTML(chosen.i)}</span><div><small>VOCÊ ESTÁ JOGANDO COMO</small><b>${escapeHTML(chosen.n)}</b></div>` : '';
+      badge.innerHTML = chosen ? `<span class="selected-player-thumb">${characterArtMarkup(chosen.id, chosen.n, 'selected-player-image')}</span><div><small>VOCÊ ESTÁ JOGANDO COMO</small><b>${escapeHTML(chosen.n)}</b><em>${escapeHTML(chosen.r)}</em></div>` : '';
     }
     $('heroes-grid').innerHTML = state.heroes.map((hero, index) => {
-      const health = Number(statValue(hero,'Health') || 0);
-      const focus = Number(statValue(hero,'Focus') || 0);
-      const karma = Number(statValue(hero,'Karma') || 0);
+      const maxHealth = heroMaxHealth(hero);
+      const currentHealth = heroCurrentHealth(hero);
+      const maxFocus = heroMaxFocus(hero);
+      const currentFocus = heroCurrentFocus(hero);
+      const karma = heroKarma(hero);
+      const hpPct = maxHealth ? Math.round((currentHealth / maxHealth) * 100) : 0;
+      const fpPct = maxFocus ? Math.round((currentFocus / maxFocus) * 100) : 0;
       const mine = state.role === 'player' && state.selectedHero === hero.id;
-      const headline = mine ? 'SEU PERSONAGEM' : hero.tags.includes('Heroic') ? 'HERÓI' : 'OPERATIVO';
-      const topTags = [...hero.tags].slice(0,4);
+      const headline = mine ? 'SEU PERSONAGEM' : hero.tags.includes('Heroic') ? 'HERÓI' : (hero.tier || 'OPERATIVO');
       const editButton = canEditHero(hero.id) ? `<button type="button" data-action="edit-hero" data-index="${index}">${mine ? 'EDITAR MINHA FICHA' : 'EDITAR'}</button>` : '';
       return `<article class="card villain-card hero-card ${mine ? 'owned-hero-card' : ''}" data-hero-card="${index}">
-        <div class="art art-${escapeHTML(hero.id)}"><span class="hero-glyph">${escapeHTML(hero.i)}</span><span class="rank">RANK ${clamp(hero.rank,1,6)} · ${headline}</span></div>
+        <div class="art art-${escapeHTML(hero.id)}">${characterArtMarkup(hero.id, hero.n)}<span class="art-shade"></span><span class="rank">RANK ${clamp(hero.rank,1,6)} · ${headline}</span></div>
         <div class="body"><h3>${escapeHTML(hero.n)}</h3><div class="muted">${escapeHTML(hero.r)}</div>
           <div class="resource-bars hero-resource-bars">
-            <div class="resource-row"><span><small>HEALTH</small><b>${health}/${health}</b></span><i><u style="width:100%"></u></i></div>
-            <div class="resource-row focus"><span><small>FOCUS</small><b>${focus}/${focus}</b></span><i><u style="width:100%"></u></i></div>
+            <div class="resource-row"><span><small>HEALTH</small><b>${currentHealth}/${maxHealth}</b></span><i><u style="width:${hpPct}%"></u></i></div>
+            <div class="resource-row focus"><span><small>FOCUS</small><b>${currentFocus}/${maxFocus}</b></span><i><u style="width:${fpPct}%"></u></i></div>
           </div>
-          <div class="hero-aux-stats"><span><small>KARMA</small><b>${karma}</b></span>${ABILITIES.slice(0,2).map(name=>`<span><small>${name.toUpperCase()}</small><b>${signed(abilityValue(hero,name))}</b></span>`).join('')}</div>
-          <div class="chips">${topTags.map(tag => `<span class="chip">${escapeHTML(tag)}</span>`).join('')}</div>
+          <div class="chips"><span class="chip">${escapeHTML(hero.role || hero.tier || 'HERÓI')}</span><span class="chip">Inic. ${escapeHTML(hero.initiative || '+0')}</span><span class="chip">Karma ${karma}</span></div>
           <div class="card-actions hero-card-actions"><button class="primary" type="button" data-action="view-hero" data-index="${index}">VER RESUMO</button>${editButton}<button class="sheet-button" type="button" data-action="view-hero-pdf" data-index="${index}">▣ VISUALIZAR FICHA COMPLETA</button></div>
         </div>
       </article>`;
@@ -441,7 +523,7 @@
       const hpPct = villain.maxHealth ? Math.round((villain.currentHealth / villain.maxHealth) * 100) : 0;
       const fpPct = villain.maxFocus ? Math.round((villain.currentFocus / villain.maxFocus) * 100) : 0;
       return `<article class="card villain-card ${villain.tier === 'CHEFE FINAL' ? 'boss-card' : ''}">
-        <div class="art">${escapeHTML(villain.i)}<span class="rank">RANK ${clamp(villain.rank,1,6)} · ${escapeHTML(villain.tier)}</span></div>
+        <div class="art art-${escapeHTML(villain.id)}">${characterArtMarkup(villain.id, villain.n)}<span class="art-shade"></span><span class="rank">RANK ${clamp(villain.rank,1,6)} · ${escapeHTML(villain.tier)}</span></div>
         <div class="body"><h3>${escapeHTML(villain.n)}</h3><div class="muted">${escapeHTML(villain.r)}</div>
           <div class="resource-bars">
             <div class="resource-row"><span><small>HEALTH</small><b>${villain.currentHealth}/${villain.maxHealth}</b></span><i><u style="width:${hpPct}%"></u></i></div>
@@ -532,12 +614,27 @@
     openModal(`<div class="pdf-viewer"><div class="pdf-viewer-head"><div><small>${safeSubtitle}</small><h2 id="modal-title">${safeTitle}</h2></div><div class="pdf-viewer-actions"><a href="${pdf}" target="_blank" rel="noopener">ABRIR EM NOVA GUIA</a><a href="${pdf}" download>BAIXAR PDF</a></div></div><div class="pdf-frame-wrap"><iframe class="pdf-frame" src="${src}" title="${safeTitle}"></iframe></div><p class="pdf-fallback">Se o navegador não exibir PDFs incorporados, use <b>Abrir em nova guia</b>. O arquivo continua incluído dentro do projeto e funciona também quando o site é hospedado.</p></div>`, 'pdf');
   }
 
+  function heroAbilityCards(hero) {
+    return ABILITIES.map(name => `<div><small>${name}</small><b>${signed(abilityValue(hero,name))}</b><span>Def. ${abilityValue(hero,name)+10}</span></div>`).join('');
+  }
+
   function viewHero(index) {
     const hero = state.heroes[index];
     if (!hero) return;
-    const abilityCards = ABILITIES.map(name => `<div><small>${name}</small><b>${signed(abilityValue(hero,name))}</b></div>`).join('');
-    const edit = canEditHero(hero.id) ? `<button type="button" data-action="edit-hero" data-index="${index}">${state.role === 'player' ? 'EDITAR MINHA FICHA' : 'EDITAR DADOS RÁPIDOS'}</button>` : '';
-    openModal(`<h2 id="modal-title">${escapeHTML(hero.i)} ${escapeHTML(hero.n)}</h2><p class="muted">${escapeHTML(hero.r)} · Rank ${escapeHTML(hero.rank)}</p><div class="sheet">${hero.stats.map(([name,value]) => `<div><small>${escapeHTML(name)}</small><b>${escapeHTML(value)}</b></div>`).join('')}${abilityCards}</div><h3>Traits</h3><ul>${hero.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul><h3>Tags</h3><div class="chips">${hero.tags.map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div><div class="editbuttons"><button class="savebtn" type="button" data-action="view-hero-pdf" data-index="${index}">VISUALIZAR FICHA COMPLETA</button>${edit}</div>`);
+    const canAdjust = canEditHero(hero.id);
+    const healthButtons = canAdjust ? `<div><button type="button" data-action="adjust-hero" data-resource="health" data-delta="-10" data-index="${index}">−10</button><button type="button" data-action="adjust-hero" data-resource="health" data-delta="-5" data-index="${index}">−5</button><button type="button" data-action="adjust-hero" data-resource="health" data-delta="5" data-index="${index}">+5</button><button type="button" data-action="adjust-hero" data-resource="health" data-delta="10" data-index="${index}">+10</button></div>` : '';
+    const focusButtons = canAdjust ? `<div><button type="button" data-action="adjust-hero" data-resource="focus" data-delta="-10" data-index="${index}">−10</button><button type="button" data-action="adjust-hero" data-resource="focus" data-delta="-5" data-index="${index}">−5</button><button type="button" data-action="adjust-hero" data-resource="focus" data-delta="5" data-index="${index}">+5</button><button type="button" data-action="adjust-hero" data-resource="focus" data-delta="10" data-index="${index}">+10</button></div>` : '';
+    const edit = canAdjust ? `<button type="button" data-action="edit-hero" data-index="${index}">${state.role === 'player' ? 'EDITAR MINHA FICHA' : 'EDITAR DADOS'}</button>` : '';
+    openModal(`<h2 id="modal-title">${escapeHTML(hero.n)}</h2><p class="muted">${escapeHTML(hero.r)} · Rank ${escapeHTML(hero.rank)} · ${escapeHTML(hero.tier || 'HERÓI')}</p>
+      <div class="villain-resource-editor">
+        <div><small>HEALTH ATUAL</small><b>${heroCurrentHealth(hero)} / ${heroMaxHealth(hero)}</b>${healthButtons}</div>
+        <div><small>FOCUS ATUAL</small><b>${heroCurrentFocus(hero)} / ${heroMaxFocus(hero)}</b>${focusButtons}</div>
+      </div>
+      <div class="sheet villain-sheet">${heroAbilityCards(hero)}<div><small>RED. HEALTH</small><b>${escapeHTML(hero.healthDR || '—')}</b></div><div><small>RED. FOCUS</small><b>${escapeHTML(hero.focusDR || '—')}</b></div><div><small>INICIATIVA</small><b>${escapeHTML(hero.initiative || '+0')}</b></div><div><small>KARMA</small><b>${heroKarma(hero)}</b></div></div>
+      <div class="dossier-grid"><div><h3>Perfil</h3><p><b>Ocupação:</b> ${escapeHTML(hero.occupation || '—')}</p><p><b>Origem:</b> ${escapeHTML(hero.origin || '—')}</p><p><b>Equipes:</b> ${escapeHTML(hero.teams || '—')}</p><p><b>Base:</b> ${escapeHTML(hero.base || '—')}</p></div><div><h3>Função na campanha</h3><p>${escapeHTML(hero.role || '—')}</p><p>${escapeHTML(hero.hook || '—')}</p><p><b>Velocidade:</b> ${escapeHTML(hero.speed || '—')}</p></div></div>
+      <h3>Poderes</h3><div class="chips power-chips">${(hero.powers || []).map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div>
+      <div class="dossier-grid"><div><h3>Traits</h3><ul>${hero.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div><div><h3>Tags</h3><ul>${hero.tags.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div></div>
+      <div class="editbuttons"><button class="savebtn" type="button" data-action="view-hero-pdf" data-index="${index}">VISUALIZAR FICHA COMPLETA</button>${edit}</div>`);
   }
 
   function viewHeroPdf(index) {
@@ -550,14 +647,22 @@
     const hero = state.heroes[index];
     if (!hero) return;
     if (!canEditHero(hero.id)) { toast('Você só pode editar o personagem que escolheu'); return; }
-    const abilityInputs = ABILITIES.map(name => `<label>${name}<input id="e-ability-${name}" type="number" min="-20" max="30" value="${escapeHTML(abilityValue(hero,name))}"></label>`).join('');
+    const abilityInputs = ABILITIES.map(name => `<label>${name}<input id="h-e-ability-${name}" type="number" min="-20" max="30" value="${escapeHTML(abilityValue(hero,name))}"></label>`).join('');
     openModal(`<h2 id="modal-title">Editar ${escapeHTML(hero.n)}</h2><div class="editgrid">
-      <label>Nome<input id="e-name" value="${escapeHTML(hero.n)}" maxlength="60"></label><label>Identidade<input id="e-real" value="${escapeHTML(hero.r)}" maxlength="80"></label>
-      <label>Rank<input id="e-rank" type="number" min="1" max="6" value="${escapeHTML(hero.rank)}"></label><label>Health<input id="e-health" type="number" min="0" max="9999" value="${escapeHTML(statValue(hero,'Health'))}"></label>
-      <label>Focus<input id="e-focus" type="number" min="0" max="9999" value="${escapeHTML(statValue(hero,'Focus'))}"></label><label>Karma<input id="e-karma" type="number" min="0" max="99" value="${escapeHTML(statValue(hero,'Karma'))}"></label>
+      <label>Nome<input id="h-e-name" value="${escapeHTML(hero.n)}" maxlength="60"></label><label>Identidade<input id="h-e-real" value="${escapeHTML(hero.r)}" maxlength="80"></label>
+      <label>Rank<input id="h-e-rank" type="number" min="1" max="6" value="${escapeHTML(hero.rank)}"></label><label>Tier<input id="h-e-tier" value="${escapeHTML(hero.tier || 'HERÓI')}" maxlength="30"></label>
+      <label>Health máximo<input id="h-e-health" type="number" min="0" max="9999" value="${escapeHTML(heroMaxHealth(hero))}"></label><label>Health atual<input id="h-e-current-health" type="number" min="0" max="9999" value="${escapeHTML(heroCurrentHealth(hero))}"></label>
+      <label>Focus máximo<input id="h-e-focus" type="number" min="0" max="9999" value="${escapeHTML(heroMaxFocus(hero))}"></label><label>Focus atual<input id="h-e-current-focus" type="number" min="0" max="9999" value="${escapeHTML(heroCurrentFocus(hero))}"></label>
+      <label>Karma<input id="h-e-karma" type="number" min="0" max="99" value="${escapeHTML(heroKarma(hero))}"></label><label>Iniciativa<input id="h-e-init" value="${escapeHTML(hero.initiative || '+0')}"></label>
+      <label>Red. dano Health<input id="h-e-health-dr" value="${escapeHTML(hero.healthDR || '—')}"></label><label>Red. dano Focus<input id="h-e-focus-dr" value="${escapeHTML(hero.focusDR || '—')}"></label>
+      <label>Velocidade<input id="h-e-speed" value="${escapeHTML(hero.speed || '')}"></label><label>Ocupação<input id="h-e-occupation" value="${escapeHTML(hero.occupation || '')}"></label>
+      <label>Origem<input id="h-e-origin" value="${escapeHTML(hero.origin || '')}"></label><label>Equipes<input id="h-e-teams" value="${escapeHTML(hero.teams || '')}"></label>
+      <label>Base<input id="h-e-base" value="${escapeHTML(hero.base || '')}"></label><label class="full">Função na campanha<input id="h-e-role" value="${escapeHTML(hero.role || '')}"></label>
+      <label class="full">Gancho<input id="h-e-hook" value="${escapeHTML(hero.hook || '')}"></label>
       <div class="full ability-editor"><small>HABILIDADES (MARVEL)</small>${abilityInputs}</div>
-      <label class="full">Traits — separados por vírgula<textarea id="e-traits">${escapeHTML(hero.traits.join(', '))}</textarea></label>
-      <label class="full">Tags — separados por vírgula<textarea id="e-tags">${escapeHTML(hero.tags.join(', '))}</textarea></label>
+      <label class="full">Poderes — separados por vírgula<textarea id="h-e-powers">${escapeHTML((hero.powers || []).join(', '))}</textarea></label>
+      <label class="full">Traits — separados por vírgula<textarea id="h-e-traits">${escapeHTML(hero.traits.join(', '))}</textarea></label>
+      <label class="full">Tags — separados por vírgula<textarea id="h-e-tags">${escapeHTML(hero.tags.join(', '))}</textarea></label>
       </div><div class="editbuttons"><button class="savebtn" type="button" data-action="save-hero" data-index="${index}">SALVAR ALTERAÇÕES</button><button type="button" data-action="view-hero" data-index="${index}">CANCELAR</button></div>`);
   }
 
@@ -565,27 +670,59 @@
     const hero = state.heroes[index];
     if (!hero) return;
     if (!canEditHero(hero.id)) { toast('Edição não permitida para este personagem'); return; }
-    hero.n = $('e-name').value.trim() || hero.n;
-    hero.r = $('e-real').value.trim();
-    hero.rank = clamp($('e-rank').value, 1, 6);
-    hero.stats = [['Health',clamp($('e-health').value,0,9999)],['Focus',clamp($('e-focus').value,0,9999)],['Karma',clamp($('e-karma').value,0,99)]];
-    ABILITIES.forEach(name => { hero.abilities[name] = clamp($(`e-ability-${name}`).value,-20,30); });
-    hero.traits = $('e-traits').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,30);
-    hero.tags = $('e-tags').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,30);
+    hero.n = $('h-e-name').value.trim() || hero.n;
+    hero.r = $('h-e-real').value.trim();
+    hero.rank = clamp($('h-e-rank').value, 1, 6);
+    hero.tier = $('h-e-tier').value.trim() || 'HERÓI';
+    hero.maxHealth = clamp($('h-e-health').value,0,9999);
+    hero.maxFocus = clamp($('h-e-focus').value,0,9999);
+    hero.currentHealth = Math.min(clamp($('h-e-current-health').value,0,9999), hero.maxHealth);
+    hero.currentFocus = Math.min(clamp($('h-e-current-focus').value,0,9999), hero.maxFocus);
+    hero.karma = clamp($('h-e-karma').value,0,99);
+    hero.stats = [['Health',hero.maxHealth],['Focus',hero.maxFocus],['Karma',hero.karma]];
+    hero.healthDR = $('h-e-health-dr').value.trim() || '—';
+    hero.focusDR = $('h-e-focus-dr').value.trim() || '—';
+    hero.initiative = $('h-e-init').value.trim() || '+0';
+    hero.speed = $('h-e-speed').value.trim();
+    hero.occupation = $('h-e-occupation').value.trim();
+    hero.origin = $('h-e-origin').value.trim();
+    hero.teams = $('h-e-teams').value.trim();
+    hero.base = $('h-e-base').value.trim();
+    hero.role = $('h-e-role').value.trim();
+    hero.hook = $('h-e-hook').value.trim();
+    ABILITIES.forEach(name => { hero.abilities[name] = clamp($(`h-e-ability-${name}`).value,-20,30); });
+    hero.powers = $('h-e-powers').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,60);
+    hero.traits = $('h-e-traits').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,40);
+    hero.tags = $('h-e-tags').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,40);
     localStorage.setItem(STORAGE.heroes, JSON.stringify(state.heroes));
     if (backendReady && window.ArachneAPI) window.ArachneAPI.saveHero(hero);
     renderHeroes();
     renderChallengeSummary();
     closeModal();
     markSaved('Herói salvo');
-    toast('Ficha atualizada');
+    toast('Ficha do herói atualizada');
+  }
+
+  function adjustHero(index, resource, delta) {
+    const hero = state.heroes[index];
+    if (!hero) return;
+    if (!canEditHero(hero.id)) { toast('Edição não permitida para este personagem'); return; }
+    const key = resource === 'focus' ? 'currentFocus' : 'currentHealth';
+    const max = resource === 'focus' ? heroMaxFocus(hero) : heroMaxHealth(hero);
+    hero[key] = Math.min(max, Math.max(0, Number(hero[key] || 0) + Number(delta || 0)));
+    hero.stats = [['Health',heroMaxHealth(hero)],['Focus',heroMaxFocus(hero)],['Karma',heroKarma(hero)]];
+    saveJSON(STORAGE.heroes, state.heroes);
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.saveHero(hero);
+    renderHeroes();
+    viewHero(index);
+    markSaved(`${resource === 'focus' ? 'Focus' : 'Health'} atualizado`);
   }
 
   function viewVillain(index) {
     const villain = state.villains[index];
     if (!villain) return;
     const abilityCards = ABILITIES.map(name => `<div><small>${name}</small><b>${signed(abilityValue(villain,name))}</b><span>Def. ${abilityValue(villain,name)+10}</span></div>`).join('');
-    openModal(`<h2 id="modal-title">${escapeHTML(villain.i)} ${escapeHTML(villain.n)}</h2><p class="muted">${escapeHTML(villain.r)} · Rank ${escapeHTML(villain.rank)} · ${escapeHTML(villain.tier)}</p>
+    openModal(`<h2 id="modal-title">${escapeHTML(villain.n)}</h2><p class="muted">${escapeHTML(villain.r)} · Rank ${escapeHTML(villain.rank)} · ${escapeHTML(villain.tier)}</p>
       <div class="villain-resource-editor">
         <div><small>HEALTH ATUAL</small><b>${villain.currentHealth} / ${villain.maxHealth}</b><div><button type="button" data-action="adjust-villain" data-resource="health" data-delta="-10" data-index="${index}">−10</button><button type="button" data-action="adjust-villain" data-resource="health" data-delta="-5" data-index="${index}">−5</button><button type="button" data-action="adjust-villain" data-resource="health" data-delta="5" data-index="${index}">+5</button><button type="button" data-action="adjust-villain" data-resource="health" data-delta="10" data-index="${index}">+10</button></div></div>
         <div><small>FOCUS ATUAL</small><b>${villain.currentFocus} / ${villain.maxFocus}</b><div><button type="button" data-action="adjust-villain" data-resource="focus" data-delta="-10" data-index="${index}">−10</button><button type="button" data-action="adjust-villain" data-resource="focus" data-delta="-5" data-index="${index}">−5</button><button type="button" data-action="adjust-villain" data-resource="focus" data-delta="5" data-index="${index}">+5</button><button type="button" data-action="adjust-villain" data-resource="focus" data-delta="10" data-index="${index}">+10</button></div></div>
@@ -1342,6 +1479,7 @@
   }
   function renderScenarioMovementPanel(){
     const piece=selectedScenarioPiece(),panel=$('scenario-movement-panel');if(!panel)return;
+    if(state.role!=='master'){panel.innerHTML='<div class="movement-empty"><b>VISUALIZAÇÃO</b><span>Somente leitura para jogadores. Apenas o mestre pode selecionar peças, mover e editar o cenário.</span></div>';return;}
     if(!piece){panel.innerHTML='<div class="movement-empty"><b>MOVIMENTO</b><span>Selecione uma peça.</span></div>';return;}
     const st=movementStatus(piece),opts=st.valid.map(([k,v])=>`<option value="${k}" ${k===st.mode?'selected':''} ${st.locked&&k!==st.mode?'disabled':''}>${MOVE_META[k]?.label||k} · ${v}</option>`).join('');
     const stats=st.valid.map(([k,v])=>`<span class="speed-chip ${k===st.mode?'active':''} ${st.locked&&k!==st.mode?'locked':''}"><small>${MOVE_META[k]?.abbr||k.toUpperCase()}</small><b>${v}</b></span>`).join('');
@@ -1350,15 +1488,15 @@
     $('scenario-reset-piece-move')?.addEventListener('click',()=>{delete state.scenario.turnMovement[piece.id];saveScenario();renderScenario();toast(`${piece.name}: novo turno`);});
   }
   function renderScenario(){
-    const board=$('scenario-board');if(!board)return;normalizeScenario();renderScenarioToolAvailability();const{w,h}=boardSize();
-    const selected=selectedScenarioPiece(),st=selected?movementStatus(selected):null,reachable=selected&&state.scenario.selectedTool==='select'?reachableCells(selected,st.mode,st.remaining):new Map();
-    board.innerHTML='';board.style.setProperty('--board-zoom',String(state.scenario.zoom||1));board.style.gridTemplateColumns=`repeat(${w}, var(--cell))`;board.style.gridTemplateRows=`repeat(${h}, var(--cell))`;board.dataset.environment=state.scenario.environment;
+    const board=$('scenario-board');if(!board)return;normalizeScenario();if(state.role==='master')renderScenarioToolAvailability();const{w,h}=boardSize();
+    const selected=state.role==='master'?selectedScenarioPiece():null,st=selected?movementStatus(selected):null,reachable=selected&&state.role==='master'&&state.scenario.selectedTool==='select'?reachableCells(selected,st.mode,st.remaining):new Map();
+    board.innerHTML='';board.style.setProperty('--board-zoom',String(state.scenario.zoom||1));board.style.gridTemplateColumns=`repeat(${w}, var(--cell))`;board.style.gridTemplateRows=`repeat(${h}, var(--cell))`;board.dataset.environment=state.scenario.environment;board.dataset.readonly=state.role==='master'?'false':'true';
     for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-      const t=terrainAt(x,y),cell=document.createElement('button');cell.type='button';cell.className=`scenario-cell ${(x+y)%2?'cell-dark':'cell-light'} base-${escapeHTML(state.scenario.baseTerrain)} terrain-${escapeHTML(t.type)} elevation-${Math.max(0,t.elevation||0)}`;cell.dataset.x=x;cell.dataset.y=y;cell.setAttribute('role','gridcell');cell.setAttribute('aria-label',`${x+1},${y+1} · ${t.label}${t.elevation>0?` · altura ${t.elevation}`:''}`);cell.title=t.label;
-      const decor=decorAt(x,y),obs=obstacleAt(x,y),piece=scenarioPieceAt(x,y),key=scenarioCellKey(x,y);if(decor&&DECOR_META[decor]){cell.classList.add('has-decor',`decor-${decor}`);cell.innerHTML=decorHTML(decor);}if(obs&&OBSTACLE_META[obs]){cell.classList.add('has-obstacle',`obstacle-${obs}`);cell.innerHTML+=obstacleHTML(obs);}if(reachable.has(key)){cell.classList.add('reachable');cell.innerHTML+=`<span class="move-cost">${reachable.get(key)}</span>`;}if(piece){cell.classList.add('has-piece');cell.innerHTML+=pieceHTML(piece);if(state.scenario.selectedPiece===piece.id)cell.classList.add('selected');}board.appendChild(cell);
+      const t=terrainAt(x,y),cell=document.createElement('button');cell.type='button';cell.className=`scenario-cell ${(x+y)%2?'cell-dark':'cell-light'} base-${escapeHTML(state.scenario.baseTerrain)} terrain-${escapeHTML(t.type)} elevation-${Math.max(0,t.elevation||0)}`;cell.dataset.x=x;cell.dataset.y=y;cell.setAttribute('role','gridcell');cell.setAttribute('aria-readonly',state.role==='master'?'false':'true');cell.setAttribute('aria-label',`${x+1},${y+1} · ${t.label}${t.elevation>0?` · altura ${t.elevation}`:''}`);cell.title=t.label;
+      const decor=decorAt(x,y),obs=obstacleAt(x,y),piece=scenarioPieceAt(x,y),key=scenarioCellKey(x,y);if(decor&&DECOR_META[decor]){cell.classList.add('has-decor',`decor-${decor}`);cell.innerHTML=decorHTML(decor);}if(obs&&OBSTACLE_META[obs]){cell.classList.add('has-obstacle',`obstacle-${obs}`);cell.innerHTML+=obstacleHTML(obs);}if(reachable.has(key)){cell.classList.add('reachable');cell.innerHTML+=`<span class="move-cost">${reachable.get(key)}</span>`;}if(piece){cell.classList.add('has-piece');cell.innerHTML+=pieceHTML(piece);if(state.role==='master'&&state.scenario.selectedPiece===piece.id)cell.classList.add('selected');}board.appendChild(cell);
     }
     $('scenario-count').textContent=`${state.scenario.pieces.length} peças · ${w}×${h}`;if($('scenario-preset'))$('scenario-preset').value=state.scenario.preset||'empty';if($('scenario-environment'))$('scenario-environment').value=state.scenario.environment||'lab';
-    $('scenario-selection').textContent=selected?`${selected.name} · ${MOVE_META[st.mode]?.label||st.mode} ${st.remaining}/${st.max}`:state.scenario.selectedTool!=='select'?`${TERRAIN_META[state.scenario.selectedTool]?.label||OBSTACLE_META[state.scenario.selectedTool]?.label||'Apagar'}`:'—';
+    $('scenario-selection').textContent=state.role==='master'?(selected?`${selected.name} · ${MOVE_META[st.mode]?.label||st.mode} ${st.remaining}/${st.max}`:state.scenario.selectedTool!=='select'?`${TERRAIN_META[state.scenario.selectedTool]?.label||OBSTACLE_META[state.scenario.selectedTool]?.label||'Apagar'}`:'—'):'Somente visualização para jogadores';
     qsa('[data-obstacle]').forEach(b=>b.classList.toggle('active',b.dataset.obstacle===state.scenario.selectedTool));if($('scenario-zoom-value'))$('scenario-zoom-value').textContent=`${Math.round((state.scenario.zoom||1)*100)}%`;renderScenarioMovementPanel();
   }
   function setMapCore(env,w,h){state.scenario.environment=env;state.scenario.baseTerrain=ENVIRONMENTS[env]?.base||'floor';state.scenario.width=w;state.scenario.height=h;state.scenario.obstacles={};state.scenario.terrain={};state.scenario.decor={};state.scenario.turnMovement={};state.scenario.movementSpent={};state.scenario.selectedPiece=null;state.scenario.selectedTool='select';state.scenario.selectedMode='run';}
@@ -1419,6 +1557,7 @@
     for(let i=0;i<qty;i++){const cell=firstFreeScenarioCell(Math.max(0,8+i*2));if(!cell)break;const id=`enemy-${Date.now()}-${i}-${Math.random().toString(36).slice(2,5)}`;state.scenario.pieces.push({id,kind:'enemy',tier,baseId:entity.id,name:qty>1?`${entity.n} ${i+1}`:entity.n,short,color:scenarioColorFor(entity,i),x:cell.x,y:cell.y,movement:movementForEntity(entity)});}saveScenario();renderScenario();toast(`${qty} inimigo${qty===1?'':'s'} adicionado${qty===1?'':'s'}`);
   }
   function handleScenarioCell(cell){
+    if(state.role!=='master') return;
     const x=Number(cell.dataset.x),y=Number(cell.dataset.y),piece=scenarioPieceAt(x,y),tool=state.scenario.selectedTool||'select';
     if(tool!=='select'){
       if(tool==='erase'){clearCellArt(x,y);if(piece?.kind==='enemy'){state.scenario.pieces=state.scenario.pieces.filter(p=>p.id!==piece.id);delete state.scenario.turnMovement[piece.id];}}
@@ -1443,7 +1582,7 @@
     const visible = state.role === 'player' && !!hero;
     wrap.classList.toggle('hidden', !visible);
     if (!visible) return;
-    $('hero-notes-title').textContent = `${hero.i} ${hero.n} — minhas anotações`;
+    $('hero-notes-title').textContent = `${hero.n} — minhas anotações`;
     const textarea = $('hero-notes-text');
     if (document.activeElement !== textarea) textarea.value = state.playerNotes[hero.id] || '';
     updatePlayerNotesCount();
@@ -1632,6 +1771,7 @@
     if (action.dataset.action === 'view-hero-pdf') viewHeroPdf(index);
     if (action.dataset.action === 'edit-hero') editHero(index);
     if (action.dataset.action === 'save-hero') saveHero(index);
+    if (action.dataset.action === 'adjust-hero') adjustHero(index, action.dataset.resource, Number(action.dataset.delta));
     if (action.dataset.action === 'view-villain') viewVillain(index);
     if (action.dataset.action === 'view-villain-pdf') viewVillainPdf(index);
     if (action.dataset.action === 'view-campaign-pdf') viewCampaignPdf();
