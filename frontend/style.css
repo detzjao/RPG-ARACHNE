@@ -301,9 +301,9 @@ main{margin-left:var(--sidebar);padding:28px 34px 64px;min-width:0}main>header{m
 .art-spider{background:radial-gradient(circle at 50% 30%,#19304b 0,#0b1018 55%,#070b10 100%),linear-gradient(135deg,#132746,#0f1621)!important}
 .art-spider::after{content:"";position:absolute;inset:18px;background:repeating-radial-gradient(circle at 50% 50%,transparent 0 10px,#ffffff08 11px 12px,transparent 13px 23px);opacity:.75}
 .art-wolverine{background:radial-gradient(circle at 50% 25%,#2f2f12 0,#12161d 58%,#080b10 100%),linear-gradient(135deg,#3a3012,#0e1219)!important}
-.art-wolverine::after{content:"";position:absolute;left:50%;top:24px;transform:translateX(-50%);width:110px;height:110px;background:linear-gradient(90deg,transparent 10%,#ffd54a 10% 20%,#0b0f16 20% 28%,#ffd54a 28% 38%,transparent 38% 62%,#ffd54a 62% 72%,#0b0f16 72% 80%,#ffd54a 80% 90%,transparent 90%);clip-path:polygon(0 18%,18% 0,34% 20%,50% 0,66% 20%,82% 0,100% 18%,64% 100%,50% 80%,36% 100%);opacity:.7}
+.art-wolverine::after{content:none}
 .art-cap{background:radial-gradient(circle at 50% 26%,#17315e 0,#0d121b 55%,#070b10 100%),linear-gradient(135deg,#0b2651,#0e1219)!important}
-.art-cap::after{content:"";position:absolute;left:50%;top:34px;transform:translateX(-50%);width:102px;height:102px;border-radius:50%;background:radial-gradient(circle,#fdfdfd 0 14%,#1f4da4 14% 30%,#fff 30% 43%,#d7333e 43% 58%,#fff 58% 73%,#d7333e 73% 86%,#1f4da4 86% 100%);box-shadow:0 10px 20px #0008}
+.art-cap::after{content:none}
 .hero-card .body,.villain-card .body{padding:18px}
 .hero-card .body h3,.villain-card .body h3{font-size:21px}
 .hero-card .muted,.villain-card .muted{font-size:12px;color:#a2adbb}
@@ -363,6 +363,28 @@ main{margin-left:var(--sidebar);padding:28px 34px 64px;min-width:0}main>header{m
 .scenario-cell.terrain-gap{background:radial-gradient(circle at 50% 40%,#0a0d12 0,#020305 70%,#000 100%)!important;box-shadow:inset 0 0 26px #000}
 .scenario-cell.reachable{background-image:linear-gradient(145deg,#245447,#153328)!important;box-shadow:inset 0 0 0 2px rgba(92,240,180,.52),0 6px 12px rgba(0,0,0,.35)}
 .scenario-cell.selected{outline:3px solid #ffffff;outline-offset:-3px;box-shadow:inset 0 0 0 3px rgba(255,255,255,.12),0 0 0 2px rgba(255,255,255,.2)}
+.scenario-board[data-readonly="true"] .scenario-cell{cursor:default}
+.scenario-board[data-readonly="true"] .scenario-cell:hover{outline:none;transform:none;z-index:auto}
+
+/* Player full-screen scenario */
+body[data-role="player"] #scenario .scenario-layout{grid-template-columns:minmax(0,1fr)!important}
+body[data-role="player"] #scenario .scenario-board-panel{grid-column:1/-1;min-height:calc(100vh - 170px);display:flex;flex-direction:column;padding:16px}
+body[data-role="player"] #scenario .scenario-topbar{margin-bottom:12px}
+body[data-role="player"] #scenario .scenario-movement-panel,
+body[data-role="player"] #scenario .scenario-selection{display:none}
+body[data-role="player"] #scenario .board-scroll{flex:1;min-height:calc(100vh - 280px);max-height:none;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
+body[data-role="player"] #scenario .board-surface{margin:auto;max-width:none}
+body[data-role="player"] #scenario .scenario-board{margin:auto}
+
+@media(max-width:980px){
+  body[data-role="player"] #scenario .scenario-board-panel{min-height:calc(100vh - 150px);padding:12px}
+  body[data-role="player"] #scenario .board-scroll{min-height:calc(100vh - 250px);padding:12px}
+}
+
+@media(max-width:680px){
+  body[data-role="player"] #scenario .board-scroll{min-height:calc(100vh - 235px);padding:8px}
+  body[data-role="player"] #scenario .scenario-topbar{gap:8px}
+}
 .move-cost{background:#0e6f56;color:#d9fff2;border:1px solid #84ffd0;box-shadow:0 4px 10px rgba(0,0,0,.55)}
 .board-piece{z-index:9}
 .hero-piece{box-shadow:0 calc(var(--cell)*.12) calc(var(--cell)*.16) #000c,0 0 0 max(1px,calc(var(--cell)*.035)) #fff,inset 0 calc(var(--cell)*-.08) calc(var(--cell)*.12) #0006,inset 0 calc(var(--cell)*.05) calc(var(--cell)*.1) #fff4}
@@ -402,3 +424,44 @@ main{margin-left:var(--sidebar);padding:28px 34px 64px;min-width:0}main>header{m
 
 /* ===== v12 · jogadores separados ===== */
 .player-select-area{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);text-align:left}.login-section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.login-section-head>div{display:grid;gap:3px}.login-section-head strong{font-size:15px}.login-back{width:38px;height:38px;border:1px solid var(--line);border-radius:9px;background:#0d1219;color:#fff;cursor:pointer;font-size:18px}.login-back:hover{border-color:#4a5563;background:#141b24}.player-choice-grid{display:grid;grid-template-columns:1fr;gap:8px}.player-choice-grid button{display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;gap:2px 10px;align-items:center;text-align:left;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0c1118;color:#fff;cursor:pointer;transition:.18s ease}.player-choice-grid button:hover{border-color:#4b596d;background:#121923;transform:translateY(-1px)}.player-choice-grid button>span{grid-row:1/3;font-size:28px;text-align:center;filter:drop-shadow(0 5px 8px #0008)}.player-choice-grid button>b{font-size:13px}.player-choice-grid button>small{font-size:9px;color:#8c97a6;letter-spacing:.2px}.selected-player-badge{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid #2c4059;border-radius:10px;background:linear-gradient(180deg,#111c2a,#0b121b)}.selected-player-badge>span{font-size:24px}.selected-player-badge>div{display:grid;gap:2px}.selected-player-badge small{font-size:8px;color:#7f91a7;letter-spacing:1px}.selected-player-badge b{font-size:12px;color:#e7edf6}.owned-hero-card{border-color:#496d9a!important;box-shadow:0 0 0 1px #2b4d75 inset,0 12px 28px #0007}.owned-hero-card .rank{border-color:#5a7da8;background:#102138e8;color:#dbeaff}.owned-hero-card .body{background:linear-gradient(180deg,#0c141f,#091018)}.hero-player-notes{margin-top:22px;overflow:hidden;padding:0;border-color:#26364a;background:linear-gradient(180deg,#0b121b,#080e15)}.hero-notes-toolbar{padding:14px 16px}.hero-notes-toolbar>div{display:grid;gap:3px}.hero-notes-toolbar h3{margin:0;font-size:17px}.hero-notes-toolbar small{font-size:8px;color:#7f8fa4;letter-spacing:1.1px}.hero-player-notes textarea{width:100%;min-height:260px;display:block;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0a1017,#090e14);color:#eef4fb;resize:vertical;padding:18px;line-height:1.65;outline:none}.hero-player-notes textarea:focus{box-shadow:inset 0 0 0 1px #395678}.hero-notes-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px}.hero-notes-foot>span{font-size:9px;color:#7e8997}.hero-notes-foot .notes-actions{margin-left:auto}@media(max-width:720px){.selected-player-badge{width:100%}.hero-notes-foot{align-items:flex-start;flex-direction:column}.hero-notes-foot .notes-actions{margin-left:0;width:100%}}
+
+/* ===== v13 portraits + responsive equal cards ===== */
+.cards{align-items:stretch}
+.hero-card,.villain-card{display:flex;flex-direction:column;height:100%;min-height:100%}
+.hero-card .body,.villain-card .body{display:flex;flex-direction:column;flex:1}
+.hero-card .card-actions,.villain-card .card-actions{margin-top:auto}
+.hero-card .art,.villain-card .art{height:210px;position:relative;isolation:isolate;overflow:hidden}
+.character-art-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.03);filter:saturate(1.04) contrast(1.04) brightness(.94)}
+.art-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(7,10,15,.08) 0%,rgba(7,10,15,.14) 36%,rgba(7,10,15,.54) 100%),radial-gradient(circle at 50% 18%,rgba(255,255,255,.12) 0%,transparent 36%)}
+.hero-card .rank,.villain-card .rank{z-index:3;max-width:calc(100% - 24px)}
+.hero-card .art::before,.villain-card .art::before{z-index:2}
+.hero-card .hero-glyph,.villain-card .hero-glyph{position:relative;z-index:2}
+.hero-card .art.art-spider{background:#0c1117!important}
+.hero-card .art.art-wolverine{background:#101015!important}
+.hero-card .art.art-cap{background:#0c1017!important}
+.villain-card .art.art-crossbones{background:#17120f}
+.villain-card .art.art-goblin{background:#141016}
+.villain-card .art.art-hydra-agent{background:#0d100d}
+.villain-card .art.art-aim-agent{background:#111318}
+.villain-card .art.art-sinister{background:#130b16}
+.hero-card .body h3,.villain-card .body h3{font-size:22px;line-height:1.05}
+.hero-card .muted,.villain-card .muted{min-height:16px}
+.hero-card .chip,.villain-card .chip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.player-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.player-choice-grid button{grid-template-columns:1fr;grid-template-rows:auto auto auto;justify-items:start;gap:8px;padding:12px 12px 13px;min-height:158px;align-content:start}
+.player-choice-grid button .player-choice-thumb{grid-row:auto;width:100%;height:82px;border-radius:10px;overflow:hidden;border:1px solid #2b3a4d;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);background:#0a1017}
+.player-choice-grid button .player-choice-thumb img{width:100%;height:100%;display:block;object-fit:cover;object-position:center 22%;filter:saturate(1.05) contrast(1.04)}
+.player-choice-grid button b{font-size:13px;line-height:1.15}
+.player-choice-grid button small{font-size:10px;line-height:1.3}
+.selected-player-badge{display:flex;align-items:center;gap:12px;min-height:72px}
+.selected-player-thumb{position:relative;width:66px;height:66px;flex:0 0 66px;border-radius:12px;overflow:hidden;border:1px solid #365171;background:#09111a;box-shadow:0 10px 18px rgba(0,0,0,.32)}
+.selected-player-image{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block;transform:none;filter:saturate(1.06) contrast(1.05)}
+.selected-player-badge>div{display:grid;gap:3px}
+.selected-player-badge em{font-style:normal;font-size:11px;color:#94a8be}
+.hero-resource-bars{margin-bottom:12px}
+.hero-aux-stats{margin-bottom:12px}
+.owned-hero-card .character-art-image{filter:saturate(1.08) contrast(1.05) brightness(.96)}
+.owned-hero-card .art-shade{background:linear-gradient(180deg,rgba(8,14,24,.02) 0%,rgba(8,14,24,.08) 32%,rgba(8,14,24,.54) 100%),radial-gradient(circle at 50% 18%,rgba(94,149,219,.18) 0%,transparent 42%)}
+@media (max-width:1100px){.player-choice-grid{grid-template-columns:1fr 1fr 1fr}.hero-card .art,.villain-card .art{height:190px}}
+@media (max-width:860px){.player-choice-grid{grid-template-columns:1fr}.player-choice-grid button{grid-template-columns:96px 1fr;grid-template-rows:auto auto;align-items:center;min-height:0}.player-choice-grid button .player-choice-thumb{width:96px;height:76px;grid-row:1/3}.player-choice-grid button b,.player-choice-grid button small{align-self:end}.selected-player-badge{width:100%}.hero-card .art,.villain-card .art{height:180px}}
+@media (max-width:640px){.hero-card .art,.villain-card .art{height:168px}.hero-card .body h3,.villain-card .body h3{font-size:20px}.hero-card .muted,.villain-card .muted{font-size:11px}.selected-player-thumb{width:58px;height:58px;flex-basis:58px}}
