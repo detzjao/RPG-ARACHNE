@@ -26,9 +26,9 @@
           <div><small>ESCOLHA SEU PERSONAGEM</small><strong id="player-select-title">Quem você vai jogar?</strong></div>
         </div>
         <div class="player-choice-grid">
-          <button type="button" data-player-hero="spider"><span class="player-choice-thumb"><img src="assets/portraits/hero-spider.jpg" alt="Homem-Aranha"></span><b>Homem-Aranha</b><small>Peter Parker</small></button>
-          <button type="button" data-player-hero="wolverine"><span class="player-choice-thumb"><img src="assets/portraits/hero-wolverine.jpg" alt="Wolverine"></span><b>Wolverine</b><small>James Howlett / Logan</small></button>
-          <button type="button" data-player-hero="cap"><span class="player-choice-thumb"><img src="assets/portraits/hero-cap.jpg" alt="Capitão América"></span><b>Capitão América</b><small>Steve Rogers</small></button>
+          <button type="button" data-player-hero="spider"><span>🕷️</span><b>Homem-Aranha</b><small>Peter Parker</small></button>
+          <button type="button" data-player-hero="wolverine"><span>🗡️</span><b>Wolverine</b><small>James Howlett / Logan</small></button>
+          <button type="button" data-player-hero="cap"><span>🛡️</span><b>Capitão América</b><small>Steve Rogers</small></button>
         </div>
       </div>
       <div id="password-area" class="password-area hidden">
@@ -39,7 +39,7 @@
         </div>
         <span id="login-error" role="alert"></span>
       </div>
-      <span class="local-badge"><i></i> frontend + API · cache local</span>
+      <span class="local-badge"><i></i></span>
     </div>
   </div>
 
@@ -56,7 +56,7 @@
         <button type="button" data-page="villains" data-master="true"><span>☠</span><em>Vilões</em></button>
                 <button type="button" data-page="campaign" data-master="true"><span>▣</span><em>Campanha</em></button>
         <button type="button" data-page="dice" data-master="true"><span>⚄</span><em>Dados do Mestre</em></button>
-        <button type="button" data-page="scenario"><span>▦</span><em>Cenário</em></button>
+        <button type="button" data-page="scenario" data-master="true"><span>▦</span><em>Cenário</em></button>
         <button type="button" data-page="notes" data-master="true"><span>✎</span><em>Anotações do Mestre</em></button>
       </nav>
       <footer><i></i> <span>cache local + banco do servidor</span></footer>
@@ -106,7 +106,7 @@
                 <button type="button" data-go="heroes"><span>♙</span><b>Fichas dos heróis</b><small>Consultar e editar</small></button>
                 <button type="button" data-go="notes" data-master="true"><span>✎</span><b>Anotações do Mestre</b><small>Registro privado da sessão</small></button>
                 <button type="button" data-go="dice" data-master="true"><span>⚄</span><b>Dados do Mestre</b><small>D616, dano e iniciativa</small></button>
-                <button type="button" data-go="scenario"><span>▦</span><b>Cenário</b><small>Grade tática e obstáculos</small></button>
+                <button type="button" data-go="scenario" data-master="true"><span>▦</span><b>Montador de cenário</b><small>Grade tática e obstáculos</small></button>
                 <button type="button" data-go="campaign" data-master="true"><span>▣</span><b>Campanha</b><small>8 sessões</small></button>
                 <button type="button" data-action="view-campaign-pdf" data-master="true"><span>▤</span><b>PDF da campanha</b><small>Visualizar as 24 páginas</small></button>
               </div>
@@ -264,10 +264,10 @@
           </div>
         </section>
 
-        <section id="scenario" class="page">
+        <section id="scenario" class="page" data-master="true">
           <div class="intro scenario-intro"><div><small>MONTADOR TÁTICO</small><h2>Cenário de Combate</h2></div></div>
           <div class="scenario-layout">
-            <aside class="panel scenario-controls" data-master="true">
+            <aside class="panel scenario-controls">
               <div class="panel-head"><div><small>CONFIGURAÇÃO</small><h3>Montar encontro</h3></div><span id="scenario-count">3 peças</span></div>
 
               <small class="control-label">MAPA</small>
@@ -346,7 +346,7 @@
                   <span id="scenario-zoom-value">100%</span>
                   <button id="scenario-zoom-in" type="button" aria-label="Aumentar zoom">+</button>
                   <button id="scenario-fit" type="button">AJUSTAR</button>
-                  <button id="scenario-reset-movement" type="button" data-master="true">NOVA RODADA</button>
+                  <button id="scenario-reset-movement" type="button">NOVA RODADA</button>
                 </div>
               </div>
               <div id="scenario-movement-panel" class="scenario-movement-panel"><div class="movement-empty"><b>MOVIMENTO</b><span>Selecione uma peça.</span></div></div>
