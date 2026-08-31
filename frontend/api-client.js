@@ -6,7 +6,7 @@
   const API_BASE = window.ARACHNE_API_URL || DEFAULT_API;
   const suffixMap = {
     heroes:'heroes', villains:'villains', campaign:'campaign', dice:'dice', challenge:'challenge',
-    scenario:'scenario', initiative:'initiative', notes_player:'notesPlayer', notes_master:'notesMaster'
+    scenario:'scenario', initiative:'initiative', player_notes:'playerNotes', notes_player:'notesPlayer', notes_master:'notesMaster'
   };
 
   function stateKeyFromStorage(storageKey) {
@@ -59,10 +59,21 @@
     }
   }
 
+  async function saveHero(hero) {
+    if (!hero?.id) return false;
+    try {
+      await request(`/heroes/${encodeURIComponent(hero.id)}`, { method:'PUT', body:JSON.stringify({ hero }) });
+      return true;
+    } catch (error) {
+      console.warn(`[Arachne API] falha ao salvar herói ${hero.id}.`, error.message);
+      return false;
+    }
+  }
+
   async function health() {
     try { return await request('/health'); }
     catch { return null; }
   }
 
-  window.ArachneAPI = { API_BASE, loadAll, saveStorageKey, saveMany, health, stateKeyFromStorage };
+  window.ArachneAPI = { API_BASE, loadAll, saveStorageKey, saveMany, saveHero, health, stateKeyFromStorage };
 })();

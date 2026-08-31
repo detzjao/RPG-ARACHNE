@@ -1,10 +1,11 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = 11;
+  const APP_VERSION = 12;
   const STORAGE = {
     heroes: `arachne_v${APP_VERSION}_heroes`,
     notesPlayer: `arachne_v${APP_VERSION}_notes_player`,
+    playerNotes: `arachne_v${APP_VERSION}_player_notes`,
     notesMaster: `arachne_v${APP_VERSION}_notes_master`,
     campaign: `arachne_v${APP_VERSION}_campaign`,
     dice: `arachne_v${APP_VERSION}_dice`,
@@ -186,29 +187,34 @@
     if (backendReady && window.ArachneAPI) window.ArachneAPI.saveStorageKey(key, value);
   }
 
-  // Migração para v9 com fallbacks anteriores.
+  // Migração para v12 com fallbacks anteriores.
   const migrationCandidates = {
-    heroes:['arachne_v10_heroes','arachne_v9_heroes','arachne_v8_heroes','arachne_v7_heroes','arachne_v6_heroes','arachne_v5_heroes','arachne_v4_heroes','arachne_v3_heroes'],
-    campaign:['arachne_v10_campaign','arachne_v9_campaign','arachne_v8_campaign','arachne_v7_campaign','arachne_v6_campaign','arachne_v5_campaign','arachne_v4_campaign','arachne_v3_campaign'],
-    dice:['arachne_v10_dice','arachne_v9_dice','arachne_v8_dice','arachne_v7_dice','arachne_v6_dice','arachne_v5_dice','arachne_v4_dice','arachne_v3_dice'],
-    challenge:['arachne_v10_challenge','arachne_v9_challenge','arachne_v8_challenge','arachne_v7_challenge','arachne_v6_challenge','arachne_v5_challenge','arachne_v4_challenge']
+    heroes:['arachne_v11_heroes','arachne_v10_heroes','arachne_v9_heroes','arachne_v8_heroes','arachne_v7_heroes','arachne_v6_heroes','arachne_v5_heroes','arachne_v4_heroes','arachne_v3_heroes'],
+    campaign:['arachne_v11_campaign','arachne_v10_campaign','arachne_v9_campaign','arachne_v8_campaign','arachne_v7_campaign','arachne_v6_campaign','arachne_v5_campaign','arachne_v4_campaign','arachne_v3_campaign'],
+    dice:['arachne_v11_dice','arachne_v10_dice','arachne_v9_dice','arachne_v8_dice','arachne_v7_dice','arachne_v6_dice','arachne_v5_dice','arachne_v4_dice','arachne_v3_dice'],
+    challenge:['arachne_v11_challenge','arachne_v10_challenge','arachne_v9_challenge','arachne_v8_challenge','arachne_v7_challenge','arachne_v6_challenge','arachne_v5_challenge','arachne_v4_challenge']
   };
   Object.entries(migrationCandidates).forEach(([name, keys]) => {
     if (localStorage.getItem(STORAGE[name])) return;
     const oldKey = keys.find(key => localStorage.getItem(key) != null);
     if (oldKey) localStorage.setItem(STORAGE[name], localStorage.getItem(oldKey));
   });
-  if (!localStorage.getItem(STORAGE.villains)) { const oldVillains = localStorage.getItem('arachne_v10_villains') ?? localStorage.getItem('arachne_v9_villains') ?? localStorage.getItem('arachne_v8_villains') ?? localStorage.getItem('arachne_v7_villains') ?? localStorage.getItem('arachne_v6_villains'); if (oldVillains != null) localStorage.setItem(STORAGE.villains, oldVillains); }
+  if (!localStorage.getItem(STORAGE.villains)) { const oldVillains = localStorage.getItem('arachne_v11_villains') ?? localStorage.getItem('arachne_v10_villains') ?? localStorage.getItem('arachne_v9_villains') ?? localStorage.getItem('arachne_v8_villains') ?? localStorage.getItem('arachne_v7_villains') ?? localStorage.getItem('arachne_v6_villains'); if (oldVillains != null) localStorage.setItem(STORAGE.villains, oldVillains); }
   if (!localStorage.getItem(STORAGE.notesPlayer)) {
-    const oldNotes = localStorage.getItem('arachne_v10_notes_player') ?? localStorage.getItem('arachne_v9_notes_player') ?? localStorage.getItem('arachne_v8_notes_player') ?? localStorage.getItem('arachne_v7_notes_player') ?? localStorage.getItem('arachne_v6_notes_player') ?? localStorage.getItem('arachne_v5_notes_player') ?? localStorage.getItem('arachne_v4_notes_player') ?? localStorage.getItem('arachne_v3_notes') ?? localStorage.getItem('arachne_notes');
+    const oldNotes = localStorage.getItem('arachne_v11_notes_player') ?? localStorage.getItem('arachne_v10_notes_player') ?? localStorage.getItem('arachne_v9_notes_player') ?? localStorage.getItem('arachne_v8_notes_player') ?? localStorage.getItem('arachne_v7_notes_player') ?? localStorage.getItem('arachne_v6_notes_player') ?? localStorage.getItem('arachne_v5_notes_player') ?? localStorage.getItem('arachne_v4_notes_player') ?? localStorage.getItem('arachne_v3_notes') ?? localStorage.getItem('arachne_notes');
     if (oldNotes != null) localStorage.setItem(STORAGE.notesPlayer, oldNotes || '');
   }
+  if (!localStorage.getItem(STORAGE.playerNotes)) {
+    const oldPlayerNotes = localStorage.getItem('arachne_v11_player_notes');
+    if (oldPlayerNotes != null) localStorage.setItem(STORAGE.playerNotes, oldPlayerNotes);
+    else localStorage.setItem(STORAGE.playerNotes, JSON.stringify({spider:'',wolverine:'',cap:''}));
+  }
   if (!localStorage.getItem(STORAGE.notesMaster)) {
-    const oldNotes = localStorage.getItem('arachne_v10_notes_master') ?? localStorage.getItem('arachne_v9_notes_master') ?? localStorage.getItem('arachne_v8_notes_master') ?? localStorage.getItem('arachne_v7_notes_master') ?? localStorage.getItem('arachne_v6_notes_master') ?? localStorage.getItem('arachne_v5_notes_master') ?? localStorage.getItem('arachne_v4_notes_master');
+    const oldNotes = localStorage.getItem('arachne_v11_notes_master') ?? localStorage.getItem('arachne_v10_notes_master') ?? localStorage.getItem('arachne_v9_notes_master') ?? localStorage.getItem('arachne_v8_notes_master') ?? localStorage.getItem('arachne_v7_notes_master') ?? localStorage.getItem('arachne_v6_notes_master') ?? localStorage.getItem('arachne_v5_notes_master') ?? localStorage.getItem('arachne_v4_notes_master');
     if (oldNotes != null) localStorage.setItem(STORAGE.notesMaster, oldNotes || '');
   }
-  if (!localStorage.getItem(STORAGE.scenario)) { const oldScenario = localStorage.getItem('arachne_v10_scenario') ?? localStorage.getItem('arachne_v9_scenario') ?? localStorage.getItem('arachne_v8_scenario') ?? localStorage.getItem('arachne_v7_scenario') ?? localStorage.getItem('arachne_v6_scenario'); if (oldScenario != null) localStorage.setItem(STORAGE.scenario, oldScenario); }
-  if (!localStorage.getItem(STORAGE.initiative)) { const oldInit = localStorage.getItem('arachne_v10_initiative') ?? localStorage.getItem('arachne_v9_initiative') ?? localStorage.getItem('arachne_v8_initiative') ?? localStorage.getItem('arachne_v7_initiative') ?? localStorage.getItem('arachne_v6_initiative'); if (oldInit != null) localStorage.setItem(STORAGE.initiative, oldInit); }
+  if (!localStorage.getItem(STORAGE.scenario)) { const oldScenario = localStorage.getItem('arachne_v11_scenario') ?? localStorage.getItem('arachne_v10_scenario') ?? localStorage.getItem('arachne_v9_scenario') ?? localStorage.getItem('arachne_v8_scenario') ?? localStorage.getItem('arachne_v7_scenario') ?? localStorage.getItem('arachne_v6_scenario'); if (oldScenario != null) localStorage.setItem(STORAGE.scenario, oldScenario); }
+  if (!localStorage.getItem(STORAGE.initiative)) { const oldInit = localStorage.getItem('arachne_v11_initiative') ?? localStorage.getItem('arachne_v10_initiative') ?? localStorage.getItem('arachne_v9_initiative') ?? localStorage.getItem('arachne_v8_initiative') ?? localStorage.getItem('arachne_v7_initiative') ?? localStorage.getItem('arachne_v6_initiative'); if (oldInit != null) localStorage.setItem(STORAGE.initiative, oldInit); }
 
   function normalizeHero(hero, fallback) {
     const out = {...clone(fallback), ...hero};
@@ -247,14 +253,15 @@
   const loadedHeroes = loadJSON(STORAGE.heroes, DEFAULT_HEROES);
   const loadedVillains = loadJSON(STORAGE.villains, DEFAULT_VILLAINS);
   const state = {
-    role:'player', page:'home', diceMode:'d616', rolling:false, currentRoll:null,
+    role:'player', selectedHero:null, page:'home', diceMode:'d616', rolling:false, currentRoll:null,
     heroes: DEFAULT_HEROES.map((fallback, i) => normalizeHero((Array.isArray(loadedHeroes) ? loadedHeroes.find(item => item?.id === fallback.id) : null) || loadedHeroes[i] || fallback, fallback)),
     villains: DEFAULT_VILLAINS.map((fallback, i) => normalizeVillain((Array.isArray(loadedVillains) ? loadedVillains.find(item => item?.id === fallback.id) : null) || fallback, fallback)),
     campaign: loadJSON(STORAGE.campaign, Object.fromEntries(SESSIONS.map(s => [s.id, 'todo']))),
     diceHistory: loadJSON(STORAGE.dice, []),
     challenge: {...DEFAULT_CHALLENGE, ...loadJSON(STORAGE.challenge, DEFAULT_CHALLENGE)},
     scenario: {...clone(DEFAULT_SCENARIO), ...loadJSON(STORAGE.scenario, DEFAULT_SCENARIO)},
-    initiativeParticipants: loadJSON(STORAGE.initiative, [])
+    initiativeParticipants: loadJSON(STORAGE.initiative, []),
+    playerNotes: {...{spider:'',wolverine:'',cap:''}, ...loadJSON(STORAGE.playerNotes, {spider:'',wolverine:'',cap:''})}
   };
   saveJSON(STORAGE.heroes, state.heroes);
   saveJSON(STORAGE.villains, state.villains);
@@ -268,6 +275,7 @@
       challenge: state.challenge,
       scenario: state.scenario,
       initiative: state.initiativeParticipants,
+      playerNotes: state.playerNotes,
       notesPlayer: localStorage.getItem(STORAGE.notesPlayer) || '',
       notesMaster: localStorage.getItem(STORAGE.notesMaster) || ''
     };
@@ -298,12 +306,14 @@
     if (remote.challenge && typeof remote.challenge === 'object') { state.challenge = {...DEFAULT_CHALLENGE, ...remote.challenge}; localStorage.setItem(STORAGE.challenge, JSON.stringify(state.challenge)); }
     if (remote.scenario && typeof remote.scenario === 'object') { state.scenario = {...clone(DEFAULT_SCENARIO), ...remote.scenario}; localStorage.setItem(STORAGE.scenario, JSON.stringify(state.scenario)); }
     if (Array.isArray(remote.initiative)) { state.initiativeParticipants = remote.initiative; localStorage.setItem(STORAGE.initiative, JSON.stringify(remote.initiative)); }
+    if (remote.playerNotes && typeof remote.playerNotes === 'object' && !Array.isArray(remote.playerNotes)) { state.playerNotes = {...{spider:'',wolverine:'',cap:''}, ...remote.playerNotes}; localStorage.setItem(STORAGE.playerNotes, JSON.stringify(state.playerNotes)); }
     if (typeof remote.notesPlayer === 'string') localStorage.setItem(STORAGE.notesPlayer, remote.notesPlayer);
     if (typeof remote.notesMaster === 'string') localStorage.setItem(STORAGE.notesMaster, remote.notesMaster);
 
     backendReady = true;
     renderAll();
     loadNotesForRole();
+    renderPlayerNotes();
     markSaved('Sincronizado com servidor');
   }
 
@@ -329,37 +339,65 @@
   function abilityValue(hero, ability) { return Number(hero?.abilities?.[ability] ?? 0); }
   function signed(value) { const n = Number(value) || 0; return n >= 0 ? `+${n}` : String(n); }
 
-  function enter(role) {
+  function selectedHero() {
+    return state.heroes.find(hero => hero.id === state.selectedHero) || null;
+  }
+
+  function canEditHero(heroId) {
+    return state.role === 'master' || (state.role === 'player' && state.selectedHero === heroId);
+  }
+
+  function updateAccessLabels() {
+    const hero = selectedHero();
+    $('role-label').textContent = state.role === 'master' ? 'MESTRE' : hero ? `JOGADOR · ${hero.n.toUpperCase()}` : 'JOGADOR';
+    $('home-role').textContent = state.role === 'master' ? 'MESTRE' : hero ? hero.n.toUpperCase() : 'JOGADOR';
+  }
+
+  function enter(role, heroId = null) {
     state.role = role;
+    state.selectedHero = role === 'player' ? heroId : null;
+    if (role === 'player' && !selectedHero()) { toast('Escolha um personagem'); return; }
+    try {
+      if (state.selectedHero) sessionStorage.setItem('arachne_selected_hero', state.selectedHero);
+      else sessionStorage.removeItem('arachne_selected_hero');
+    } catch {}
     $('login').classList.add('hidden');
     $('app').classList.remove('hidden');
-    $('role-label').textContent = role === 'master' ? 'MESTRE' : 'JOGADOR';
-    $('home-role').textContent = role === 'master' ? 'MESTRE' : 'JOGADOR';
+    $('player-select-area').classList.add('hidden');
+    $('password-area').classList.add('hidden');
+    updateAccessLabels();
     qsa('[data-master]').forEach(el => el.classList.toggle('hidden', role !== 'master'));
     loadNotesForRole();
-    goToPage(role === 'master' ? 'home' : 'heroes');
     renderAll();
+    renderPlayerNotes();
+    goToPage('home');
   }
 
   function logout() {
     state.role = 'player';
+    state.selectedHero = null;
     state.currentRoll = null;
+    try { sessionStorage.removeItem('arachne_selected_hero'); } catch {}
     $('app').classList.add('hidden');
     $('app').classList.remove('nav-open');
     $('login').classList.remove('hidden');
+    $('player-select-area').classList.add('hidden');
+    $('password-area').classList.add('hidden');
+    qsa('.login-actions').forEach(el => el.classList.remove('hidden'));
     $('master-password').value = '';
     $('login-error').textContent = '';
   }
 
   function goToPage(id) {
-    if ((id === 'home' || id === 'villains' || id === 'campaign' || id === 'dice' || id === 'scenario') && state.role !== 'master') id = 'heroes';
+    if ((id === 'villains' || id === 'campaign' || id === 'dice' || id === 'scenario' || id === 'notes') && state.role !== 'master') id = 'heroes';
     state.page = id;
     qsa('.page').forEach(el => el.classList.remove('active'));
     $(id)?.classList.add('active');
     qsa('#nav button').forEach(el => el.classList.toggle('active', el.dataset.page === id));
-    $('title').textContent = {home:'Central da Campanha',heroes:'Heróis',villains:'Vilões',campaign:'Projeto Arachne',dice:'Dados do Mestre',scenario:'Montador de Cenário',notes:'Anotações'}[id] || 'Projeto Arachne';
+    $('title').textContent = {home:'Central da Campanha',heroes:'Heróis',villains:'Vilões',campaign:'Projeto Arachne',dice:'Dados do Mestre',scenario:'Montador de Cenário',notes:'Anotações do Mestre'}[id] || 'Projeto Arachne';
     closeNav();
     if(id==='scenario')requestAnimationFrame(()=>fitScenarioBoard());
+    if(id==='heroes')renderPlayerNotes();
   }
 
   function openNav() { $('app').classList.add('nav-open'); $('menu-toggle').setAttribute('aria-expanded', 'true'); }
@@ -367,13 +405,21 @@
 
   function renderHeroes() {
     $('hero-count').textContent = String(state.heroes.length).padStart(2, '0');
+    const chosen = selectedHero();
+    const badge = $('selected-player-badge');
+    if (badge) {
+      badge.classList.toggle('hidden', state.role !== 'player' || !chosen);
+      badge.innerHTML = chosen ? `<span>${escapeHTML(chosen.i)}</span><div><small>VOCÊ ESTÁ JOGANDO COMO</small><b>${escapeHTML(chosen.n)}</b></div>` : '';
+    }
     $('heroes-grid').innerHTML = state.heroes.map((hero, index) => {
       const health = Number(statValue(hero,'Health') || 0);
       const focus = Number(statValue(hero,'Focus') || 0);
       const karma = Number(statValue(hero,'Karma') || 0);
-      const headline = hero.tags.includes('Heroic') ? 'HERÓI' : 'OPERATIVO';
+      const mine = state.role === 'player' && state.selectedHero === hero.id;
+      const headline = mine ? 'SEU PERSONAGEM' : hero.tags.includes('Heroic') ? 'HERÓI' : 'OPERATIVO';
       const topTags = [...hero.tags].slice(0,4);
-      return `<article class="card villain-card hero-card" data-hero-card="${index}">
+      const editButton = canEditHero(hero.id) ? `<button type="button" data-action="edit-hero" data-index="${index}">${mine ? 'EDITAR MINHA FICHA' : 'EDITAR'}</button>` : '';
+      return `<article class="card villain-card hero-card ${mine ? 'owned-hero-card' : ''}" data-hero-card="${index}">
         <div class="art art-${escapeHTML(hero.id)}"><span class="hero-glyph">${escapeHTML(hero.i)}</span><span class="rank">RANK ${clamp(hero.rank,1,6)} · ${headline}</span></div>
         <div class="body"><h3>${escapeHTML(hero.n)}</h3><div class="muted">${escapeHTML(hero.r)}</div>
           <div class="resource-bars hero-resource-bars">
@@ -382,11 +428,12 @@
           </div>
           <div class="hero-aux-stats"><span><small>KARMA</small><b>${karma}</b></span>${ABILITIES.slice(0,2).map(name=>`<span><small>${name.toUpperCase()}</small><b>${signed(abilityValue(hero,name))}</b></span>`).join('')}</div>
           <div class="chips">${topTags.map(tag => `<span class="chip">${escapeHTML(tag)}</span>`).join('')}</div>
-          <div class="card-actions hero-card-actions"><button class="primary" type="button" data-action="view-hero" data-index="${index}">VER RESUMO</button><button type="button" data-action="edit-hero" data-index="${index}">EDITAR</button><button class="sheet-button" type="button" data-action="view-hero-pdf" data-index="${index}">▣ VISUALIZAR FICHA COMPLETA</button></div>
+          <div class="card-actions hero-card-actions"><button class="primary" type="button" data-action="view-hero" data-index="${index}">VER RESUMO</button>${editButton}<button class="sheet-button" type="button" data-action="view-hero-pdf" data-index="${index}">▣ VISUALIZAR FICHA COMPLETA</button></div>
         </div>
       </article>`;
     }).join('');
     renderActorOptions();
+    renderPlayerNotes();
   }
 
   function renderVillains() {
@@ -489,7 +536,8 @@
     const hero = state.heroes[index];
     if (!hero) return;
     const abilityCards = ABILITIES.map(name => `<div><small>${name}</small><b>${signed(abilityValue(hero,name))}</b></div>`).join('');
-    openModal(`<h2 id="modal-title">${escapeHTML(hero.i)} ${escapeHTML(hero.n)}</h2><p class="muted">${escapeHTML(hero.r)} · Rank ${escapeHTML(hero.rank)}</p><div class="sheet">${hero.stats.map(([name,value]) => `<div><small>${escapeHTML(name)}</small><b>${escapeHTML(value)}</b></div>`).join('')}${abilityCards}</div><h3>Traits</h3><ul>${hero.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul><h3>Tags</h3><div class="chips">${hero.tags.map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div><div class="editbuttons"><button class="savebtn" type="button" data-action="view-hero-pdf" data-index="${index}">VISUALIZAR FICHA COMPLETA</button><button type="button" data-action="edit-hero" data-index="${index}">EDITAR DADOS RÁPIDOS</button></div>`);
+    const edit = canEditHero(hero.id) ? `<button type="button" data-action="edit-hero" data-index="${index}">${state.role === 'player' ? 'EDITAR MINHA FICHA' : 'EDITAR DADOS RÁPIDOS'}</button>` : '';
+    openModal(`<h2 id="modal-title">${escapeHTML(hero.i)} ${escapeHTML(hero.n)}</h2><p class="muted">${escapeHTML(hero.r)} · Rank ${escapeHTML(hero.rank)}</p><div class="sheet">${hero.stats.map(([name,value]) => `<div><small>${escapeHTML(name)}</small><b>${escapeHTML(value)}</b></div>`).join('')}${abilityCards}</div><h3>Traits</h3><ul>${hero.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul><h3>Tags</h3><div class="chips">${hero.tags.map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div><div class="editbuttons"><button class="savebtn" type="button" data-action="view-hero-pdf" data-index="${index}">VISUALIZAR FICHA COMPLETA</button>${edit}</div>`);
   }
 
   function viewHeroPdf(index) {
@@ -501,6 +549,7 @@
   function editHero(index) {
     const hero = state.heroes[index];
     if (!hero) return;
+    if (!canEditHero(hero.id)) { toast('Você só pode editar o personagem que escolheu'); return; }
     const abilityInputs = ABILITIES.map(name => `<label>${name}<input id="e-ability-${name}" type="number" min="-20" max="30" value="${escapeHTML(abilityValue(hero,name))}"></label>`).join('');
     openModal(`<h2 id="modal-title">Editar ${escapeHTML(hero.n)}</h2><div class="editgrid">
       <label>Nome<input id="e-name" value="${escapeHTML(hero.n)}" maxlength="60"></label><label>Identidade<input id="e-real" value="${escapeHTML(hero.r)}" maxlength="80"></label>
@@ -515,6 +564,7 @@
   function saveHero(index) {
     const hero = state.heroes[index];
     if (!hero) return;
+    if (!canEditHero(hero.id)) { toast('Edição não permitida para este personagem'); return; }
     hero.n = $('e-name').value.trim() || hero.n;
     hero.r = $('e-real').value.trim();
     hero.rank = clamp($('e-rank').value, 1, 6);
@@ -522,7 +572,8 @@
     ABILITIES.forEach(name => { hero.abilities[name] = clamp($(`e-ability-${name}`).value,-20,30); });
     hero.traits = $('e-traits').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,30);
     hero.tags = $('e-tags').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,30);
-    saveJSON(STORAGE.heroes, state.heroes);
+    localStorage.setItem(STORAGE.heroes, JSON.stringify(state.heroes));
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.saveHero(hero);
     renderHeroes();
     renderChallengeSummary();
     closeModal();
@@ -1385,12 +1436,77 @@
   function resetAllScenarioMovement(){state.scenario.turnMovement={};state.scenario.movementSpent={};saveScenario();renderScenario();toast('Nova rodada');}
 
   // -------------------- Notes / export --------------------
-  function activeNotesKey() { return state.role === 'master' ? STORAGE.notesMaster : STORAGE.notesPlayer; }
+  function renderPlayerNotes() {
+    const wrap = $('hero-player-notes');
+    if (!wrap) return;
+    const hero = selectedHero();
+    const visible = state.role === 'player' && !!hero;
+    wrap.classList.toggle('hidden', !visible);
+    if (!visible) return;
+    $('hero-notes-title').textContent = `${hero.i} ${hero.n} — minhas anotações`;
+    const textarea = $('hero-notes-text');
+    if (document.activeElement !== textarea) textarea.value = state.playerNotes[hero.id] || '';
+    updatePlayerNotesCount();
+    $('hero-notes-status').textContent = backendReady ? 'Sincronizado com o servidor' : 'Salvo neste navegador';
+  }
+
+  function updatePlayerNotesCount() {
+    const textarea = $('hero-notes-text');
+    if (!textarea) return;
+    const value = textarea.value || '';
+    const words = value.trim() ? value.trim().split(/\s+/).length : 0;
+    $('hero-notes-count').textContent = `${words} palavra${words === 1 ? '' : 's'} · ${value.length} caractere${value.length === 1 ? '' : 's'}`;
+  }
+
+  function savePlayerNotes() {
+    const hero = selectedHero();
+    if (!hero || state.role !== 'player') return;
+    state.playerNotes[hero.id] = $('hero-notes-text').value;
+    localStorage.setItem(STORAGE.playerNotes, JSON.stringify(state.playerNotes));
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.saveStorageKey(STORAGE.playerNotes, state.playerNotes);
+    updatePlayerNotesCount();
+    markSaved(backendReady ? 'Anotações sincronizadas' : 'Anotações salvas');
+    $('hero-notes-status').textContent = backendReady ? 'Alterações sincronizadas' : 'Alterações salvas localmente';
+  }
+
+  function playerNotesMarkdown() {
+    const hero = selectedHero();
+    const date = new Date().toLocaleString('pt-BR');
+    return `# Projeto Arachne — ${hero?.n || 'Jogador'}\n\n**Personagem:** ${hero?.n || ''}  \n**Identidade:** ${hero?.r || ''}  \n**Exportado em:** ${date}\n\n---\n\n${$('hero-notes-text').value || ''}\n`;
+  }
+
+  async function copyPlayerNotes() {
+    const value = $('hero-notes-text').value || '';
+    if (!value) return toast('Não há anotações para copiar');
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value);
+      else throw new Error('fallback');
+    } catch {
+      const temp = document.createElement('textarea');
+      temp.value = value; temp.setAttribute('readonly',''); temp.style.position='absolute'; temp.style.left='-9999px';
+      document.body.appendChild(temp); temp.select(); document.execCommand('copy'); temp.remove();
+    }
+    $('hero-notes-status').textContent = 'Copiado agora';
+    toast('Anotações copiadas');
+  }
+
+  function exportPlayerNotes(format) {
+    const hero = selectedHero();
+    const value = $('hero-notes-text').value || '';
+    if (!hero || !value) return toast('Não há anotações para exportar');
+    const stamp = exportStamp();
+    if (format === 'md') downloadText(`arachne-${hero.id}-anotacoes_${stamp}.md`, playerNotesMarkdown(), 'text/markdown;charset=utf-8');
+    else downloadText(`arachne-${hero.id}-anotacoes_${stamp}.txt`, value, 'text/plain;charset=utf-8');
+    $('hero-notes-status').textContent = `Exportado ${format.toUpperCase()}`;
+    toast(`Anotações exportadas em .${format}`);
+  }
+
+  function activeNotesKey() { return STORAGE.notesMaster; }
   function loadNotesForRole() {
     if (!$('notes-text')) return;
     $('notes-text').value = localStorage.getItem(activeNotesKey()) || '';
     updateNotesCount();
-    $('notes-export-status').textContent = state.role === 'master' ? 'Bloco privado do Mestre' : 'Bloco do Jogador';
+    $('notes-export-status').textContent = 'Bloco privado do Mestre';
   }
 
   function updateNotesCount() {
@@ -1439,7 +1555,7 @@
   }
 
   function notesMarkdown() {
-    const role = state.role === 'master' ? 'Mestre' : 'Jogador';
+    const role = 'Mestre';
     const date = new Date().toLocaleString('pt-BR');
     return `# Projeto Arachne — Anotações\n\n**Perfil:** ${role}  \n**Exportado em:** ${date}\n\n---\n\n${$('notes-text').value || ''}\n`;
   }
@@ -1457,7 +1573,7 @@
   function exportBackup() {
     const backup = {
       app:'Projeto Arachne', version:APP_VERSION, exportedAt:new Date().toISOString(), role:state.role,
-      notes:$('notes-text').value, heroes:state.heroes, villains:state.villains, campaign:state.campaign,
+      notes:$('notes-text').value, playerNotes:state.playerNotes, heroes:state.heroes, villains:state.villains, campaign:state.campaign,
       challenge:state.challenge, diceHistory:state.diceHistory, scenario:state.scenario, initiativeParticipants:state.initiativeParticipants
     };
     downloadText(`projeto-arachne-backup_${exportStamp()}.json`, JSON.stringify(backup,null,2), 'application/json;charset=utf-8');
@@ -1481,7 +1597,9 @@
   }
 
   // Login
-  $('player-login').addEventListener('click', () => enter('player'));
+  $('player-login').addEventListener('click', () => { qsa('.login-actions').forEach(el => el.classList.add('hidden')); $('password-area').classList.add('hidden'); $('player-select-area').classList.remove('hidden'); $('login-error').textContent=''; });
+  qsa('[data-player-hero]').forEach(button => button.addEventListener('click', () => enter('player', button.dataset.playerHero)));
+  $('back-login').addEventListener('click', () => { $('player-select-area').classList.add('hidden'); qsa('.login-actions').forEach(el => el.classList.remove('hidden')); });
   $('master-login').addEventListener('click', () => {
     $('password-area').classList.toggle('hidden');
     if (!$('password-area').classList.contains('hidden')) $('master-password').focus();
@@ -1616,6 +1734,19 @@
     if (backendReady && window.ArachneAPI) window.ArachneAPI.saveStorageKey(key, '');
     updateNotesCount();
     $('notes-export-status').textContent = 'Anotações limpas';
+    toast('Anotações limpas');
+  });
+
+  $('hero-notes-text').addEventListener('input', savePlayerNotes);
+  $('copy-hero-notes').addEventListener('click', copyPlayerNotes);
+  $('export-hero-notes-md').addEventListener('click', () => exportPlayerNotes('md'));
+  $('export-hero-notes-txt').addEventListener('click', () => exportPlayerNotes('txt'));
+  $('clear-hero-notes').addEventListener('click', () => {
+    const hero = selectedHero();
+    if (!hero || !$('hero-notes-text').value || !confirm(`Limpar as anotações de ${hero.n}?`)) return;
+    $('hero-notes-text').value = '';
+    savePlayerNotes();
+    $('hero-notes-status').textContent = 'Anotações limpas';
     toast('Anotações limpas');
   });
 

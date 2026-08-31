@@ -5,7 +5,7 @@ import { config } from './config.js';
 import { createRepository } from './db/index.js';
 
 const repo = createRepository();
-const allowedKeys = new Set(['heroes','villains','campaign','dice','challenge','scenario','initiative','notesPlayer','notesMaster']);
+const allowedKeys = new Set(['heroes','villains','campaign','dice','challenge','scenario','initiative','playerNotes','notesPlayer','notesMaster']);
 const MIME = {
   '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8',
   '.json':'application/json; charset=utf-8', '.pdf':'application/pdf', '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.svg':'image/svg+xml'
@@ -63,6 +63,21 @@ async function handleApi(req, res, url) {
     await repo.setMany(sanitized);
     return send(res, 200, { ok:true, saved:Object.keys(sanitized) }, headers);
   }
+  const heroMatch = url.pathname.match(/^\/api\/heroes\/([^/]+)$/);
+  if (heroMatch && req.method === 'PUT') {
+    const heroId = decodeURIComponent(heroMatch[1]);
+    const body = await readJson(req);
+    const hero = body?.hero;
+    if (!hero || typeof hero !== 'object' || Array.isArray(hero) || hero.id !== heroId) return send(res, 400, { ok:false, error:'Herói inválido.' }, headers);
+    const current = await repo.get('heroes');
+    const heroes = Array.isArray(current) ? [...current] : [];
+    const index = heroes.findIndex(item => item?.id === heroId);
+    if (index >= 0) heroes[index] = hero;
+    else heroes.push(hero);
+    await repo.set('heroes', heroes);
+    return send(res, 200, { ok:true, data:hero }, headers);
+  }
+
   const match = url.pathname.match(/^\/api\/state\/([^/]+)$/);
   if (match) {
     const key = decodeURIComponent(match[1]);
