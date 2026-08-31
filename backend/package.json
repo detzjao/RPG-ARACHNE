@@ -1,0 +1,13 @@
+{
+  "name": "projeto-arachne-backend",
+  "version": "11.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
