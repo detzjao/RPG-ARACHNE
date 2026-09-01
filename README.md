@@ -1,449 +1,166 @@
-# RPG Arachne
+# RPG Arachne v20
 
-O **Arachne** é uma mesa virtual desenvolvida para auxiliar na organização e execução de uma campanha de RPG inspirada no universo Marvel.
+Mesa virtual online para campanhas de **Marvel Multiverse RPG**.
 
-A aplicação reúne fichas de personagens, informações da campanha, anotações individuais, ferramentas do Mestre e o cenário tático utilizado durante as sessões.
+A v20 muda a arquitetura de criação de campanhas: novas mesas não clonam mais automaticamente o Projeto Arachne. O Mestre escolhe como a campanha será criada e depois pode editar elenco, fichas, PDF e sessões sem modificar os modelos originais.
 
-O projeto começou como uma aplicação totalmente em frontend e evoluiu para uma arquitetura separada em **frontend + backend + persistência de dados**, permitindo compartilhar o estado da mesa entre diferentes dispositivos e preparando a aplicação para utilizar Supabase/PostgreSQL no ambiente online.
+## Criação de campanha
 
-## O que já existe no projeto
+Ao criar uma mesa existem três modos:
 
-### Campanha
+- **Campanha pronta** — cria uma cópia editável de um template.
+- **Em branco** — começa sem heróis, vilões ou sessões.
+- **Importar PDF** — cria uma campanha vazia e envia o PDF do narrador para a mesa.
 
-A aplicação possui uma área dedicada à campanha, onde ficam concentradas as informações utilizadas pelo Mestre durante a mesa.
+## Campanhas prontas incluídas
 
-O Mestre consegue acompanhar o progresso das sessões e consultar o PDF completo da campanha.
+- Projeto Arachne
+- Os Vingadores — Protocolo Destino
+- X-Men — Era do Apocalipse
+- Quarteto Fantástico — A Zona Negativa
+- Sombras de Hell's Kitchen
 
-### Fichas de heróis
+Os templates guardam estrutura, elenco recomendado, antagonistas e sessões. Ao iniciar uma campanha, o backend cria uma cópia independente. Alterar a cópia não altera o template.
 
-Os três personagens jogadores disponíveis atualmente são:
+## Elenco editável
 
-- Homem-Aranha — Peter Parker;
-- Wolverine — James Howlett / Logan;
-- Capitão América — Steve Rogers.
+Na página **Campanha > Configurar campanha**, o Mestre pode:
 
-As fichas possuem informações como:
+- adicionar/remover heróis;
+- adicionar/remover vilões;
+- usar personagens presentes nas campanhas prontas;
+- criar um personagem do zero;
+- editar atributos completos;
+- enviar imagem do personagem;
+- enviar ficha em PDF.
 
-- Nome;
-- Identidade;
-- Rank;
-- Health;
-- Focus;
-- Karma;
-- velocidade;
-- habilidades MARVEL;
-- Powers;
-- Traits;
-- Tags;
-- PDF completo da ficha.
+A lista de personagens disponíveis na tela de entrada do jogador agora é gerada pelo elenco real daquela campanha. O jogador continua podendo editar somente o personagem escolhido.
 
-#### Habilidades MARVEL
+## Conteúdo da campanha
 
-- Melee;
-- Agility;
-- Resilience;
-- Vigilance;
-- Ego;
-- Logic.
+O Mestre pode:
 
-### Jogadores separados por personagem
+- editar título, subtítulo e resumo;
+- escrever o conteúdo da campanha dentro do sistema;
+- enviar ou trocar o PDF da campanha;
+- criar, editar e remover sessões;
+- acompanhar o progresso das sessões.
 
-Ao entrar como **Jogador**, a aplicação pergunta qual personagem será utilizado naquela sessão:
+## Uploads
 
-- Homem-Aranha;
-- Wolverine;
-- Capitão América.
+Tipos aceitos:
 
-A escolha define o personagem controlado pelo jogador durante aquela sessão.
+- PDF
+- PNG
+- JPEG
+- WebP
 
-Exemplo: se o jogador entrar como **Wolverine**:
+Limite atual por arquivo: **30 MB**.
 
-- pode visualizar a ficha do Homem-Aranha;
-- pode visualizar a ficha do Capitão América;
-- pode visualizar a ficha completa em PDF dos três heróis;
-- pode editar somente a ficha do Wolverine;
-- não recebe o botão de edição dos outros dois personagens.
+### SQLite/local
 
-O Mestre continua podendo editar qualquer ficha.
-
-A seleção do personagem é mantida durante a sessão atual do navegador.
-
-> Atualmente essa separação funciona como controle de permissão da aplicação. Autenticação real de usuários pode ser adicionada futuramente com Supabase Auth.
-
-### Anotações individuais
-
-Cada personagem possui agora seu próprio bloco de anotações.
-
-As anotações ficam na própria página **Heróis**, abaixo das fichas.
-
-Assim:
-
-- Homem-Aranha possui suas próprias anotações;
-- Wolverine possui suas próprias anotações;
-- Capitão América possui suas próprias anotações.
-
-O jogador só vê e edita o bloco correspondente ao personagem escolhido no login.
-
-As anotações podem ser:
-
-- salvas no banco;
-- copiadas integralmente;
-- exportadas em `.md`;
-- exportadas em `.txt`;
-- apagadas quando necessário.
-
-O Mestre continua possuindo um bloco privado separado para suas próprias anotações.
-
-### Fichas de vilões
-
-Os vilões possuem fichas próprias e podem ser administrados pelo Mestre.
-
-Entre os dados disponíveis estão:
-
-- Nome;
-- Identidade;
-- Rank;
-- Tier;
-- Health máximo;
-- Health atual;
-- Focus máximo;
-- Focus atual;
-- redução de dano de Health;
-- redução de dano de Focus;
-- iniciativa;
-- velocidade;
-- ocupação;
-- origem;
-- equipes;
-- base;
-- função na campanha;
-- gancho narrativo;
-- habilidades MARVEL;
-- Powers;
-- Traits;
-- Tags;
-- ficha completa em PDF.
-
-O Mestre pode alterar os valores durante a sessão conforme os acontecimentos da aventura.
-
-### Ferramentas de dados do Mestre
-
-O projeto possui ferramentas próprias para auxiliar durante os combates:
-
-- D616;
-- cálculo de dano;
-- iniciativa;
-- outros dados poliédricos.
-
-Essas ferramentas ficam disponíveis somente para o Mestre na interface.
-
-### Cenário
-
-O Arachne possui um cenário tático próprio para combates e outras situações da campanha.
-
-O Mestre possui controle sobre:
-
-- peças dos heróis;
-- peças dos inimigos;
-- obstáculos;
-- terreno;
-- elevações;
-- água;
-- áreas escaláveis;
-- áreas puláveis;
-- movimentação baseada em Speed;
-- geração de mapas;
-- modelos de ambientes.
-
-O sistema já possui diferentes tipos de ambiente, como:
-
-- laboratório;
-- garagem;
-- ambiente fechado;
-- sala pequena;
-- sala grande;
-- telhado;
-- floresta;
-- madeireira;
-- taverna;
-- ruínas;
-- rua da cidade.
-
-## Mestre e jogadores
-
-### Mestre
-
-O Mestre possui acesso às ferramentas administrativas da mesa, incluindo:
-
-- edição de todos os heróis;
-- edição dos vilões;
-- controle da campanha;
-- ferramentas de dados;
-- controle do cenário;
-- gerenciamento dos inimigos;
-- movimentação das peças;
-- controle de rodada;
-- anotações privadas do Mestre.
-
-### Jogadores
-
-Os jogadores possuem acesso às informações necessárias para acompanhar a mesa.
-
-Cada jogador:
-
-- escolhe seu personagem ao entrar;
-- visualiza todos os heróis;
-- visualiza os PDFs das fichas;
-- edita somente o personagem escolhido;
-- possui anotações próprias vinculadas ao personagem.
-
-## Tecnologias utilizadas
-
-### Frontend
-
-- HTML;
-- CSS;
-- JavaScript.
-
-O frontend é responsável pela interface da aplicação, fichas, ferramentas visuais e interação com a API.
-
-### Backend
-
-- Node.js;
-- JavaScript;
-- API REST.
-
-O backend recebe as requisições do frontend e realiza a persistência do estado da campanha.
-
-### Banco de dados
-
-O projeto possui suporte a:
-
-- **SQLite** para desenvolvimento local;
-- **Supabase/PostgreSQL** para ambiente online.
-
-O SQL necessário para criar as tabelas no Supabase está disponível em:
+Os arquivos são guardados em:
 
 ```text
-backend/database/supabase.sql
+backend/uploads/
 ```
 
-## Estrutura do projeto
+### Supabase
+
+Quando `DB_PROVIDER=supabase`, os arquivos são enviados para o Supabase Storage. O backend usa a Service Role e prepara automaticamente o bucket público configurado em:
+
+```env
+SUPABASE_STORAGE_BUCKET=arachne-assets
+```
+
+A `SUPABASE_SERVICE_ROLE_KEY` nunca deve ir para o frontend.
+
+## Estrutura
 
 ```text
-RPG-ARACHNE/
-│
+projeto-arachne-v20/
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
 │   ├── script.js
 │   ├── api-client.js
 │   └── assets/
-│
 ├── backend/
 │   ├── src/
 │   │   ├── server.js
+│   │   ├── templates.js
+│   │   ├── files.js
+│   │   ├── auth.js
 │   │   └── db/
 │   ├── database/
-│   │   ├── schema.sqlite.sql
-│   │   └── supabase.sql
-│   ├── data/
-│   ├── package.json
-│   └── .env.example
-│
-├── start.bat
-├── start.sh
-├── .gitignore
+│   └── package.json
+├── render.yaml
+├── netlify.toml
 └── README.md
 ```
 
-## Como executar localmente
-
-Entre na pasta do backend:
+## Rodar localmente
 
 ```bash
 cd backend
-```
-
-Inicie o servidor:
-
-```bash
 npm start
 ```
 
-Por padrão, a API fica disponível em:
-
-```text
-http://localhost:3000/api
-```
-
-Quando `SERVE_FRONTEND=true`, o backend também disponibiliza o frontend em:
+Abra:
 
 ```text
 http://localhost:3000
 ```
 
-## Persistência local
+Evite abrir `frontend/index.html` diretamente quando quiser testar login, uploads, sincronização e múltiplas campanhas.
 
-Durante o desenvolvimento, o projeto pode utilizar SQLite.
+## Supabase
 
-O banco é criado automaticamente em:
-
-```text
-backend/data/arachne.sqlite
-```
-
-O frontend também mantém cache local no navegador para reduzir o risco de perda de dados quando a API estiver temporariamente indisponível.
-
-## Configuração do Supabase
-
-Para utilizar Supabase, crie um projeto e execute:
-
-```text
-backend/database/supabase.sql
-```
-
-Depois copie:
-
-```text
-backend/.env.example
-```
-
-para:
-
-```text
-backend/.env
-```
-
-Configure:
+Variáveis principais:
 
 ```env
 DB_PROVIDER=supabase
 SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=sua-chave-secreta
-CAMPAIGN_ID=main
-SERVE_FRONTEND=false
+SUPABASE_STORAGE_BUCKET=arachne-assets
+SESSION_SECRET=uma-chave-grande-e-aleatoria
+SERVE_FRONTEND=true
 CORS_ORIGIN=*
 ```
 
-A `SUPABASE_SERVICE_ROLE_KEY` é privada e nunca deve ser colocada no frontend ou enviada para o GitHub.
+Execute `backend/database/supabase.sql` no SQL Editor antes do primeiro deploy.
 
-## Dados salvos atualmente
+## O que continua sincronizado
 
-O backend já persiste estados como:
+Cada campanha mantém estado independente para:
 
-```text
-heroes
-villains
-campaign
-dice
-challenge
-scenario
-initiative
-playerNotes
-notesMaster
-```
+- heróis;
+- vilões;
+- Health e Focus;
+- campanha e progresso;
+- cenário e peças;
+- iniciativa;
+- rolagens e histórico;
+- anotações dos jogadores;
+- anotações do Mestre.
 
-`playerNotes` armazena as anotações separadas por personagem.
+O realtime continua usando SSE por campanha.
 
-## Deploy
 
-A arquitetura permite hospedar frontend, backend e banco separadamente.
+## Atualizações v26
+- Continuei a biblioteca visual e substituí artes de Luke Cage, Barão Zemo e Encantadora por recortes melhores.
+- Enriqueci as fichas dos personagens adicionais com mais dados: role, hook, movement, powers, traits, tags e estatísticas completas.
+- Regenerei os PDFs das fichas atualizadas para esses heróis e vilões extras.
 
-### Frontend
 
-Pode ser publicado em serviços como:
+## Atualizações v28
+- Auditoria da biblioteca contra os perfis destacados do Core Rulebook.
+- Primeiro lote de expansão oficial: Pantera Negra, Capitã Marvel, Doutor Estranho, Hulk, Gavião Arqueiro, Feiticeira Escarlate, Shang-Chi, Mulher-Hulk, Visão e Máquina de Combate.
+- Cada novo personagem recebeu ficha de dados completa, powers, traits, tags, portrait card e PDF próprio.
+- APP_VERSION atualizado para 27.
 
-- Netlify;
-- Vercel;
-- Cloudflare Pages.
 
-### Backend
-
-Pode ser publicado em serviços como:
-
-- Render;
-- Railway;
-- Fly.io;
-- VPS próprio.
-
-### Banco
-
-O ambiente online pode utilizar Supabase/PostgreSQL.
-
-```text
-Jogador / Mestre
-       │
-       ▼
-    Frontend
-       │
-       ▼
-    Backend
-       │
-       ▼
-   Supabase
-       │
-       ▼
-     Banco
-```
-
-A chave `service_role` permanece apenas no backend.
-
-## Estado atual do projeto
-
-Atualmente o Arachne já possui:
-
-- campanha;
-- fichas completas de heróis;
-- fichas de vilões;
-- PDFs das fichas;
-- edição de personagens;
-- seleção de personagem ao entrar como jogador;
-- permissão para o jogador editar somente seu personagem;
-- visualização das fichas dos outros heróis;
-- anotações separadas por personagem;
-- exportação das anotações;
-- Health;
-- Focus;
-- Karma;
-- habilidades MARVEL;
-- Powers;
-- Traits;
-- Tags;
-- ferramentas de dados;
-- cenário tático;
-- mapas gerados aleatoriamente;
-- movimentação baseada em Speed;
-- frontend separado do backend;
-- API REST;
-- persistência com SQLite;
-- adaptador para Supabase;
-- SQL pronto para Supabase/PostgreSQL.
-
-## Próximos passos
-
-Algumas evoluções possíveis são:
-
-- Supabase Auth;
-- contas reais para Mestre e jogadores;
-- impedir que dois jogadores escolham o mesmo personagem simultaneamente;
-- salas de campanha por código;
-- múltiplas campanhas;
-- presença online;
-- sincronização em tempo real;
-- histórico de alterações;
-- permissões validadas também pelo backend;
-- chat da mesa;
-- upload de mapas;
-- upload de fichas;
-- controle de iniciativa compartilhado;
-- sistema de combate mais completo;
-- histórico de rolagens por sessão.
-
-## Objetivo
-
-O objetivo do Arachne é reunir em uma única aplicação tudo o que a mesa precisa durante uma campanha: personagens, fichas, anotações, ferramentas do Mestre, campanha e cenário.
-
-A ideia é que o Mestre consiga conduzir a sessão com controle sobre os elementos administrativos enquanto cada jogador possui sua própria identidade dentro da mesa, sua ficha editável e seu espaço individual de anotações.
-
-O projeto continua em desenvolvimento e pode evoluir futuramente para uma plataforma de campanha completa com autenticação, salas e sincronização em tempo real.
+## Correção v28 — Biblioteca completa
+- A tela **+ Adicionar** agora usa `/api/characters` e mostra todos os personagens cadastrados na biblioteca, mesmo quando eles não pertencem a nenhum template de campanha.
+- Os novos heróis da v27 (Pantera Negra, Capitã Marvel, Doutor Estranho, Hulk, Gavião Arqueiro, Feiticeira Escarlate, Shang-Chi, Mulher-Hulk, Visão e Máquina de Combate) passam a aparecer normalmente no seletor.
+- A criação de campanhas também usa a biblioteca completa.

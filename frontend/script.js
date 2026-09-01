@@ -1,19 +1,23 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = 13;
+  const APP_VERSION = 28;
+  let activeCampaignCacheKey = 'lobby';
+  const keyFor = suffix => `arachne_v${APP_VERSION}_${activeCampaignCacheKey}_${suffix}`;
   const STORAGE = {
-    heroes: `arachne_v${APP_VERSION}_heroes`,
-    notesPlayer: `arachne_v${APP_VERSION}_notes_player`,
-    playerNotes: `arachne_v${APP_VERSION}_player_notes`,
-    notesMaster: `arachne_v${APP_VERSION}_notes_master`,
-    campaign: `arachne_v${APP_VERSION}_campaign`,
-    dice: `arachne_v${APP_VERSION}_dice`,
-    challenge: `arachne_v${APP_VERSION}_challenge`,
-    villains: `arachne_v${APP_VERSION}_villains`,
-    scenario: `arachne_v${APP_VERSION}_scenario`,
-    initiative: `arachne_v${APP_VERSION}_initiative`
+    get heroes(){ return keyFor('heroes'); },
+    get notesPlayer(){ return keyFor('notes_player'); },
+    get playerNotes(){ return keyFor('player_notes'); },
+    get notesMaster(){ return keyFor('notes_master'); },
+    get campaign(){ return keyFor('campaign'); },
+    get campaignContent(){ return keyFor('campaign_content'); },
+    get dice(){ return keyFor('dice'); },
+    get challenge(){ return keyFor('challenge'); },
+    get villains(){ return keyFor('villains'); },
+    get scenario(){ return keyFor('scenario'); },
+    get initiative(){ return keyFor('initiative'); }
   };
+  const CAMPAIGN_LIBRARY_KEY = 'arachne_campaign_library';
 
   const ABILITIES = ['Melee', 'Agility', 'Resilience', 'Vigilance', 'Ego', 'Logic'];
 
@@ -21,13 +25,56 @@
     spider:{src:'assets/portraits/hero-spider.jpg', position:'center 18%'},
     wolverine:{src:'assets/portraits/hero-wolverine.jpg', position:'center 20%'},
     cap:{src:'assets/portraits/hero-cap.jpg', position:'center 26%'},
+    'iron-man':{src:'assets/portraits/hero-iron-man.png', position:'center 20%'},
+    thor:{src:'assets/portraits/hero-thor.png', position:'center 18%'},
+    cyclops:{src:'assets/portraits/hero-cyclops.png', position:'center 22%'},
+    storm:{src:'assets/portraits/hero-storm.png', position:'center 20%'},
+    gambit:{src:'assets/portraits/hero-gambit.png', position:'center 20%'},
     octopus:{src:'assets/portraits/villain-octopus.jpg', position:'center 24%'},
     sabretooth:{src:'assets/portraits/villain-sabretooth.jpg', position:'center 24%'},
     crossbones:{src:'assets/portraits/villain-crossbones.jpg', position:'center 28%'},
     goblin:{src:'assets/portraits/villain-goblin.jpg', position:'center 24%'},
     'hydra-agent':{src:'assets/portraits/villain-hydra-agent.jpg', position:'center 22%'},
     'aim-agent':{src:'assets/portraits/villain-aim-agent.jpg', position:'center 28%'},
-    sinister:{src:'assets/portraits/villain-sinister.jpg', position:'center 18%'}
+    sinister:{src:'assets/portraits/villain-sinister.jpg', position:'center 18%'},
+    iceman:{src:'assets/portraits/hero-iceman.png', position:'center 22%'},
+    'mr-fantastic':{src:'assets/portraits/hero-mr-fantastic.png', position:'center 22%'},
+    'invisible-woman':{src:'assets/portraits/hero-invisible-woman.png', position:'center center'},
+    'human-torch':{src:'assets/portraits/hero-human-torch.png', position:'center 18%'},
+    thing:{src:'assets/portraits/hero-thing.png', position:'center 20%'},
+    daredevil:{src:'assets/portraits/hero-daredevil.png', position:'center 18%'},
+    'luke-cage':{src:'assets/portraits/hero-luke-cage.png', position:'center 18%'},
+    deadpool:{src:'assets/portraits/hero-deadpool.png', position:'center 18%'},
+    doom:{src:'assets/portraits/villain-doom.png', position:'center 16%'},
+    loki:{src:'assets/portraits/villain-loki.png', position:'center 18%'},
+    zemo:{src:'assets/portraits/villain-zemo.png', position:'center 16%'},
+    abomination:{src:'assets/portraits/villain-abomination.png', position:'center center'},
+    enchantress:{src:'assets/portraits/villain-enchantress.png', position:'center 16%'},
+    apocalypse:{src:'assets/portraits/villain-apocalypse.png', position:'center 18%'},
+    mystique:{src:'assets/portraits/villain-mystique.png', position:'center center'},
+    juggernaut:{src:'assets/portraits/villain-juggernaut.png', position:'center center'},
+    magneto:{src:'assets/portraits/villain-magneto.png', position:'center 18%'},
+    annihilus:{src:'assets/portraits/villain-annihilus.png', position:'center center'},
+    'super-skrull':{src:'assets/portraits/villain-super-skrull.png', position:'center center'},
+    blastaar:{src:'assets/portraits/villain-blastaar.png', position:'center center'},
+    'molecule-man':{src:'assets/portraits/villain-molecule-man.png', position:'center center'},
+    kingpin:{src:'assets/portraits/villain-kingpin.png', position:'center center'},
+    bullseye:{src:'assets/portraits/villain-bullseye.png', position:'center center'},
+    ajax:{src:'assets/portraits/villain-ajax.png', position:'center center'},
+    tombstone:{src:'assets/portraits/villain-tombstone.png', position:'center center'},
+    madcap:{src:'assets/portraits/villain-madcap.png', position:'center center'},
+    't-ray':{src:'assets/portraits/villain-t-ray.png', position:'center center'},
+    elektra:{src:'assets/portraits/villain-elektra.png', position:'center center'},
+    "black-panther":{src:"assets/portraits/hero-black-panther.png", position:'center center'},
+    "captain-marvel":{src:"assets/portraits/hero-captain-marvel.png", position:'center center'},
+    "doctor-strange":{src:"assets/portraits/hero-doctor-strange.png", position:'center center'},
+    "hulk":{src:"assets/portraits/hero-hulk.png", position:'center center'},
+    "hawkeye":{src:"assets/portraits/hero-hawkeye.png", position:'center center'},
+    "scarlet-witch":{src:"assets/portraits/hero-scarlet-witch.png", position:'center center'},
+    "shang-chi":{src:"assets/portraits/hero-shang-chi.png", position:'center center'},
+    "she-hulk":{src:"assets/portraits/hero-she-hulk.png", position:'center center'},
+    "vision":{src:"assets/portraits/hero-vision.png", position:'center center'},
+    "war-machine":{src:"assets/portraits/hero-war-machine.png", position:'center center'},
   };
 
   const DEFAULT_HEROES = [
@@ -188,26 +235,29 @@
     ]
   };
 
-  const MASTER_PASSWORD = 'ARACHNE';
   const $ = id => document.getElementById(id);
   const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
   const clone = value => typeof structuredClone === 'function' ? structuredClone(value) : JSON.parse(JSON.stringify(value));
   const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 
-  function characterArt(id) {
-    return CHARACTER_ART[id]?.src || '';
+  function characterArt(id, custom = '') {
+    return custom || CHARACTER_ART[id]?.src || '';
   }
 
   function characterArtPosition(id) {
     return CHARACTER_ART[id]?.position || 'center center';
   }
 
-  function characterArtMarkup(id, label, extraClass = '') {
-    const src = characterArt(id);
+  function monogram(label='?') {
+    return String(label||'?').split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase() || '?';
+  }
+
+  function characterArtMarkup(id, label, extraClass = '', custom = '') {
+    const src = characterArt(id, custom);
     const pos = characterArtPosition(id);
     return src
       ? `<img class="character-art-image ${extraClass}" src="${escapeHTML(src)}" alt="${escapeHTML(label)}" loading="lazy" style="object-position:${escapeHTML(pos)}">`
-      : `<span class="hero-glyph">${escapeHTML(label)}</span>`;
+      : `<span class="hero-glyph ${escapeHTML(extraClass)}"><b>${escapeHTML(monogram(label))}</b><small>${escapeHTML(label)}</small></span>`;
   }
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, Number(value) || 0));
@@ -216,6 +266,13 @@
   const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let backendReady = false;
+  let activeCampaign = null;
+  let availableTemplates = [];
+  let availableCharacters = {heroes:[],villains:[]};
+  let createCampaignMode = 'template';
+  let selectedTemplateId = 'arachne';
+  let builderHeroIds = [];
+  let builderVillainIds = [];
 
   function loadJSON(key, fallback) {
     try {
@@ -230,36 +287,34 @@
     if (backendReady && window.ArachneAPI) window.ArachneAPI.saveStorageKey(key, value);
   }
 
-  // Migração para v12 com fallbacks anteriores.
-  const migrationCandidates = {
-    heroes:['arachne_v11_heroes','arachne_v10_heroes','arachne_v9_heroes','arachne_v8_heroes','arachne_v7_heroes','arachne_v6_heroes','arachne_v5_heroes','arachne_v4_heroes','arachne_v3_heroes'],
-    campaign:['arachne_v11_campaign','arachne_v10_campaign','arachne_v9_campaign','arachne_v8_campaign','arachne_v7_campaign','arachne_v6_campaign','arachne_v5_campaign','arachne_v4_campaign','arachne_v3_campaign'],
-    dice:['arachne_v11_dice','arachne_v10_dice','arachne_v9_dice','arachne_v8_dice','arachne_v7_dice','arachne_v6_dice','arachne_v5_dice','arachne_v4_dice','arachne_v3_dice'],
-    challenge:['arachne_v11_challenge','arachne_v10_challenge','arachne_v9_challenge','arachne_v8_challenge','arachne_v7_challenge','arachne_v6_challenge','arachne_v5_challenge','arachne_v4_challenge']
-  };
-  Object.entries(migrationCandidates).forEach(([name, keys]) => {
-    if (localStorage.getItem(STORAGE[name])) return;
-    const oldKey = keys.find(key => localStorage.getItem(key) != null);
+  // Migração automática de versões anteriores para a estrutura atual.
+  const priorVersions = [18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3];
+  const migrateJsonKey = (name, suffix = name) => {
+    if (localStorage.getItem(STORAGE[name]) != null) return;
+    const oldKey = priorVersions.map(v => `arachne_v${v}_${suffix}`).find(key => localStorage.getItem(key) != null);
     if (oldKey) localStorage.setItem(STORAGE[name], localStorage.getItem(oldKey));
-  });
-  if (!localStorage.getItem(STORAGE.villains)) { const oldVillains = localStorage.getItem('arachne_v11_villains') ?? localStorage.getItem('arachne_v10_villains') ?? localStorage.getItem('arachne_v9_villains') ?? localStorage.getItem('arachne_v8_villains') ?? localStorage.getItem('arachne_v7_villains') ?? localStorage.getItem('arachne_v6_villains'); if (oldVillains != null) localStorage.setItem(STORAGE.villains, oldVillains); }
+  };
+  migrateJsonKey('heroes');
+  migrateJsonKey('villains');
+  migrateJsonKey('campaign');
+  migrateJsonKey('dice');
+  migrateJsonKey('challenge');
+  migrateJsonKey('scenario');
+  migrateJsonKey('initiative');
+  migrateJsonKey('notesPlayer','notes_player');
+  migrateJsonKey('notesMaster','notes_master');
+  migrateJsonKey('playerNotes','player_notes');
   if (!localStorage.getItem(STORAGE.notesPlayer)) {
-    const oldNotes = localStorage.getItem('arachne_v11_notes_player') ?? localStorage.getItem('arachne_v10_notes_player') ?? localStorage.getItem('arachne_v9_notes_player') ?? localStorage.getItem('arachne_v8_notes_player') ?? localStorage.getItem('arachne_v7_notes_player') ?? localStorage.getItem('arachne_v6_notes_player') ?? localStorage.getItem('arachne_v5_notes_player') ?? localStorage.getItem('arachne_v4_notes_player') ?? localStorage.getItem('arachne_v3_notes') ?? localStorage.getItem('arachne_notes');
-    if (oldNotes != null) localStorage.setItem(STORAGE.notesPlayer, oldNotes || '');
+    const legacy = localStorage.getItem('arachne_v3_notes') ?? localStorage.getItem('arachne_notes');
+    if (legacy != null) localStorage.setItem(STORAGE.notesPlayer, legacy || '');
   }
-  if (!localStorage.getItem(STORAGE.playerNotes)) {
-    const oldPlayerNotes = localStorage.getItem('arachne_v11_player_notes');
-    if (oldPlayerNotes != null) localStorage.setItem(STORAGE.playerNotes, oldPlayerNotes);
-    else localStorage.setItem(STORAGE.playerNotes, JSON.stringify({spider:'',wolverine:'',cap:''}));
-  }
-  if (!localStorage.getItem(STORAGE.notesMaster)) {
-    const oldNotes = localStorage.getItem('arachne_v11_notes_master') ?? localStorage.getItem('arachne_v10_notes_master') ?? localStorage.getItem('arachne_v9_notes_master') ?? localStorage.getItem('arachne_v8_notes_master') ?? localStorage.getItem('arachne_v7_notes_master') ?? localStorage.getItem('arachne_v6_notes_master') ?? localStorage.getItem('arachne_v5_notes_master') ?? localStorage.getItem('arachne_v4_notes_master');
-    if (oldNotes != null) localStorage.setItem(STORAGE.notesMaster, oldNotes || '');
-  }
-  if (!localStorage.getItem(STORAGE.scenario)) { const oldScenario = localStorage.getItem('arachne_v11_scenario') ?? localStorage.getItem('arachne_v10_scenario') ?? localStorage.getItem('arachne_v9_scenario') ?? localStorage.getItem('arachne_v8_scenario') ?? localStorage.getItem('arachne_v7_scenario') ?? localStorage.getItem('arachne_v6_scenario'); if (oldScenario != null) localStorage.setItem(STORAGE.scenario, oldScenario); }
-  if (!localStorage.getItem(STORAGE.initiative)) { const oldInit = localStorage.getItem('arachne_v11_initiative') ?? localStorage.getItem('arachne_v10_initiative') ?? localStorage.getItem('arachne_v9_initiative') ?? localStorage.getItem('arachne_v8_initiative') ?? localStorage.getItem('arachne_v7_initiative') ?? localStorage.getItem('arachne_v6_initiative'); if (oldInit != null) localStorage.setItem(STORAGE.initiative, oldInit); }
+  if (!localStorage.getItem(STORAGE.playerNotes)) localStorage.setItem(STORAGE.playerNotes, JSON.stringify({spider:'',wolverine:'',cap:''}));
 
   function normalizeHero(hero, fallback) {
+    fallback = fallback || {
+      id:hero?.id || `hero-${Date.now()}`, n:hero?.n || 'Novo Herói', r:hero?.r || '', i:'', rank:4, tier:'HERÓI', pdf:'', image:'', role:'Herói da campanha', hook:'',
+      maxHealth:90,maxFocus:90,currentHealth:90,currentFocus:90,karma:4,healthDR:'—',focusDR:'—',initiative:'+0',speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3',movement:{run:5,climb:3,swim:3,jump:3},occupation:'',origin:'',teams:'',base:'',stats:[['Health',90],['Focus',90],['Karma',4]],abilities:{Melee:0,Agility:0,Resilience:0,Vigilance:0,Ego:0,Logic:0},traits:[],tags:['Heroic'],powers:[]
+    };
     const out = {...clone(fallback), ...(hero || {})};
     out.id = hero?.id || fallback.id;
     out.traits = Array.isArray(hero?.traits) ? hero.traits : clone(fallback.traits);
@@ -309,6 +364,9 @@
   function statValueRaw(hero, name) { return hero?.stats?.find(([key]) => key === name)?.[1] ?? 0; }
 
   function normalizeVillain(villain, fallback) {
+    fallback = fallback || {
+      id:villain?.id || `villain-${Date.now()}`, n:villain?.n || 'Novo Vilão', r:villain?.r || '', i:'', rank:4, tier:'AMEAÇA', pdf:'', image:'', role:'AMEAÇA', hook:'',maxHealth:90,maxFocus:60,currentHealth:90,currentFocus:60,karma:'—',healthDR:'—',focusDR:'—',initiative:'+0',speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3',movement:{run:5,climb:3,swim:3,jump:3},occupation:'',origin:'',teams:'',base:'',abilities:{Melee:0,Agility:0,Resilience:0,Vigilance:0,Ego:0,Logic:0},traits:[],tags:['Villainous'],powers:[]
+    };
     const out = {...clone(fallback), ...(villain || {})};
     out.id = villain?.id || fallback.id;
     out.abilities = {...fallback.abilities, ...(villain?.abilities || {})};
@@ -323,13 +381,23 @@
     return out;
   }
 
+  function normalizeHeroList(list) {
+    return (Array.isArray(list) ? list : []).map(item => normalizeHero(item, DEFAULT_HEROES.find(f => f.id === item?.id)));
+  }
+
+  function normalizeVillainList(list) {
+    return (Array.isArray(list) ? list : []).map(item => normalizeVillain(item, DEFAULT_VILLAINS.find(f => f.id === item?.id)));
+  }
+
   const loadedHeroes = loadJSON(STORAGE.heroes, DEFAULT_HEROES);
   const loadedVillains = loadJSON(STORAGE.villains, DEFAULT_VILLAINS);
+  const DEFAULT_CAMPAIGN_CONTENT = {title:'Projeto Arachne',subtitle:'Conspiração genética em 8 sessões',summary:'Três heróis. Um experimento. Uma mente por trás de tudo.',rank:4,players:3,finalVillain:'Senhor Sinistro',accent:'#ef3340',sessions:clone(SESSIONS),documentMode:'pdf',campaignPdf:CAMPAIGN_PDF,editorText:'',templateId:'arachne',templateName:'Projeto Arachne'};
   const state = {
     role:'player', selectedHero:null, page:'home', diceMode:'d616', rolling:false, currentRoll:null,
     heroes: DEFAULT_HEROES.map((fallback, i) => normalizeHero((Array.isArray(loadedHeroes) ? loadedHeroes.find(item => item?.id === fallback.id) : null) || loadedHeroes[i] || fallback, fallback)),
     villains: DEFAULT_VILLAINS.map((fallback, i) => normalizeVillain((Array.isArray(loadedVillains) ? loadedVillains.find(item => item?.id === fallback.id) : null) || fallback, fallback)),
     campaign: loadJSON(STORAGE.campaign, Object.fromEntries(SESSIONS.map(s => [s.id, 'todo']))),
+    campaignContent: {...clone(DEFAULT_CAMPAIGN_CONTENT), ...loadJSON(STORAGE.campaignContent, DEFAULT_CAMPAIGN_CONTENT)},
     diceHistory: loadJSON(STORAGE.dice, []),
     challenge: {...DEFAULT_CHALLENGE, ...loadJSON(STORAGE.challenge, DEFAULT_CHALLENGE)},
     scenario: {...clone(DEFAULT_SCENARIO), ...loadJSON(STORAGE.scenario, DEFAULT_SCENARIO)},
@@ -339,11 +407,299 @@
   saveJSON(STORAGE.heroes, state.heroes);
   saveJSON(STORAGE.villains, state.villains);
 
+  function campaignCacheId(campaign) {
+    return String(campaign?.id || campaign?.code || 'lobby').replace(/[^a-z0-9_-]/gi,'_').slice(0,80) || 'lobby';
+  }
+
+  function campaignLibrary() {
+    try {
+      const value = JSON.parse(localStorage.getItem(CAMPAIGN_LIBRARY_KEY) || '[]');
+      return Array.isArray(value) ? value : [];
+    } catch { return []; }
+  }
+
+  function rememberCampaign(campaign) {
+    if (!campaign?.code) return;
+    const next = [campaign, ...campaignLibrary().filter(item => item?.code !== campaign.code)].slice(0,12)
+      .map(item => ({ id:item.id, code:item.code, name:item.name, template:item.template || 'arachne', lastOpened:Date.now() }));
+    localStorage.setItem(CAMPAIGN_LIBRARY_KEY, JSON.stringify(next));
+  }
+
+  function resetCampaignState() {
+    const localHeroes = loadJSON(STORAGE.heroes, DEFAULT_HEROES);
+    const localVillains = loadJSON(STORAGE.villains, DEFAULT_VILLAINS);
+    state.heroes = Array.isArray(localHeroes) ? normalizeHeroList(localHeroes) : normalizeHeroList(DEFAULT_HEROES);
+    state.villains = Array.isArray(localVillains) ? normalizeVillainList(localVillains) : normalizeVillainList(DEFAULT_VILLAINS);
+    state.campaign = loadJSON(STORAGE.campaign, Object.fromEntries(SESSIONS.map(s=>[s.id,'todo'])));
+    state.campaignContent = {...clone(DEFAULT_CAMPAIGN_CONTENT), ...loadJSON(STORAGE.campaignContent, DEFAULT_CAMPAIGN_CONTENT)};
+    state.diceHistory = loadJSON(STORAGE.dice, []);
+    state.challenge = {...DEFAULT_CHALLENGE, ...loadJSON(STORAGE.challenge, DEFAULT_CHALLENGE)};
+    state.scenario = {...clone(DEFAULT_SCENARIO), ...loadJSON(STORAGE.scenario, DEFAULT_SCENARIO)};
+    state.initiativeParticipants = loadJSON(STORAGE.initiative, []);
+    state.playerNotes = {...{spider:'',wolverine:'',cap:''}, ...loadJSON(STORAGE.playerNotes,{spider:'',wolverine:'',cap:''})};
+    state.currentRoll = null;
+  }
+
+  function applyCampaignBranding() {
+    const name = activeCampaign?.name || state.campaignContent?.title || 'Projeto Arachne';
+    const code = activeCampaign?.code || 'ARACHNE';
+    const brand = $('sidebar-campaign-name');
+    if (brand) brand.innerHTML = escapeHTML(name).replace(/\s+/g,'<br>');
+    if ($('sidebar-campaign-code')) $('sidebar-campaign-code').textContent = `CÓDIGO ${code}`;
+    const bannerTitle = document.querySelector('#home .banner h2');
+    if (bannerTitle) bannerTitle.textContent = name.toUpperCase();
+    const bannerText = document.querySelector('#home .banner p');
+    if (bannerText) bannerText.textContent = state.campaignContent?.summary || state.campaignContent?.subtitle || activeCampaign?.campaignContent?.subtitle || 'Mesa Marvel Multiverse RPG.';
+    document.title = `${name} — Marvel Multiverse RPG`;
+  }
+
+  function selectCampaign(campaign) {
+    if (!campaign) return;
+    activeCampaign = campaign;
+    activeCampaignCacheKey = campaignCacheId(campaign);
+    // Migra automaticamente os dados locais antigos apenas para a campanha Arachne original.
+    if (campaign.code === 'ARACHNE') {
+      const legacy = {
+        heroes:'heroes', villains:'villains', campaign:'campaign', dice:'dice', challenge:'challenge', scenario:'scenario', initiative:'initiative',
+        playerNotes:'player_notes', notesPlayer:'notes_player', notesMaster:'notes_master'
+      };
+      for (const [name,suffix] of Object.entries(legacy)) {
+        if (localStorage.getItem(STORAGE[name]) != null) continue;
+        const old = localStorage.getItem(`arachne_v17_${suffix}`);
+        if (old != null) localStorage.setItem(STORAGE[name], old);
+      }
+    }
+    resetCampaignState();
+    if(campaign.campaignContent) state.campaignContent={...state.campaignContent,...campaign.campaignContent,title:campaign.campaignContent.title||campaign.name};
+    rememberCampaign(campaign);
+    renderPlayerChoices(campaign.heroes || []);
+    $('campaign-hub')?.classList.add('hidden');
+    $('campaign-access')?.classList.remove('hidden');
+    if ($('selected-campaign-code')) $('selected-campaign-code').textContent = `CÓDIGO ${campaign.code}`;
+    if ($('selected-campaign-name')) $('selected-campaign-name').textContent = campaign.name;
+    $('login-title').textContent = campaign.name.toUpperCase();
+    $('campaign-error').textContent = '';
+    applyCampaignBranding();
+  }
+
+  function returnToCampaignHub() {
+    window.ArachneAPI?.clearSession?.();
+    backendReady = false;
+    activeCampaign = null;
+    activeCampaignCacheKey = 'lobby';
+    $('campaign-access')?.classList.add('hidden');
+    $('player-select-area')?.classList.add('hidden');
+    $('password-area')?.classList.add('hidden');
+    qsa('.login-actions').forEach(el=>el.classList.remove('hidden'));
+    $('campaign-hub')?.classList.remove('hidden');
+    $('login-title').textContent = 'SUAS CAMPANHAS';
+    renderCampaignLibrary();
+  }
+
+  async function renderCampaignLibrary() {
+    const wrap = $('campaign-library');
+    if (!wrap || !window.ArachneAPI) return;
+    const saved = campaignLibrary();
+    const codes = ['ARACHNE', ...saved.map(item=>item.code)].filter(Boolean);
+    let campaigns = [];
+    try { campaigns = await window.ArachneAPI.lookupCampaigns(codes); } catch {}
+    const byCode = new Map(campaigns.map(item=>[item.code,item]));
+    const ordered = [...new Set(codes)].map(code=>byCode.get(code)).filter(Boolean);
+    wrap.innerHTML = ordered.length ? ordered.map(campaign=>`<button type="button" class="campaign-card" data-open-campaign="${escapeHTML(campaign.code)}"><span>${escapeHTML(campaign.code.slice(0,2))}</span><div><b>${escapeHTML(campaign.name)}</b><small>Código ${escapeHTML(campaign.code)}</small></div><i>→</i></button>`).join('') : '<div class="campaign-empty">Nenhuma campanha encontrada.</div>';
+  }
+
+  async function loadTemplateLibrary() {
+    if (!window.ArachneAPI) return [];
+    try { availableTemplates = await window.ArachneAPI.getTemplates(); } catch { availableTemplates = []; }
+    try {
+      const library = await window.ArachneAPI.getCharacters();
+      availableCharacters = {
+        heroes:Array.isArray(library?.heroes)?library.heroes:[],
+        villains:Array.isArray(library?.villains)?library.villains:[]
+      };
+    } catch {
+      availableCharacters = {heroes:[],villains:[]};
+    }
+    const preferred = availableTemplates.find(t=>t.id===selectedTemplateId) || availableTemplates[0] || null;
+    if (preferred) {
+      selectedTemplateId = preferred.id;
+      if ($('new-campaign-name') && !$('new-campaign-name').value.trim() && createCampaignMode==='template') $('new-campaign-name').value = preferred.name;
+    }
+    syncBuilderRosterFromTemplate(true);
+    renderTemplatePicker();
+    renderTemplatePreview();
+    renderBuilderCharacterLibrary();
+    return availableTemplates;
+  }
+
+  function currentBuilderTemplate() {
+    return availableTemplates.find(t=>t.id===selectedTemplateId) || availableTemplates[0] || null;
+  }
+
+  function syncBuilderRosterFromTemplate(force = false) {
+    const template = currentBuilderTemplate();
+    if (createCampaignMode === 'template' && template) {
+      if (force || !builderHeroIds.length) builderHeroIds = (template.heroes || []).map(hero => hero.id);
+      if (force || !builderVillainIds.length) builderVillainIds = (template.villains || []).map(villain => villain.id);
+    } else if (force) {
+      builderHeroIds = [];
+      builderVillainIds = [];
+    }
+  }
+
+  function renderTemplatePicker() {
+    const wrap = $('template-picker');
+    if (!wrap) return;
+    wrap.innerHTML = availableTemplates.map(template => {
+      const featured = (template.villains || []).find(item => item.image) || (template.heroes || []).find(item => item.image) || template.villains?.[0] || template.heroes?.[0];
+      const art = featured ? characterArtMarkup(featured.id, featured.n, 'template-card-art-image', featured.image || '') : `<span class="hero-glyph template-card-art-image"><b>${escapeHTML(String(template.name||'C').slice(0,1).toUpperCase())}</b><small>CAMPANHA</small></span>`;
+      return `<button type="button" class="template-card ${selectedTemplateId===template.id?'active':''}" data-template-id="${escapeHTML(template.id)}" style="--template-accent:${escapeHTML(template.accent||'#ef3340')}"><span class="template-card-art">${art}</span><div><small>${escapeHTML(template.players)} JOGADORES · RANK ${escapeHTML(template.rank)} · ${escapeHTML((template.sessions||[]).length)} SESSÕES</small><b>${escapeHTML(template.name)}</b><span>${escapeHTML(template.subtitle||template.summary||'')}</span></div><em>${escapeHTML(template.finalVillain||'')}</em></button>`;
+    }).join('') || '<div class="campaign-empty">Nenhuma campanha pronta disponível.</div>';
+  }
+
+  function renderTemplatePreview() {
+    const wrap = $('template-preview');
+    if (!wrap) return;
+    const template = currentBuilderTemplate();
+    const heroes = allTemplateCharacters('hero').filter(item => builderHeroIds.includes(item.id));
+    const villains = allTemplateCharacters('villain').filter(item => builderVillainIds.includes(item.id));
+    if (createCampaignMode === 'template' && template) {
+      const featured = villains.find(item=>item.image) || heroes.find(item=>item.image) || villains[0] || heroes[0];
+      wrap.innerHTML = `<div class="template-preview-card" style="--template-accent:${escapeHTML(template.accent||'#ef3340')}"><div class="template-preview-art">${featured ? characterArtMarkup(featured.id, featured.n, 'template-preview-art-image', featured.image || '') : ''}<span class="template-preview-shade"></span><div class="template-preview-copy"><small>CAMPANHA BASE</small><b>${escapeHTML(template.name)}</b><span>${escapeHTML(template.summary || template.subtitle || '')}</span><div class="template-preview-meta"><span>${heroes.length} heróis</span><span>${villains.length} vilões</span><span>${(template.sessions||[]).length} sessões</span></div></div></div><div class="template-preview-roster"><div><small>HERÓIS SELECIONADOS</small><p>${heroes.map(item=>escapeHTML(item.n)).join(' · ') || 'Nenhum'}</p></div><div><small>VILÕES SELECIONADOS</small><p>${villains.map(item=>escapeHTML(item.n)).join(' · ') || 'Nenhum'}</p></div></div></div>`;
+      return;
+    }
+    const label = createCampaignMode === 'pdf' ? 'CAMPANHA POR PDF' : 'CAMPANHA EM BRANCO';
+    const description = createCampaignMode === 'pdf'
+      ? 'Monte o elenco agora e envie o PDF da campanha. Depois você ainda pode editar sessões, fichas e anexos.'
+      : 'Comece do zero, monte o elenco e personalize a história do jeito que quiser.';
+    wrap.innerHTML = `<div class="template-preview-card is-generic"><div class="template-preview-generic"><small>${label}</small><b>${escapeHTML($('new-campaign-name')?.value.trim() || 'Nova Campanha')}</b><span>${description}</span><div class="template-preview-meta"><span>${builderHeroIds.length} heróis</span><span>${builderVillainIds.length} vilões</span><span>100% personalizável</span></div></div></div>`;
+  }
+
+  function renderBuilderCharacterLibrary() {
+    const heroWrap = $('builder-hero-library');
+    const villainWrap = $('builder-villain-library');
+    const heroes = allTemplateCharacters('hero');
+    const villains = allTemplateCharacters('villain');
+    if ($('builder-hero-count')) $('builder-hero-count').textContent = String(builderHeroIds.length).padStart(2,'0');
+    if ($('builder-villain-count')) $('builder-villain-count').textContent = String(builderVillainIds.length).padStart(2,'0');
+    if (heroWrap) heroWrap.innerHTML = heroes.map(item => {
+      const active = builderHeroIds.includes(item.id);
+      return `<button type="button" class="builder-character-card ${active?'active':''}" data-builder-select="${escapeHTML(item.id)}" data-builder-kind="hero">${characterArtMarkup(item.id, item.n, 'builder-card-image', item.image || '')}<div><b>${escapeHTML(item.n)}</b><small>${escapeHTML(item.r || item.role || `Rank ${item.rank||4}`)}</small></div></button>`;
+    }).join('') || '<div class="campaign-empty">Nenhum herói disponível.</div>';
+    if (villainWrap) villainWrap.innerHTML = villains.map(item => {
+      const active = builderVillainIds.includes(item.id);
+      return `<button type="button" class="builder-character-card ${active?'active':''}" data-builder-select="${escapeHTML(item.id)}" data-builder-kind="villain">${characterArtMarkup(item.id, item.n, 'builder-card-image', item.image || '')}<div><b>${escapeHTML(item.n)}</b><small>${escapeHTML(item.tier || item.role || `Rank ${item.rank||4}`)}</small></div></button>`;
+    }).join('') || '<div class="campaign-empty">Nenhum vilão disponível.</div>';
+    renderTemplatePreview();
+  }
+
+  function toggleBuilderSelection(kind, id) {
+    if (!id) return;
+    const source = kind === 'hero' ? [...builderHeroIds] : [...builderVillainIds];
+    const index = source.indexOf(id);
+    if (index >= 0) source.splice(index, 1);
+    else source.push(id);
+    if (kind === 'hero') builderHeroIds = [...new Set(source)];
+    else builderVillainIds = [...new Set(source)];
+    renderBuilderCharacterLibrary();
+  }
+
+  function setCreateCampaignMode(mode) {
+    createCampaignMode = ['template','blank','pdf'].includes(mode) ? mode : 'template';
+    qsa('[data-create-mode]').forEach(btn => btn.classList.toggle('active',btn.dataset.createMode===createCampaignMode));
+    $('template-picker-wrap')?.classList.toggle('hidden',createCampaignMode!=='template');
+    $('pdf-create-wrap')?.classList.toggle('hidden',createCampaignMode!=='pdf');
+    const rosterLabel = $('builder-roster-label');
+    if (rosterLabel) rosterLabel.textContent = createCampaignMode === 'template' ? 'Elenco inicial da campanha' : 'Monte seu elenco';
+    if (createCampaignMode === 'template') {
+      const template = currentBuilderTemplate();
+      if (template) {
+        selectedTemplateId = template.id;
+        if (!$('new-campaign-name').value.trim()) $('new-campaign-name').value = template.name;
+      }
+    }
+    syncBuilderRosterFromTemplate(true);
+    renderTemplatePicker();
+    renderBuilderCharacterLibrary();
+    renderTemplatePreview();
+  }
+
+  function renderPlayerChoices(heroes = activeCampaign?.heroes || []) {
+    const wrap = $('player-choice-grid'); if(!wrap) return;
+    const roster = Array.isArray(heroes) ? heroes : [];
+    wrap.innerHTML = roster.length ? roster.map(hero => {
+      const image = hero.image || CHARACTER_ART[hero.id]?.src || '';
+      return `<button type="button" data-player-hero="${escapeHTML(hero.id)}">${image?`<span class="player-choice-thumb"><img src="${escapeHTML(image)}" alt="${escapeHTML(hero.n)}"></span>`:`<span class="player-choice-thumb player-choice-fallback">${escapeHTML((hero.n||'?').slice(0,2).toUpperCase())}</span>`}<b>${escapeHTML(hero.n||'Herói')}</b><small>${escapeHTML(hero.r||`Rank ${hero.rank||4}`)}</small></button>`;
+    }).join('') : '<div class="campaign-empty-state"><b>Sem heróis jogáveis.</b><span>O Mestre precisa adicionar personagens antes dos jogadores entrarem.</span></div>';
+  }
+
+  function slugifyId(value,prefix='char') {
+    const base=String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,56);
+    return base || `${prefix}-${Date.now().toString(36)}`;
+  }
+
+  function allTemplateCharacters(kind='hero') {
+    const map=new Map();
+    const fullLibrary = kind==='hero' ? availableCharacters.heroes : availableCharacters.villains;
+    for(const item of fullLibrary||[]){if(item?.id&&!map.has(item.id))map.set(item.id,item);}
+    for(const template of availableTemplates){
+      for(const item of (kind==='hero'?template.heroes:template.villains)||[]){if(item?.id&&!map.has(item.id))map.set(item.id,item);}
+    }
+    return [...map.values()].sort((a,b)=>String(a.n||'').localeCompare(String(b.n||''),'pt-BR'));
+  }
+
+  function renderCampaignManager() {
+    if(state.role!=='master') return;
+    const content=state.campaignContent||DEFAULT_CAMPAIGN_CONTENT;
+    if($('campaign-edit-title')) $('campaign-edit-title').value=content.title||activeCampaign?.name||'';
+    if($('campaign-edit-subtitle')) $('campaign-edit-subtitle').value=content.subtitle||'';
+    if($('campaign-edit-summary')) $('campaign-edit-summary').value=content.summary||'';
+    if($('campaign-edit-text')) $('campaign-edit-text').value=content.editorText||'';
+    if($('campaign-hero-roster')) $('campaign-hero-roster').innerHTML=state.heroes.map((hero,index)=>`<div class="roster-item"><div>${hero.image?`<img src="${escapeHTML(hero.image)}" alt="">`:`<span>${escapeHTML((hero.n||'H').slice(0,2).toUpperCase())}</span>`}<p><b>${escapeHTML(hero.n)}</b><small>${escapeHTML(hero.r||`Rank ${hero.rank}`)}</small></p></div><div><button type="button" data-action="edit-hero" data-index="${index}">EDITAR</button><button type="button" data-roster-remove-hero="${escapeHTML(hero.id)}">REMOVER</button></div></div>`).join('')||'<div class="roster-empty">Nenhum herói adicionado.</div>';
+    if($('campaign-villain-roster')) $('campaign-villain-roster').innerHTML=state.villains.map((villain,index)=>`<div class="roster-item"><div>${villain.image?`<img src="${escapeHTML(villain.image)}" alt="">`:`<span>${escapeHTML((villain.n||'V').slice(0,2).toUpperCase())}</span>`}<p><b>${escapeHTML(villain.n)}</b><small>${escapeHTML(villain.tier||`Rank ${villain.rank}`)}</small></p></div><div><button type="button" data-action="edit-villain" data-index="${index}">EDITAR</button><button type="button" data-roster-remove-villain="${escapeHTML(villain.id)}">REMOVER</button></div></div>`).join('')||'<div class="roster-empty">Nenhum vilão adicionado.</div>';
+    if($('campaign-session-editor')) $('campaign-session-editor').innerHTML=activeSessions().map((session,index)=>`<div class="session-edit-row" data-session-edit="${index}"><input data-session-field="title" value="${escapeHTML(session.title||'')}" placeholder="Título da sessão"><textarea data-session-field="text" rows="2" placeholder="Resumo, objetivo e acontecimentos">${escapeHTML(session.text||'')}</textarea><button type="button" data-remove-session="${index}">×</button></div>`).join('')||'<div class="roster-empty">Nenhuma sessão. Adicione a primeira sessão.</div>';
+  }
+
+  function collectCampaignSessions() {
+    return qsa('[data-session-edit]',$('campaign-session-editor')).map((row,index)=>({id:String(index+1).padStart(2,'0'),title:row.querySelector('[data-session-field="title"]')?.value.trim()||`Sessão ${index+1}`,text:row.querySelector('[data-session-field="text"]')?.value.trim()||''}));
+  }
+
+  async function saveCampaignManagerContent() {
+    const sessions=collectCampaignSessions();
+    const previous=state.campaign||{};const nextProgress={};sessions.forEach(s=>nextProgress[s.id]=previous[s.id]||'todo');
+    state.campaignContent={...state.campaignContent,title:$('campaign-edit-title').value.trim()||activeCampaign?.name||'Campanha',subtitle:$('campaign-edit-subtitle').value.trim(),summary:$('campaign-edit-summary').value.trim(),editorText:$('campaign-edit-text').value,sessions,players:state.heroes.length,documentMode:state.campaignContent?.campaignPdf?'pdf':'editor'};
+    state.campaign=nextProgress;
+    localStorage.setItem(STORAGE.campaignContent,JSON.stringify(state.campaignContent));localStorage.setItem(STORAGE.campaign,JSON.stringify(state.campaign));
+    if(backendReady&&window.ArachneAPI)await window.ArachneAPI.saveMany({campaignContent:state.campaignContent,campaign:state.campaign});
+    renderCampaign();applyCampaignBranding();markSaved('Campanha salva');toast('Campanha atualizada');
+  }
+
+  function openAddCharacter(kind='hero') {
+    const items=allTemplateCharacters(kind);const existing=new Set((kind==='hero'?state.heroes:state.villains).map(x=>x.id));
+    openModal(`<h2 id="modal-title">Adicionar ${kind==='hero'?'herói':'vilão'}</h2><p class="muted">Escolha um personagem da biblioteca completa ou crie um cadastro novo.</p><div class="character-library-grid">${items.map(item=>`<button type="button" data-add-library-character="${escapeHTML(item.id)}" data-character-kind="${kind}" ${existing.has(item.id)?'disabled':''}>${item.image?`<img src="${escapeHTML(item.image)}" alt="">`:`<span>${escapeHTML((item.n||'?').slice(0,2).toUpperCase())}</span>`}<b>${escapeHTML(item.n)}</b><small>${escapeHTML(item.r||`Rank ${item.rank||4}`)}</small></button>`).join('')}</div><div class="editbuttons"><button class="savebtn" type="button" data-create-custom-character="${kind}">CRIAR DO ZERO</button></div>`);
+  }
+
+  async function addLibraryCharacter(kind,id) {
+    const templateItem=allTemplateCharacters(kind).find(item=>item.id===id);if(!templateItem)return;
+    const character=kind==='hero'?normalizeHero(templateItem):normalizeVillain(templateItem);
+    if(kind==='hero'){
+      if(state.heroes.some(h=>h.id===character.id))return;state.heroes.push(character);state.playerNotes[character.id]='';saveJSON(STORAGE.heroes,state.heroes);if(backendReady&&window.ArachneAPI)await window.ArachneAPI.saveHero(character);
+    }else{if(state.villains.some(v=>v.id===character.id))return;state.villains.push(character);saveJSON(STORAGE.villains,state.villains);if(backendReady&&window.ArachneAPI)await window.ArachneAPI.saveVillain(character);}
+    closeModal();renderAll();renderCampaignManager();toast('Personagem adicionado');
+  }
+
+  function createCustomCharacter(kind='hero') {
+    closeModal();const id=`${kind}-${Date.now().toString(36)}`;
+    if(kind==='hero'){const hero=normalizeHero({id,n:'Novo Herói',r:'',rank:4});state.heroes.push(hero);state.playerNotes[id]='';saveJSON(STORAGE.heroes,state.heroes);if(backendReady&&window.ArachneAPI)window.ArachneAPI.saveHero(hero);renderHeroes();editHero(state.heroes.length-1);}
+    else{const villain=normalizeVillain({id,n:'Novo Vilão',r:'',rank:4,tier:'AMEAÇA'});state.villains.push(villain);saveJSON(STORAGE.villains,state.villains);if(backendReady&&window.ArachneAPI)window.ArachneAPI.saveVillain(villain);renderVillains();editVillain(state.villains.length-1);}
+  }
+
   function backendSnapshot() {
     return {
       heroes: state.heroes,
       villains: state.villains,
       campaign: state.campaign,
+      campaignContent: state.campaignContent,
       dice: state.diceHistory,
       challenge: state.challenge,
       scenario: state.scenario,
@@ -355,43 +711,126 @@
   }
 
   async function hydrateFromBackend() {
-    if (!window.ArachneAPI) return;
+    if (!window.ArachneAPI) return false;
     const remote = await window.ArachneAPI.loadAll();
-    if (remote === null) return;
+    if (remote === null) return false;
 
     if (!Object.keys(remote).length) {
-      await window.ArachneAPI.saveMany(backendSnapshot());
+      if (state.role === 'master') await window.ArachneAPI.saveMany(backendSnapshot());
       backendReady = true;
-      markSaved('Banco inicializado');
-      return;
+      markSaved('Pronto');
+      return true;
     }
 
     if (Array.isArray(remote.heroes)) {
-      state.heroes = DEFAULT_HEROES.map((fallback, i) => normalizeHero(remote.heroes.find(item => item?.id === fallback.id) || remote.heroes[i] || fallback, fallback));
+      state.heroes = normalizeHeroList(remote.heroes);
       localStorage.setItem(STORAGE.heroes, JSON.stringify(state.heroes));
     }
-    if (Array.isArray(remote.villains)) {
-      state.villains = DEFAULT_VILLAINS.map((fallback, i) => normalizeVillain(remote.villains.find(item => item?.id === fallback.id) || remote.villains[i] || fallback, fallback));
+    if (Array.isArray(remote.villains) && state.role === 'master') {
+      state.villains = normalizeVillainList(remote.villains);
       localStorage.setItem(STORAGE.villains, JSON.stringify(state.villains));
     }
-    if (remote.campaign && typeof remote.campaign === 'object') { state.campaign = remote.campaign; localStorage.setItem(STORAGE.campaign, JSON.stringify(remote.campaign)); }
+    if (remote.campaign && typeof remote.campaign === 'object' && state.role === 'master') { state.campaign = remote.campaign; localStorage.setItem(STORAGE.campaign, JSON.stringify(remote.campaign)); }
+    if (remote.campaignContent && typeof remote.campaignContent === 'object') { state.campaignContent = {...clone(DEFAULT_CAMPAIGN_CONTENT), ...remote.campaignContent}; localStorage.setItem(STORAGE.campaignContent, JSON.stringify(state.campaignContent)); }
     if (Array.isArray(remote.dice)) { state.diceHistory = remote.dice; localStorage.setItem(STORAGE.dice, JSON.stringify(remote.dice)); }
     if (remote.challenge && typeof remote.challenge === 'object') { state.challenge = {...DEFAULT_CHALLENGE, ...remote.challenge}; localStorage.setItem(STORAGE.challenge, JSON.stringify(state.challenge)); }
-    if (remote.scenario && typeof remote.scenario === 'object') { state.scenario = {...clone(DEFAULT_SCENARIO), ...remote.scenario}; localStorage.setItem(STORAGE.scenario, JSON.stringify(state.scenario)); }
+    if (remote.scenario && typeof remote.scenario === 'object') {
+      const localZoom = state.scenario?.zoom || 1;
+      state.scenario = {...clone(DEFAULT_SCENARIO), ...remote.scenario};
+      if (state.role === 'player') state.scenario.zoom = localZoom;
+      localStorage.setItem(STORAGE.scenario, JSON.stringify(state.scenario));
+    }
     if (Array.isArray(remote.initiative)) { state.initiativeParticipants = remote.initiative; localStorage.setItem(STORAGE.initiative, JSON.stringify(remote.initiative)); }
-    if (remote.playerNotes && typeof remote.playerNotes === 'object' && !Array.isArray(remote.playerNotes)) { state.playerNotes = {...{spider:'',wolverine:'',cap:''}, ...remote.playerNotes}; localStorage.setItem(STORAGE.playerNotes, JSON.stringify(state.playerNotes)); }
+    if (remote.playerNotes && typeof remote.playerNotes === 'object' && !Array.isArray(remote.playerNotes)) { state.playerNotes = {...state.playerNotes, ...remote.playerNotes}; localStorage.setItem(STORAGE.playerNotes, JSON.stringify(state.playerNotes)); }
     if (typeof remote.notesPlayer === 'string') localStorage.setItem(STORAGE.notesPlayer, remote.notesPlayer);
-    if (typeof remote.notesMaster === 'string') localStorage.setItem(STORAGE.notesMaster, remote.notesMaster);
+    if (typeof remote.notesMaster === 'string' && state.role === 'master') localStorage.setItem(STORAGE.notesMaster, remote.notesMaster);
+
+    if (state.role === 'master') {
+      const snapshot = backendSnapshot();
+      const missing = Object.fromEntries(Object.entries(snapshot).filter(([key]) => !Object.prototype.hasOwnProperty.call(remote,key)));
+      if (Object.keys(missing).length) await window.ArachneAPI.saveMany(missing);
+    }
 
     backendReady = true;
     renderAll();
     loadNotesForRole();
     renderPlayerNotes();
-    markSaved('Sincronizado com servidor');
+    markSaved('Pronto');
+    return true;
+  }
+
+  function applyRemoteState(event) {
+    if (!event || event.type !== 'state') return;
+    const { key, value } = event;
+    if (key === 'heroes' && Array.isArray(value)) {
+      state.heroes = normalizeHeroList(value);
+      localStorage.setItem(STORAGE.heroes, JSON.stringify(state.heroes));
+      renderHeroes();
+      renderChallengeSummary();
+    } else if (key === 'villains' && state.role === 'master' && Array.isArray(value)) {
+      state.villains = normalizeVillainList(value);
+      localStorage.setItem(STORAGE.villains, JSON.stringify(state.villains));
+      renderVillains();
+      renderActorOptions();
+    } else if (key === 'campaign' && state.role === 'master' && value && typeof value === 'object') {
+      state.campaign = value; localStorage.setItem(STORAGE.campaign, JSON.stringify(value)); renderCampaign();
+    } else if (key === 'campaignContent' && value && typeof value === 'object') {
+      state.campaignContent = {...clone(DEFAULT_CAMPAIGN_CONTENT), ...value}; localStorage.setItem(STORAGE.campaignContent, JSON.stringify(state.campaignContent)); renderCampaign(); applyCampaignBranding();
+    } else if (key === 'dice' && Array.isArray(value)) {
+      const previousAt = state.diceHistory?.[0]?.at;
+      state.diceHistory = value; localStorage.setItem(STORAGE.dice, JSON.stringify(value)); renderDiceHistory(); renderHomeLiveRolls(); renderPlayerLiveDice();
+      const latest = value[0];
+      if (state.role === 'player' && latest && latest.at !== previousAt) {
+        animatePlayerLiveDice(latest);
+        toast(`Rolagem · ${latest.label}: ${latest.total}`);
+      }
+    } else if (key === 'challenge' && value && typeof value === 'object') {
+      state.challenge = {...DEFAULT_CHALLENGE, ...value}; localStorage.setItem(STORAGE.challenge, JSON.stringify(state.challenge)); syncChallengeInputs(); renderChallengeSummary();
+    } else if (key === 'scenario' && value && typeof value === 'object') {
+      const localZoom = state.scenario?.zoom || 1;
+      state.scenario = {...clone(DEFAULT_SCENARIO), ...value};
+      if (state.role === 'player') state.scenario.zoom = localZoom;
+      localStorage.setItem(STORAGE.scenario, JSON.stringify(state.scenario)); renderScenario();
+    } else if (key === 'initiative' && Array.isArray(value)) {
+      state.initiativeParticipants = value; localStorage.setItem(STORAGE.initiative, JSON.stringify(value)); renderInitiativeParticipants();
+    } else if (key === 'playerNotes' && value && typeof value === 'object') {
+      const heroId = value.heroId || event.heroId;
+      if (heroId) {
+        state.playerNotes[heroId] = String(value.note ?? '');
+        localStorage.setItem(STORAGE.playerNotes, JSON.stringify(state.playerNotes));
+        if (state.role === 'player' && state.selectedHero === heroId) renderPlayerNotes();
+      }
+    } else if (key === 'notesMaster' && state.role === 'master' && typeof value === 'string') {
+      localStorage.setItem(STORAGE.notesMaster, value);
+      if (state.page === 'notes' && document.activeElement !== $('notes-text')) { $('notes-text').value = value; updateNotesCount(); }
+    }
+    markSaved('Atualizado ao vivo');
+  }
+
+  function updateRealtimeStatus(status) {
+    document.body.dataset.connection = status || '';
+  }
+
+  function updatePresence(presence) {
+    if (!presence) return;
+    document.body.dataset.connectedPlayers = String(Object.values(presence.players || {}).reduce((sum,n) => sum + Number(n || 0),0));
+  }
+
+  function connectRealtime() {
+    if (!backendReady || !window.ArachneAPI) return;
+    window.ArachneAPI.connectRealtime({
+      onState:applyRemoteState,
+      onPresence:updatePresence,
+      onStatus:updateRealtimeStatus,
+      onReady:()=>hydrateFromBackend(),
+      onLiveRoll:startPlayerLiveRoll
+    });
   }
 
   let toastTimer;
   let savedTimer;
+  let playerNotesSaveTimer;
+  let masterNotesSaveTimer;
   let lastFocusedElement = null;
 
   function toast(message) {
@@ -403,9 +842,11 @@
   }
 
   function markSaved(message = 'Salvo') {
-    $('saved').querySelector('span').textContent = message;
+    const status = $('saved')?.querySelector('span');
+    if (!status) return;
+    status.textContent = message;
     clearTimeout(savedTimer);
-    savedTimer = setTimeout(() => $('saved').querySelector('span').textContent = backendReady ? 'Sincronizado' : 'Salvo localmente', 1700);
+    savedTimer = setTimeout(() => { if (status) status.textContent = 'Pronto'; }, 1700);
   }
 
   function statValue(hero, name) { return statValueRaw(hero, name); }
@@ -431,28 +872,48 @@
     $('home-role').textContent = state.role === 'master' ? 'MESTRE' : hero ? hero.n.toUpperCase() : 'JOGADOR';
   }
 
-  function enter(role, heroId = null) {
-    state.role = role;
-    state.selectedHero = role === 'player' ? heroId : null;
-    if (role === 'player' && !selectedHero()) { toast('Escolha um personagem'); return; }
-    document.body.dataset.role = role;
+  async function enter(role, heroId = null, password = '') {
+    const error = $('login-error');
+    error.textContent = '';
+    if (!activeCampaign?.code) { $('campaign-error').textContent = 'Escolha uma campanha primeiro.'; return false; }
+    if (!window.ArachneAPI) { error.textContent = 'Não foi possível iniciar a sessão.'; return false; }
     try {
-      if (state.selectedHero) sessionStorage.setItem('arachne_selected_hero', state.selectedHero);
-      else sessionStorage.removeItem('arachne_selected_hero');
-    } catch {}
-    $('login').classList.add('hidden');
-    $('app').classList.remove('hidden');
-    $('player-select-area').classList.add('hidden');
-    $('password-area').classList.add('hidden');
-    updateAccessLabels();
-    qsa('[data-master]').forEach(el => el.classList.toggle('hidden', role !== 'master'));
-    loadNotesForRole();
-    renderAll();
-    renderPlayerNotes();
-    goToPage('home');
+      const profile = await window.ArachneAPI.join(role, { campaignCode:activeCampaign.code, heroId, password });
+      if(profile?.campaign){activeCampaign={...activeCampaign,...profile.campaign};rememberCampaign(activeCampaign);}
+      state.role = role;
+      state.selectedHero = role === 'player' ? heroId : null;
+      document.body.dataset.role = role;
+      try {
+        if (state.selectedHero) sessionStorage.setItem('arachne_selected_hero', state.selectedHero);
+        else sessionStorage.removeItem('arachne_selected_hero');
+      } catch {}
+      const hydrated = await hydrateFromBackend();
+      if (!hydrated) throw new Error('Não foi possível carregar a sessão. Tente novamente em instantes.');
+      if (role === 'player' && !selectedHero()) throw new Error('Esse personagem não está disponível nesta campanha.');
+      $('login').classList.add('hidden');
+      $('app').classList.remove('hidden');
+      $('player-select-area').classList.add('hidden');
+      $('password-area').classList.add('hidden');
+      updateAccessLabels();
+      applyCampaignBranding();
+      qsa('[data-master]').forEach(el => el.classList.toggle('hidden', role !== 'master'));
+      loadNotesForRole();
+      renderAll();
+      renderPlayerNotes();
+      goToPage('home');
+      connectRealtime();
+      return true;
+    } catch (err) {
+      backendReady = false;
+      window.ArachneAPI?.clearSession?.();
+      error.textContent = err?.message || 'Não foi possível entrar na sessão.';
+      return false;
+    }
   }
 
   function logout() {
+    window.ArachneAPI?.clearSession?.();
+    backendReady = false;
     state.role = 'player';
     state.selectedHero = null;
     state.currentRoll = null;
@@ -466,6 +927,11 @@
     qsa('.login-actions').forEach(el => el.classList.remove('hidden'));
     $('master-password').value = '';
     $('login-error').textContent = '';
+    if (activeCampaign) {
+      $('campaign-hub')?.classList.add('hidden');
+      $('campaign-access')?.classList.remove('hidden');
+      $('login-title').textContent = activeCampaign.name.toUpperCase();
+    } else returnToCampaignHub();
   }
 
   function goToPage(id) {
@@ -474,7 +940,7 @@
     qsa('.page').forEach(el => el.classList.remove('active'));
     $(id)?.classList.add('active');
     qsa('#nav button').forEach(el => el.classList.toggle('active', el.dataset.page === id));
-    $('title').textContent = {home:'Central da Campanha',heroes:'Heróis',villains:'Vilões',campaign:'Projeto Arachne',dice:'Dados do Mestre',scenario:'Cenário de Combate',notes:'Anotações do Mestre'}[id] || 'Projeto Arachne';
+    $('title').textContent = {home:'Central da Campanha',heroes:'Heróis',villains:'Vilões',campaign:state.campaignContent?.title||activeCampaign?.name||'Campanha',dice:'Dados do Mestre',scenario:'Cenário de Combate',notes:'Anotações do Mestre'}[id] || (activeCampaign?.name||'Campanha');
     closeNav();
     if(id==='scenario')requestAnimationFrame(()=>fitScenarioBoard());
     if(id==='heroes')renderPlayerNotes();
@@ -489,7 +955,7 @@
     const badge = $('selected-player-badge');
     if (badge) {
       badge.classList.toggle('hidden', state.role !== 'player' || !chosen);
-      badge.innerHTML = chosen ? `<span class="selected-player-thumb">${characterArtMarkup(chosen.id, chosen.n, 'selected-player-image')}</span><div><small>VOCÊ ESTÁ JOGANDO COMO</small><b>${escapeHTML(chosen.n)}</b><em>${escapeHTML(chosen.r)}</em></div>` : '';
+      badge.innerHTML = chosen ? `<span class="selected-player-thumb">${characterArtMarkup(chosen.id, chosen.n, 'selected-player-image', chosen.image||'')}</span><div><small>VOCÊ ESTÁ JOGANDO COMO</small><b>${escapeHTML(chosen.n)}</b><em>${escapeHTML(chosen.r)}</em></div>` : '';
     }
     $('heroes-grid').innerHTML = state.heroes.map((hero, index) => {
       const maxHealth = heroMaxHealth(hero);
@@ -503,7 +969,7 @@
       const headline = mine ? 'SEU PERSONAGEM' : hero.tags.includes('Heroic') ? 'HERÓI' : (hero.tier || 'OPERATIVO');
       const editButton = canEditHero(hero.id) ? `<button type="button" data-action="edit-hero" data-index="${index}">${mine ? 'EDITAR MINHA FICHA' : 'EDITAR'}</button>` : '';
       return `<article class="card villain-card hero-card ${mine ? 'owned-hero-card' : ''}" data-hero-card="${index}">
-        <div class="art art-${escapeHTML(hero.id)}">${characterArtMarkup(hero.id, hero.n)}<span class="art-shade"></span><span class="rank">RANK ${clamp(hero.rank,1,6)} · ${headline}</span></div>
+        <div class="art art-${escapeHTML(hero.id)}">${characterArtMarkup(hero.id, hero.n, '', hero.image||'')}<span class="art-shade"></span><span class="rank">RANK ${clamp(hero.rank,1,6)} · ${headline}</span></div>
         <div class="body"><h3>${escapeHTML(hero.n)}</h3><div class="muted">${escapeHTML(hero.r)}</div>
           <div class="resource-bars hero-resource-bars">
             <div class="resource-row"><span><small>HEALTH</small><b>${currentHealth}/${maxHealth}</b></span><i><u style="width:${hpPct}%"></u></i></div>
@@ -523,7 +989,7 @@
       const hpPct = villain.maxHealth ? Math.round((villain.currentHealth / villain.maxHealth) * 100) : 0;
       const fpPct = villain.maxFocus ? Math.round((villain.currentFocus / villain.maxFocus) * 100) : 0;
       return `<article class="card villain-card ${villain.tier === 'CHEFE FINAL' ? 'boss-card' : ''}">
-        <div class="art art-${escapeHTML(villain.id)}">${characterArtMarkup(villain.id, villain.n)}<span class="art-shade"></span><span class="rank">RANK ${clamp(villain.rank,1,6)} · ${escapeHTML(villain.tier)}</span></div>
+        <div class="art art-${escapeHTML(villain.id)}">${characterArtMarkup(villain.id, villain.n, '', villain.image||'')}<span class="art-shade"></span><span class="rank">RANK ${clamp(villain.rank,1,6)} · ${escapeHTML(villain.tier)}</span></div>
         <div class="body"><h3>${escapeHTML(villain.n)}</h3><div class="muted">${escapeHTML(villain.r)}</div>
           <div class="resource-bars">
             <div class="resource-row"><span><small>HEALTH</small><b>${villain.currentHealth}/${villain.maxHealth}</b></span><i><u style="width:${hpPct}%"></u></i></div>
@@ -540,22 +1006,32 @@
     todo:{label:'NÃO INICIADA',className:''}, current:{label:'EM ANDAMENTO',className:'current'}, done:{label:'CONCLUÍDA',className:'done'}
   };
 
+  function activeSessions() {
+    return Array.isArray(state.campaignContent?.sessions) ? state.campaignContent.sessions : SESSIONS;
+  }
+
   function campaignMetrics() {
-    const done = SESSIONS.filter(s => state.campaign[s.id] === 'done').length;
-    const current = SESSIONS.findIndex(s => state.campaign[s.id] === 'current');
-    return {done,current,percent:Math.round((done / SESSIONS.length) * 100)};
+    const sessions = activeSessions();
+    const done = sessions.filter(s => state.campaign[s.id] === 'done').length;
+    const current = sessions.findIndex(s => state.campaign[s.id] === 'current');
+    return {done,current,percent:sessions.length?Math.round((done / sessions.length) * 100):0};
   }
 
   function renderCampaign() {
+    const sessions = activeSessions();
     const metrics = campaignMetrics();
     [$('campaign-progress'), $('campaign-toolbar-progress')].forEach(el => { if (el) el.style.width = `${metrics.percent}%`; });
     $('campaign-percent').textContent = `${metrics.percent}%`;
-    $('campaign-summary').textContent = `${metrics.done}/${SESSIONS.length} sessões`;
+    $('campaign-summary').textContent = `${metrics.done}/${sessions.length} sessões`;
     $('campaign-toolbar-percent').textContent = `${metrics.percent}%`;
     $('campaign-toolbar-summary').textContent = `${metrics.done} concluída${metrics.done === 1 ? '' : 's'}`;
     $('phase-label').textContent = metrics.done >= 7 ? 'FASE FINAL' : metrics.done >= 4 ? 'FASE 2' : 'FASE 1';
 
-    $('sessions').innerHTML = SESSIONS.map(session => {
+    if ($('campaign-page-title')) $('campaign-page-title').textContent = state.campaignContent?.title || activeCampaign?.name || 'Campanha';
+    const introTitle = document.querySelector('#campaign .intro h2'); if (introTitle) introTitle.textContent = state.campaignContent?.title || activeCampaign?.name || 'Campanha';
+    const docTitle = document.querySelector('.campaign-document strong'); if (docTitle) docTitle.textContent = state.campaignContent?.title || activeCampaign?.name || 'Campanha';
+    const docBtn = document.querySelector('.campaign-document [data-action="view-campaign-pdf"]'); if (docBtn) docBtn.textContent = state.campaignContent?.campaignPdf ? 'VISUALIZAR PDF DA CAMPANHA →' : 'ABRIR CONTEÚDO DA CAMPANHA →';
+    $('sessions').innerHTML = sessions.length ? sessions.map(session => {
       const statusKey = state.campaign[session.id] || 'todo';
       const status = STATUS[statusKey];
       return `<article class="session status-${status.className || 'todo'}" data-session="${session.id}">
@@ -567,13 +1043,14 @@
           <span class="chevron">+</span>
         </div><div class="sessionbody"><div><p>${escapeHTML(session.text)}</p></div></div>
       </article>`;
-    }).join('');
+    }).join('') : '<div class="campaign-empty-state"><b>Nenhuma sessão criada.</b><span>Abra “Configurar campanha” para escrever a campanha e adicionar sessões.</span></div>';
 
-    $('home-session-list').innerHTML = SESSIONS.map(session => {
+    $('home-session-list').innerHTML = sessions.map(session => {
       const key = state.campaign[session.id] || 'todo';
       const cls = key === 'done' ? 'done' : key === 'current' ? 'current' : '';
       return `<div class="mini-session ${cls}"><small>SESSÃO ${session.id}</small><b>${escapeHTML(session.title)}</b></div>`;
     }).join('');
+    renderCampaignManager();
   }
 
   function cycleSession(id) {
@@ -602,7 +1079,10 @@
 
   function safePdfPath(path) {
     const value = String(path || '');
-    return /^assets\/pdfs\/[a-z0-9._-]+\.pdf$/i.test(value) ? value : '';
+    if (/^assets\/pdfs\/[a-z0-9._-]+\.pdf$/i.test(value)) return value;
+    if (/^\/uploads\/[a-z0-9_./-]+\.pdf$/i.test(value)) return value;
+    if (/^https:\/\/[^\s]+\/storage\/v1\/object\/public\/[^\s]+\.pdf(?:\?.*)?$/i.test(value)) return value;
+    return '';
   }
 
   function openPdfViewer(path, title, subtitle = '') {
@@ -663,10 +1143,11 @@
       <label class="full">Poderes — separados por vírgula<textarea id="h-e-powers">${escapeHTML((hero.powers || []).join(', '))}</textarea></label>
       <label class="full">Traits — separados por vírgula<textarea id="h-e-traits">${escapeHTML(hero.traits.join(', '))}</textarea></label>
       <label class="full">Tags — separados por vírgula<textarea id="h-e-tags">${escapeHTML(hero.tags.join(', '))}</textarea></label>
+      <label>Imagem do personagem<input id="h-e-image-file" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Ficha em PDF<input id="h-e-pdf-file" type="file" accept="application/pdf"></label>
       </div><div class="editbuttons"><button class="savebtn" type="button" data-action="save-hero" data-index="${index}">SALVAR ALTERAÇÕES</button><button type="button" data-action="view-hero" data-index="${index}">CANCELAR</button></div>`);
   }
 
-  function saveHero(index) {
+  async function saveHero(index) {
     const hero = state.heroes[index];
     if (!hero) return;
     if (!canEditHero(hero.id)) { toast('Edição não permitida para este personagem'); return; }
@@ -694,8 +1175,12 @@
     hero.powers = $('h-e-powers').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,60);
     hero.traits = $('h-e-traits').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,40);
     hero.tags = $('h-e-tags').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,40);
+    const imageFile=$('h-e-image-file')?.files?.[0],pdfFile=$('h-e-pdf-file')?.files?.[0];
+    if(state.role==='master'&&backendReady&&window.ArachneAPI){
+      try{if(imageFile){markSaved('Enviando imagem…');const asset=await window.ArachneAPI.uploadAsset(imageFile);if(asset?.url)hero.image=asset.url;}if(pdfFile){markSaved('Enviando PDF…');const asset=await window.ArachneAPI.uploadAsset(pdfFile);if(asset?.url)hero.pdf=asset.url;}}catch(error){toast(error.message||'Falha ao enviar arquivo');}
+    }
     localStorage.setItem(STORAGE.heroes, JSON.stringify(state.heroes));
-    if (backendReady && window.ArachneAPI) window.ArachneAPI.saveHero(hero);
+    if (backendReady && window.ArachneAPI) await window.ArachneAPI.saveHero(hero);
     renderHeroes();
     renderChallengeSummary();
     closeModal();
@@ -741,7 +1226,9 @@
   }
 
   function viewCampaignPdf() {
-    openPdfViewer(CAMPAIGN_PDF, 'Projeto Arachne — Campanha Completa', '24 páginas · livro da campanha');
+    const content=state.campaignContent||DEFAULT_CAMPAIGN_CONTENT;
+    if(content.campaignPdf){openPdfViewer(content.campaignPdf, content.title||activeCampaign?.name||'Campanha', content.subtitle||'Livro da campanha');return;}
+    openModal(`<h2 id="modal-title">${escapeHTML(content.title||activeCampaign?.name||'Campanha')}</h2><p class="muted">${escapeHTML(content.subtitle||'Campanha personalizada')}</p><div class="campaign-text-view">${escapeHTML(content.editorText||content.summary||'Nenhum texto da campanha foi escrito ainda.').replace(/\n/g,'<br>')}</div>`);
   }
 
   function editVillain(index) {
@@ -762,10 +1249,11 @@
       <label class="full">Poderes — separados por vírgula<textarea id="v-e-powers">${escapeHTML(villain.powers.join(', '))}</textarea></label>
       <label class="full">Traits — separados por vírgula<textarea id="v-e-traits">${escapeHTML(villain.traits.join(', '))}</textarea></label>
       <label class="full">Tags — separados por vírgula<textarea id="v-e-tags">${escapeHTML(villain.tags.join(', '))}</textarea></label>
+      <label>Imagem do vilão<input id="v-e-image-file" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Ficha em PDF<input id="v-e-pdf-file" type="file" accept="application/pdf"></label>
       </div><div class="editbuttons"><button class="savebtn" type="button" data-action="save-villain" data-index="${index}">SALVAR ALTERAÇÕES</button><button type="button" data-action="view-villain" data-index="${index}">CANCELAR</button></div>`);
   }
 
-  function saveVillain(index) {
+  async function saveVillain(index) {
     const villain = state.villains[index];
     if (!villain) return;
     villain.n = $('v-e-name').value.trim() || villain.n; villain.r = $('v-e-real').value.trim(); villain.rank = clamp($('v-e-rank').value,1,6); villain.tier = $('v-e-tier').value.trim() || 'AMEAÇA';
@@ -775,7 +1263,9 @@
     villain.occupation = $('v-e-occupation').value.trim(); villain.origin = $('v-e-origin').value.trim(); villain.teams = $('v-e-teams').value.trim(); villain.base = $('v-e-base').value.trim(); villain.role = $('v-e-role').value.trim(); villain.hook = $('v-e-hook').value.trim();
     ABILITIES.forEach(name => { villain.abilities[name] = clamp($(`v-e-ability-${name}`).value,-20,30); });
     villain.powers = $('v-e-powers').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,60); villain.traits = $('v-e-traits').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,40); villain.tags = $('v-e-tags').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,40);
-    saveJSON(STORAGE.villains,state.villains); renderVillains(); renderChallengeSummary(); renderDamageSelectors(); renderInitiativeThreatPicker(); renderScenarioThreatPicker(); closeModal(); markSaved('Vilão salvo'); toast('Ficha do vilão atualizada');
+    const imageFile=$('v-e-image-file')?.files?.[0],pdfFile=$('v-e-pdf-file')?.files?.[0];
+    if(backendReady&&window.ArachneAPI){try{if(imageFile){markSaved('Enviando imagem…');const asset=await window.ArachneAPI.uploadAsset(imageFile);if(asset?.url)villain.image=asset.url;}if(pdfFile){markSaved('Enviando PDF…');const asset=await window.ArachneAPI.uploadAsset(pdfFile);if(asset?.url)villain.pdf=asset.url;}}catch(error){toast(error.message||'Falha ao enviar arquivo');}}
+    localStorage.setItem(STORAGE.villains,JSON.stringify(state.villains));if(backendReady&&window.ArachneAPI)await window.ArachneAPI.saveVillain(villain); renderVillains(); renderChallengeSummary(); renderDamageSelectors(); renderInitiativeThreatPicker(); renderScenarioThreatPicker(); closeModal(); markSaved('Vilão salvo'); toast('Ficha do vilão atualizada');
   }
 
   function adjustVillain(index, resource, delta) {
@@ -1053,6 +1543,7 @@
     for (let i=1;i<3;i++) if (qualityValue(roll.values[i],i) > qualityValue(roll.values[best],best)) best = i;
     const before = roll.values[best];
     const rerolled = rand(6);
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.publishLiveRoll({type:'D616',dice:{kind:best===1?'marvel':'poly',count:1,sides:6}});
     await animateCube(best, 520);
     const kept = qualityValue(rerolled,best) < qualityValue(before,best) ? rerolled : before;
     roll.values[best] = kept;
@@ -1068,6 +1559,7 @@
     const adv = effectiveAdvantage();
     const snapshot = {
       action:state.challenge.action, tn:state.challenge.tn, edge:state.challenge.edge, trouble:state.challenge.trouble,
+      source:state.challenge.source,
       actorId:actor?.id || '', actorName:actor?.n || 'Personagem', ability:state.challenge.ability,
       abilityMod:abilityValue(actor,state.challenge.ability), extra:state.challenge.extra,
       netEdge:adv.netEdge, netTrouble:adv.netTrouble
@@ -1078,6 +1570,7 @@
     };
     state.currentRoll = roll;
     $('reroll-log').innerHTML = '';
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.publishLiveRoll({type:'D616',dice:{kind:'d616',count:3,sides:6}});
     await animateAllDice(roll.values);
 
     if (roll.troubleRemaining > 0) {
@@ -1110,6 +1603,7 @@
     $('finalize-roll').disabled = true;
     const before = roll.values[index];
     const rerolled = rand(6);
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.publishLiveRoll({type:'D616',dice:{kind:index===1?'marvel':'poly',count:1,sides:6}});
     await animateCube(index, 540);
     const kept = qualityValue(rerolled,index) > qualityValue(before,index) ? rerolled : before;
     roll.values[index] = kept;
@@ -1133,7 +1627,8 @@
       type:'D616', label:`${roll.snapshot.actorName} · ${roll.snapshot.ability}`,
       action:roll.snapshot.action, tn:roll.snapshot.tn,
       detail:`${roll.values.map((v,i)=>formatDie(v,i)).join(' · ')} | ${signed(roll.snapshot.abilityMod)} hab. | ${signed(roll.snapshot.extra)} extra | TN ${roll.snapshot.tn}`,
-      total:math.total, outcome:outcome.label, outcomeKey:outcome.key, at:Date.now()
+      total:math.total, outcome:outcome.label, outcomeKey:outcome.key, at:Date.now(), visibility:roll.snapshot.source === 'hero' ? 'public' : 'masked',
+      dice:{kind:'d616',values:[...roll.values]}
     });
     renderCurrentRoll();
   }
@@ -1143,6 +1638,8 @@
     state.diceHistory = state.diceHistory.slice(0, 50);
     saveJSON(STORAGE.dice, state.diceHistory);
     renderDiceHistory(true);
+    renderHomeLiveRolls();
+    renderPlayerLiveDice();
   }
 
   function renderDiceHistory(markNewest = false) {
@@ -1156,6 +1653,91 @@
       const outcome = entry.outcome ? `<span class="history-outcome ${escapeHTML(resultClass)}">${escapeHTML(entry.outcome)}</span>` : '';
       return `<div class="historyrow ${markNewest && index === 0 ? 'new' : ''}"><span class="history-icon">${entry.type === 'D616' ? 'A' : '⚄'}</span><div><b>${escapeHTML(entry.label)}</b>${action}${outcome}</div><strong>${escapeHTML(entry.total)}</strong></div>`;
     }).join('');
+  }
+
+  function renderHomeLiveRolls() {
+    const wrap = $('home-live-rolls');
+    if (!wrap) return;
+    const rows = state.diceHistory.slice(0,6);
+    if (!rows.length) {
+      wrap.innerHTML = '<div class="history-empty">As rolagens da sessão aparecem aqui em tempo real.</div>';
+      return;
+    }
+    wrap.innerHTML = rows.map(entry => `<div class="live-roll-card"><span>${entry.type === 'D616' ? 'A' : '⚄'}</span><div><b>${escapeHTML(entry.label || 'Rolagem')}</b><small>${escapeHTML(entry.outcome || entry.action || entry.detail || 'Resultado registrado')}</small></div><strong>${escapeHTML(entry.total ?? '—')}</strong></div>`).join('');
+  }
+
+  function liveDiceValue(value, marvel = false) {
+    return marvel && Number(value) === 1 ? 'M' : String(value ?? '—');
+  }
+
+  function liveDiceMarkup(entry, rolling = false) {
+    const dice = entry?.dice || {};
+    const values = Array.isArray(dice.values) ? dice.values : [];
+    const rollClass = rolling ? ' rolling' : '';
+    if (dice.kind === 'd616' && values.length >= 3) {
+      return values.slice(0,3).map((value,index) => `<span class="live-player-die d6 ${index===1?'marvel':''}${rollClass}" style="--delay:${index*70}ms"><b>${escapeHTML(liveDiceValue(value,index===1))}</b><small>${index===1?'MARVEL':'D6'}</small></span>`).join('');
+    }
+    if (dice.kind === 'marvel' && values.length) {
+      return `<span class="live-player-die d6 marvel${rollClass}"><b>${escapeHTML(liveDiceValue(values[0],true))}</b><small>MARVEL</small></span>`;
+    }
+    if (dice.kind === 'initiative' && values.length) {
+      return values.slice(0,10).map((value,index) => `<span class="live-player-die d6 marvel mini${rollClass}" style="--delay:${index*45}ms"><b>${escapeHTML(liveDiceValue(value,true))}</b><small>M</small></span>`).join('');
+    }
+    if (dice.kind === 'poly' && values.length) {
+      const sides = Number(dice.sides || 6);
+      return values.slice(0,12).map((value,index) => `<span class="live-player-die poly d${escapeHTML(sides)}${rollClass}" style="--delay:${index*45}ms"><b>${escapeHTML(value)}</b><small>D${escapeHTML(sides)}</small></span>`).join('');
+    }
+    return `<span class="live-player-die result-only${rollClass}"><b>${escapeHTML(entry?.total ?? '—')}</b><small>${escapeHTML(entry?.type || 'ROLL')}</small></span>`;
+  }
+
+  function renderPlayerLiveDice() {
+    const panel = $('player-live-dice');
+    if (!panel) return;
+    const visible = state.role === 'player';
+    panel.classList.toggle('hidden', !visible);
+    if (!visible) return;
+    const latest = state.diceHistory[0];
+    const stage = $('player-live-dice-stage');
+    const result = $('player-live-dice-result');
+    const history = $('player-live-dice-history');
+    if (!latest) {
+      stage.innerHTML = '<div class="live-dice-empty">Aguardando a próxima rolagem.</div>';
+      result.innerHTML = '<small>RESULTADO</small><strong>—</strong><span></span>';
+      history.innerHTML = '<div class="history-empty">Nenhuma jogada registrada.</div>';
+      return;
+    }
+    stage.innerHTML = liveDiceMarkup(latest,false);
+    result.innerHTML = `<small>${escapeHTML(latest.type || 'ROLAGEM')}</small><strong>${escapeHTML(latest.total ?? '—')}</strong><span>${escapeHTML(latest.outcome || latest.action || latest.detail || '')}</span>`;
+    const rows = state.diceHistory.slice(0,5);
+    history.innerHTML = rows.map((entry,index) => `<div class="player-roll-history-row ${index===0?'latest':''}"><span>${escapeHTML(entry.type || 'ROLL')}</span><div><b>${escapeHTML(entry.label || 'Rolagem do Mestre')}</b><small>${escapeHTML(entry.outcome || entry.action || entry.detail || '')}</small></div><strong>${escapeHTML(entry.total ?? '—')}</strong></div>`).join('');
+  }
+
+  function startPlayerLiveRoll(event) {
+    if (state.role !== 'player' || !event || !$('player-live-dice-stage')) return;
+    const count = clamp(event?.dice?.count || 1,1,12);
+    const kind = event?.dice?.kind || 'marvel';
+    const sides = Number(event?.dice?.sides || 6);
+    const preview = {
+      type:event.type || 'ROLL', total:'…',
+      dice:{kind,sides,values:Array.from({length:count},()=>'?')}
+    };
+    const stage = $('player-live-dice-stage');
+    stage.innerHTML = liveDiceMarkup(preview,true);
+    stage.classList.add('live-roll-flash');
+    $('player-live-dice-result').innerHTML = `<small>${escapeHTML(event.type || 'ROLAGEM')}</small><strong>…</strong><span>Rolando agora</span>`;
+  }
+
+  async function animatePlayerLiveDice(entry) {
+    if (state.role !== 'player' || !$('player-live-dice-stage')) return;
+    renderPlayerLiveDice();
+    const stage = $('player-live-dice-stage');
+    stage.innerHTML = liveDiceMarkup(entry,true);
+    stage.classList.remove('live-roll-flash');
+    void stage.offsetWidth;
+    stage.classList.add('live-roll-flash');
+    await sleep(reducedMotion()?60:780);
+    stage.innerHTML = liveDiceMarkup(entry,false);
+    stage.classList.remove('live-roll-flash');
   }
 
   function polyDieHTML(sides, value = '?', rolling = false, index = 0) {
@@ -1175,6 +1757,7 @@
 
   async function rollGeneric() {
     const sides = clamp($('die').value,2,1000), quantity = clamp($('qty').value,1,12), modifier = clamp($('generic-mod').value,-99,99);$('qty').value=quantity;
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.publishLiveRoll({type:'GEN',dice:{kind:'poly',count:quantity,sides}});
     const stage=$('generic-dice-stage');stage.classList.add('tray-rolling');stage.innerHTML=Array.from({length:quantity},(_,i)=>polyDieHTML(sides,'?',true,i)).join('');
     $('generic-result').textContent='…';$('generic-detail').textContent=`${quantity}d${sides}${modifier?` ${signed(modifier)}`:''}`;
     const flick=setInterval(()=>qsa('.poly-value',stage).forEach(node=>node.textContent=String(rand(sides))),55);
@@ -1182,7 +1765,7 @@
     const values=Array.from({length:quantity},()=>rand(sides));stage.classList.remove('tray-rolling');stage.innerHTML=values.map((value,i)=>polyDieHTML(sides,value,false,i)).join('');
     qsa('.poly-die-wrap',stage).forEach((wrap,i)=>{wrap.classList.add('landed');setTimeout(()=>wrap.classList.remove('landed'),720+i*55);});
     const raw=values.reduce((sum,value)=>sum+value,0),total=raw+modifier;$('generic-result').textContent=total;$('generic-detail').textContent=`[${values.join(', ')}]${modifier?` ${signed(modifier)}`:''}`;
-    addHistory({type:'GEN',label:`${quantity}d${sides}`,detail:`[${values.join(', ')}]${modifier?` ${signed(modifier)}`:''}`,total,at:Date.now()});
+    addHistory({type:'GEN',label:`${quantity}d${sides}`,detail:`[${values.join(', ')}]${modifier?` ${signed(modifier)}`:''}`,total,at:Date.now(),visibility:'public',dice:{kind:'poly',sides,values}});
   }
 
   // -------------------- Dano com Marvel Die --------------------
@@ -1261,6 +1844,7 @@
   async function rollDamage() {
     const cube = $('damage-cube');
     $('roll-damage').disabled = true;
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.publishLiveRoll({type:'DMG',dice:{kind:'marvel',count:1,sides:6}});
     await animateStandaloneCube(cube,820);
     const face = rand(6);
     setStandaloneCubeValue(cube,face);
@@ -1276,7 +1860,7 @@
     $('damage-total').textContent = total;
     $('damage-detail').textContent = `${face===1?'M (vale 6)':face} × ${effectiveMult} ${bonus?signed(bonus):'+0'}${$('damage-mode').value==='fantastic'?' · dobrado':''} = ${total}${entity?` · ${entity.n}`:''}`;
     $('roll-damage').disabled = false;
-    addHistory({type:'DMG',label:`Dano · ${entity?.n || 'Personalizado'}`,detail:$('damage-detail').textContent,total,at:Date.now()});
+    addHistory({type:'DMG',label:`Dano · ${entity?.n || 'Personalizado'}`,detail:$('damage-detail').textContent,total,at:Date.now(),visibility:$('damage-source').value === 'threat' ? 'masked' : 'public',dice:{kind:'marvel',values:[face]}});
   }
 
   // -------------------- v8 · Iniciativa com 1 Marvel Die --------------------
@@ -1311,6 +1895,7 @@
   async function rollInitiative() {
     if(!state.initiativeParticipants.length)return toast('Adicione pelo menos um participante');
     const cube=$('initiative-cube'); $('roll-initiative').disabled=true;
+    if (backendReady && window.ArachneAPI) window.ArachneAPI.publishLiveRoll({type:'INIT',dice:{kind:'initiative',count:state.initiativeParticipants.length,sides:6}});
     const results=[];
     for(let i=0;i<state.initiativeParticipants.length;i++){
       const p=state.initiativeParticipants[i];
@@ -1327,7 +1912,9 @@
     const tied=results.filter(r=>r.result===top).length>1;
     $('initiative-current').textContent=tied?`Empate no topo: ${top}`:`${results[0].name} começa com ${top}`;
     $('initiative-order').innerHTML=results.map((r,i)=>`<div class="initiative-order-row ${i===0?'winner':''}"><span>${i+1}</span><div><b>${escapeHTML(r.name)}</b><small>${r.face===1?'Marvel M = 6':`Marvel ${r.face}`} ${signed(r.modifier)}</small></div><strong>${r.result}</strong></div>`).join('')+(tied?'<p class="initiative-tie">Empate no topo: ajuste um modificador ou role novamente para desempatar.</p>':'');
-    saveInitiativeParticipants(); $('roll-initiative').disabled=false;
+    saveInitiativeParticipants();
+    addHistory({type:'INIT',label:'Iniciativa',detail:`${results.length} participante${results.length===1?'':'s'}`,total:top,at:Date.now(),visibility:'masked',dice:{kind:'initiative',values:results.map(r=>r.face)}});
+    $('roll-initiative').disabled=false;
   }
 
   // -------------------- v9 · Montador tático --------------------
@@ -1422,7 +2009,11 @@
     const legacyHeroMap={'hero-spider':'spider','hero-wolverine':'wolverine','hero-cap':'cap'};const{w,h}=boardSize();
     state.scenario.pieces.forEach(p=>{if(!p.baseId&&legacyHeroMap[p.id])p.baseId=legacyHeroMap[p.id];if(!p.movement||!Object.keys(p.movement).length)p.movement=movementForPiece(p);if(p.kind==='enemy'&&PIECE_LABELS[p.baseId])p.short=PIECE_LABELS[p.baseId];p.x=clamp(p.x,0,w-1);p.y=clamp(p.y,0,h-1);});
   }
-  function saveScenario(){saveJSON(STORAGE.scenario,state.scenario);markSaved('Cenário salvo');}
+  function saveScenario(){
+    localStorage.setItem(STORAGE.scenario, JSON.stringify(state.scenario));
+    if(state.role==='master' && backendReady && window.ArachneAPI) window.ArachneAPI.saveStorageKey(STORAGE.scenario,state.scenario);
+    markSaved('Cenário salvo');
+  }
   function renderScenarioThreatPicker(){if(!$('scenario-threat-tier'))return;fillThreatSelect($('scenario-threat-choice'),$('scenario-threat-tier').value||'minion',$('scenario-threat-choice').value);}
   function scenarioPieceAt(x,y){return state.scenario.pieces.find(p=>p.x===x&&p.y===y);}
   function selectedScenarioPiece(){return state.scenario.pieces.find(p=>p.id===state.scenario.selectedPiece)||null;}
@@ -1586,7 +2177,7 @@
     const textarea = $('hero-notes-text');
     if (document.activeElement !== textarea) textarea.value = state.playerNotes[hero.id] || '';
     updatePlayerNotesCount();
-    $('hero-notes-status').textContent = backendReady ? 'Sincronizado com o servidor' : 'Salvo neste navegador';
+    $('hero-notes-status').textContent = 'Salvo';
   }
 
   function updatePlayerNotesCount() {
@@ -1602,10 +2193,21 @@
     if (!hero || state.role !== 'player') return;
     state.playerNotes[hero.id] = $('hero-notes-text').value;
     localStorage.setItem(STORAGE.playerNotes, JSON.stringify(state.playerNotes));
-    if (backendReady && window.ArachneAPI) window.ArachneAPI.saveStorageKey(STORAGE.playerNotes, state.playerNotes);
+    clearTimeout(playerNotesSaveTimer);
+    if (backendReady && window.ArachneAPI) {
+      const heroId = hero.id;
+      const note = state.playerNotes[heroId];
+      playerNotesSaveTimer = setTimeout(async () => {
+        const ok = await window.ArachneAPI.savePlayerNote(heroId, note);
+        if (ok) {
+          markSaved('Anotações salvas');
+          $('hero-notes-status').textContent = 'Salvo';
+        }
+      }, 350);
+    }
     updatePlayerNotesCount();
-    markSaved(backendReady ? 'Anotações sincronizadas' : 'Anotações salvas');
-    $('hero-notes-status').textContent = backendReady ? 'Alterações sincronizadas' : 'Alterações salvas localmente';
+    markSaved(backendReady ? 'Salvando anotações…' : 'Anotações salvas');
+    $('hero-notes-status').textContent = 'Salvando…';
   }
 
   function playerNotesMarkdown() {
@@ -1731,21 +2333,91 @@
     renderInitiativeParticipants();
     renderScenarioThreatPicker();
     renderScenario();
+    renderHomeLiveRolls();
+    renderPlayerLiveDice();
     updateNotesCount();
     clearCurrentRollVisual(true);
   }
 
-  // Login
-  $('player-login').addEventListener('click', () => { qsa('.login-actions').forEach(el => el.classList.add('hidden')); $('password-area').classList.add('hidden'); $('player-select-area').classList.remove('hidden'); $('login-error').textContent=''; });
-  qsa('[data-player-hero]').forEach(button => button.addEventListener('click', () => enter('player', button.dataset.playerHero)));
+  // Campanhas / Login
+  $('join-campaign-toggle').addEventListener('click', () => {
+    $('join-campaign-panel').classList.toggle('hidden');
+    $('create-campaign-panel').classList.add('hidden');
+    $('campaign-error').textContent = '';
+    if (!$('join-campaign-panel').classList.contains('hidden')) $('campaign-code-input').focus();
+  });
+  $('create-campaign-toggle').addEventListener('click', () => {
+    $('create-campaign-panel').classList.toggle('hidden');
+    $('join-campaign-panel').classList.add('hidden');
+    $('campaign-error').textContent = '';
+    if (!$('create-campaign-panel').classList.contains('hidden')) { loadTemplateLibrary(); setCreateCampaignMode(createCampaignMode); $('new-campaign-name').focus(); }
+  });
+  qsa('[data-create-mode]').forEach(button=>button.addEventListener('click',()=>setCreateCampaignMode(button.dataset.createMode)));
+  $('template-picker')?.addEventListener('click',event=>{const button=event.target.closest('[data-template-id]');if(!button)return;selectedTemplateId=button.dataset.templateId;const template=availableTemplates.find(t=>t.id===selectedTemplateId);if(template&&(!$('new-campaign-name').value.trim()||createCampaignMode==='template'))$('new-campaign-name').value=template.name;syncBuilderRosterFromTemplate(true);renderTemplatePicker();renderBuilderCharacterLibrary();renderTemplatePreview();});
+  $('builder-hero-library')?.addEventListener('click',event=>{const button=event.target.closest('[data-builder-select][data-builder-kind="hero"]');if(!button)return;toggleBuilderSelection('hero',button.dataset.builderSelect);});
+  $('builder-villain-library')?.addEventListener('click',event=>{const button=event.target.closest('[data-builder-select][data-builder-kind="villain"]');if(!button)return;toggleBuilderSelection('villain',button.dataset.builderSelect);});
+  $('new-campaign-name')?.addEventListener('input',()=>renderTemplatePreview());
+  $('campaign-library').addEventListener('click', async event => {
+    const button = event.target.closest('[data-open-campaign]');
+    if (!button) return;
+    button.disabled = true;
+    try {
+      const campaign = await window.ArachneAPI.lookupCampaign(button.dataset.openCampaign);
+      if (!campaign) throw new Error('Campanha não encontrada.');
+      selectCampaign(campaign);
+    } catch (error) { $('campaign-error').textContent = error.message; }
+    button.disabled = false;
+  });
+  $('join-campaign-code').addEventListener('click', async () => {
+    const code = $('campaign-code-input').value.trim();
+    $('campaign-error').textContent = '';
+    if (!code) { $('campaign-error').textContent = 'Digite o código da campanha.'; return; }
+    const button = $('join-campaign-code'); button.disabled = true;
+    try {
+      const campaign = await window.ArachneAPI.lookupCampaign(code);
+      if (!campaign) throw new Error('Campanha não encontrada. Confira o código.');
+      selectCampaign(campaign);
+    } catch (error) { $('campaign-error').textContent = error.message; }
+    button.disabled = false;
+  });
+  $('campaign-code-input').addEventListener('keydown', event => { if (event.key === 'Enter') $('join-campaign-code').click(); });
+  $('create-campaign').addEventListener('click', async () => {
+    const name = $('new-campaign-name').value.trim(), password = $('new-campaign-password').value;
+    const pdfFile = createCampaignMode==='pdf' ? $('new-campaign-pdf')?.files?.[0] : null;
+    $('campaign-error').textContent = '';
+    if(createCampaignMode==='template'&&!selectedTemplateId){$('campaign-error').textContent='Escolha uma campanha pronta.';return;}
+    if(createCampaignMode==='pdf'&&!pdfFile){$('campaign-error').textContent='Escolha o PDF da campanha.';return;}
+    if(!builderHeroIds.length){$('campaign-error').textContent='Selecione pelo menos um herói para a campanha.';return;}
+    const button = $('create-campaign'); button.disabled = true;
+    try {
+      const campaign = await window.ArachneAPI.createCampaign({name,masterPassword:password,mode:createCampaignMode,templateId:createCampaignMode==='template'?selectedTemplateId:'',heroIds:[...new Set(builderHeroIds)],villainIds:[...new Set(builderVillainIds)]});
+      selectCampaign(campaign);
+      $('master-password').value = password;
+      await enter('master', null, password);
+      if(pdfFile&&backendReady){markSaved('Enviando PDF…');const asset=await window.ArachneAPI.uploadAsset(pdfFile);if(asset?.url){state.campaignContent={...state.campaignContent,campaignPdf:asset.url,documentMode:'pdf'};localStorage.setItem(STORAGE.campaignContent,JSON.stringify(state.campaignContent));await window.ArachneAPI.saveMany({campaignContent:state.campaignContent});renderCampaign();}}
+      $('new-campaign-name').value = '';
+      $('new-campaign-password').value = '';
+      if($('new-campaign-pdf'))$('new-campaign-pdf').value='';
+      syncBuilderRosterFromTemplate(true);
+      renderBuilderCharacterLibrary();
+      renderTemplatePreview();
+    } catch (error) { $('campaign-error').textContent = error.message; }
+    button.disabled = false;
+  });
+  $('back-campaigns').addEventListener('click', returnToCampaignHub);
+
+  $('player-login').addEventListener('click', () => { qsa('.login-actions').forEach(el => el.classList.add('hidden')); $('password-area').classList.add('hidden'); renderPlayerChoices(activeCampaign?.heroes||[]); $('player-select-area').classList.remove('hidden'); $('login-error').textContent=''; });
+  $('player-choice-grid')?.addEventListener('click',async event=>{const button=event.target.closest('[data-player-hero]');if(!button)return;button.disabled=true;await enter('player',button.dataset.playerHero);button.disabled=false;});
   $('back-login').addEventListener('click', () => { $('player-select-area').classList.add('hidden'); qsa('.login-actions').forEach(el => el.classList.remove('hidden')); });
   $('master-login').addEventListener('click', () => {
     $('password-area').classList.toggle('hidden');
     if (!$('password-area').classList.contains('hidden')) $('master-password').focus();
   });
-  $('confirm-master').addEventListener('click', () => {
-    if ($('master-password').value === MASTER_PASSWORD) enter('master');
-    else $('login-error').textContent = 'Senha incorreta.';
+  $('confirm-master').addEventListener('click', async () => {
+    const button = $('confirm-master');
+    button.disabled = true;
+    await enter('master', null, $('master-password').value);
+    button.disabled = false;
   });
   $('master-password').addEventListener('keydown', event => { if (event.key === 'Enter') $('confirm-master').click(); });
   $('logout').addEventListener('click', logout);
@@ -1760,6 +2432,22 @@
   document.addEventListener('click', event => {
     const go = event.target.closest('[data-go]');
     if (go) goToPage(go.dataset.go);
+  });
+
+  $('open-campaign-manager')?.addEventListener('click',()=>{$('campaign-manager')?.classList.remove('hidden');renderCampaignManager();});
+  $('close-campaign-manager')?.addEventListener('click',()=>$('campaign-manager')?.classList.add('hidden'));
+  $('save-campaign-content')?.addEventListener('click',saveCampaignManagerContent);
+  $('add-hero')?.addEventListener('click',()=>openAddCharacter('hero'));
+  $('add-villain')?.addEventListener('click',()=>openAddCharacter('villain'));
+  $('add-campaign-session')?.addEventListener('click',()=>{const sessions=collectCampaignSessions();sessions.push({id:String(sessions.length+1).padStart(2,'0'),title:`Sessão ${sessions.length+1}`,text:''});state.campaignContent={...state.campaignContent,sessions};renderCampaignManager();});
+  $('campaign-pdf-upload')?.addEventListener('change',async event=>{const file=event.target.files?.[0];if(!file||!backendReady)return;try{markSaved('Enviando PDF…');const asset=await window.ArachneAPI.uploadAsset(file);if(asset?.url){state.campaignContent={...state.campaignContent,campaignPdf:asset.url,documentMode:'pdf'};localStorage.setItem(STORAGE.campaignContent,JSON.stringify(state.campaignContent));await window.ArachneAPI.saveMany({campaignContent:state.campaignContent});renderCampaign();toast('PDF da campanha atualizado');}}catch(error){toast(error.message||'Falha no upload');}finally{event.target.value='';}});
+
+  document.addEventListener('click',async event=>{
+    const add=event.target.closest('[data-add-library-character]');if(add){await addLibraryCharacter(add.dataset.characterKind,add.dataset.addLibraryCharacter);return;}
+    const custom=event.target.closest('[data-create-custom-character]');if(custom){createCustomCharacter(custom.dataset.createCustomCharacter);return;}
+    const removeSession=event.target.closest('[data-remove-session]');if(removeSession){const sessions=collectCampaignSessions();sessions.splice(Number(removeSession.dataset.removeSession),1);state.campaignContent={...state.campaignContent,sessions:sessions.map((s,i)=>({...s,id:String(i+1).padStart(2,'0')}))};renderCampaignManager();return;}
+    const removeHero=event.target.closest('[data-roster-remove-hero]');if(removeHero){const id=removeHero.dataset.rosterRemoveHero,hero=state.heroes.find(h=>h.id===id);if(!hero||!confirm(`Remover ${hero.n} desta campanha?`))return;state.heroes=state.heroes.filter(h=>h.id!==id);delete state.playerNotes[id];state.scenario.pieces=(state.scenario.pieces||[]).filter(p=>p.baseId!==id);localStorage.setItem(STORAGE.heroes,JSON.stringify(state.heroes));localStorage.setItem(STORAGE.playerNotes,JSON.stringify(state.playerNotes));localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));if(backendReady&&window.ArachneAPI)await window.ArachneAPI.deleteHero(id);renderAll();renderCampaignManager();toast('Herói removido');return;}
+    const removeVillain=event.target.closest('[data-roster-remove-villain]');if(removeVillain){const id=removeVillain.dataset.rosterRemoveVillain,villain=state.villains.find(v=>v.id===id);if(!villain||!confirm(`Remover ${villain.n} desta campanha?`))return;state.villains=state.villains.filter(v=>v.id!==id);localStorage.setItem(STORAGE.villains,JSON.stringify(state.villains));if(backendReady&&window.ArachneAPI)await window.ArachneAPI.deleteVillain(id);renderAll();renderCampaignManager();toast('Vilão removido');}
   });
 
   // Delegated actions
@@ -1857,17 +2545,20 @@
     const key = activeNotesKey();
     const value = $('notes-text').value;
     localStorage.setItem(key, value);
-    if (backendReady && window.ArachneAPI) window.ArachneAPI.saveStorageKey(key, value);
+    clearTimeout(masterNotesSaveTimer);
+    if (backendReady && window.ArachneAPI) {
+      masterNotesSaveTimer = setTimeout(() => window.ArachneAPI.saveStorageKey(key, value), 350);
+    }
     updateNotesCount();
-    markSaved(backendReady ? 'Anotações sincronizadas' : 'Anotações salvas');
-    $('notes-export-status').textContent = backendReady ? 'Alterações sincronizadas' : 'Alterações salvas localmente';
+    markSaved(backendReady ? 'Salvando anotações…' : 'Anotações salvas');
+    $('notes-export-status').textContent = 'Salvando…';
   });
   $('copy-notes').addEventListener('click', copyNotes);
   $('export-notes-md').addEventListener('click', () => exportNotes('md'));
   $('export-notes-txt').addEventListener('click', () => exportNotes('txt'));
   $('export-backup').addEventListener('click', exportBackup);
   $('clear-notes').addEventListener('click', () => {
-    if (!$('notes-text').value || !confirm('Limpar todas as anotações locais?')) return;
+    if (!$('notes-text').value || !confirm('Limpar todas as anotações?')) return;
     $('notes-text').value = '';
     const key = activeNotesKey();
     localStorage.setItem(key, '');
@@ -1891,5 +2582,6 @@
   });
 
   renderAll();
-  hydrateFromBackend();
+  renderCampaignLibrary();
+  document.body.dataset.role = 'guest';
 })();

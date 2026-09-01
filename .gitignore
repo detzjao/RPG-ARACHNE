@@ -3,3 +3,5 @@ backend/data/*.sqlite
 backend/data/*.sqlite-*
 .DS_Store
 Thumbs.db
+backend/uploads/*
+!backend/uploads/.gitkeep

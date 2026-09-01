@@ -26,9 +26,13 @@ export const config = {
   corsOrigin: process.env.CORS_ORIGIN || '*',
   dbProvider: (process.env.DB_PROVIDER || 'sqlite').toLowerCase(),
   sqliteFile: path.resolve(backendRoot, process.env.SQLITE_FILE || './data/arachne.sqlite'),
-  campaignId: process.env.CAMPAIGN_ID || 'main',
   serveFrontend: String(process.env.SERVE_FRONTEND || 'true').toLowerCase() !== 'false',
   frontendDir: path.resolve(backendRoot, '../frontend'),
   supabaseUrl: (process.env.SUPABASE_URL || '').replace(/\/$/, ''),
-  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+  masterPassword: process.env.MASTER_PASSWORD || 'ARACHNE',
+  sessionSecret: process.env.SESSION_SECRET || 'arachne-local-change-me',
+  sessionTtlHours: Number(process.env.SESSION_TTL_HOURS || 24),
+  uploadsDir: path.resolve(backendRoot, process.env.UPLOADS_DIR || './uploads'),
+  supabaseStorageBucket: process.env.SUPABASE_STORAGE_BUCKET || 'arachne-assets'
 };

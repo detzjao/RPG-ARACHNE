@@ -1,11 +1,21 @@
--- Execute no SQL Editor do Supabase quando quiser migrar.
+-- RPG Arachne v18 — banco multi-campanha.
+-- Execute no SQL Editor do Supabase.
 
 create table if not exists public.campaigns (
   id text primary key,
+  code text not null unique,
   name text not null,
+  password_hash text,
+  template text not null default 'arachne',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Migração segura para quem já possui a tabela antiga.
+alter table public.campaigns add column if not exists code text;
+alter table public.campaigns add column if not exists password_hash text;
+alter table public.campaigns add column if not exists template text not null default 'arachne';
+create unique index if not exists idx_campaigns_code on public.campaigns(code);
 
 create table if not exists public.app_state (
   campaign_id text not null references public.campaigns(id) on delete cascade,
@@ -14,15 +24,8 @@ create table if not exists public.app_state (
   updated_at timestamptz not null default now(),
   primary key (campaign_id, state_key)
 );
-
 create index if not exists idx_app_state_campaign on public.app_state(campaign_id);
 
-insert into public.campaigns (id, name)
-values ('main', 'Projeto Arachne')
-on conflict (id) do nothing;
-
--- Para uso inicial somente pelo backend com SERVICE_ROLE, RLS pode ficar ativado sem políticas públicas.
+-- O backend usa SERVICE_ROLE. Nenhuma chave do Supabase vai para o navegador.
 alter table public.campaigns enable row level security;
 alter table public.app_state enable row level security;
-
--- Futuramente, quando adicionar Supabase Auth, crie políticas por usuário/campanha.

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: rpg-arachne
+    runtime: node
+    rootDir: backend
+    buildCommand: ""
+    startCommand: npm start
+    envVars:
+      - key: SERVE_FRONTEND
+        value: "true"
+      - key: DB_PROVIDER
+        value: supabase
+      - key: MASTER_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

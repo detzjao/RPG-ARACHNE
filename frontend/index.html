@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b10">
-  <meta name="description" content="Painel local para a campanha Projeto Arachne — Marvel Multiverse RPG.">
-  <title>Projeto Arachne — Marvel Multiverse RPG</title>
+  <meta name="description" content="Mesa virtual multi-campanha para Marvel Multiverse RPG.">
+  <title>RPG Arachne — Marvel Multiverse RPG</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,33 +13,86 @@
     <div class="login-scan" aria-hidden="true"></div>
     <div class="loginbox">
       <div class="loginmark" aria-hidden="true"><span>A</span></div>
-      <small>ARQUIVO CONFIDENCIAL</small>
-      <h1 id="login-title">PROJETO ARACHNE</h1>
+      <small>MARVEL MULTIVERSE RPG</small>
+      <h1 id="login-title">SUAS CAMPANHAS</h1>
       <p>MARVEL MULTIVERSE RPG</p>
-      <div class="login-actions">
-        <button id="player-login" type="button">ENTRAR COMO JOGADOR</button>
-        <button id="master-login" type="button" class="secondary">ENTRAR COMO MESTRE</button>
-      </div>
-      <div id="player-select-area" class="player-select-area hidden" aria-labelledby="player-select-title">
-        <div class="login-section-head">
-          <button id="back-login" type="button" class="login-back" aria-label="Voltar">←</button>
-          <div><small>ESCOLHA SEU PERSONAGEM</small><strong id="player-select-title">Quem você vai jogar?</strong></div>
+      <div id="campaign-hub" class="campaign-hub">
+        <div id="campaign-library" class="campaign-library"></div>
+        <div class="campaign-hub-actions">
+          <button id="join-campaign-toggle" type="button">ENTRAR COM CÓDIGO</button>
+          <button id="create-campaign-toggle" type="button" class="secondary">CRIAR CAMPANHA</button>
         </div>
-        <div class="player-choice-grid">
-          <button type="button" data-player-hero="spider"><span class="player-choice-thumb"><img src="assets/portraits/hero-spider.jpg" alt="Homem-Aranha"></span><b>Homem-Aranha</b><small>Peter Parker</small></button>
-          <button type="button" data-player-hero="wolverine"><span class="player-choice-thumb"><img src="assets/portraits/hero-wolverine.jpg" alt="Wolverine"></span><b>Wolverine</b><small>James Howlett / Logan</small></button>
-          <button type="button" data-player-hero="cap"><span class="player-choice-thumb"><img src="assets/portraits/hero-cap.jpg" alt="Capitão América"></span><b>Capitão América</b><small>Steve Rogers</small></button>
+        <div id="join-campaign-panel" class="campaign-form hidden">
+          <label for="campaign-code-input">Código da campanha</label>
+          <div class="password-row"><input id="campaign-code-input" maxlength="12" placeholder="Ex.: ARACHNE" autocomplete="off"><button id="join-campaign-code" type="button">ABRIR</button></div>
+        </div>
+        <div id="create-campaign-panel" class="campaign-form campaign-builder hidden">
+          <div class="campaign-create-modes" role="tablist" aria-label="Tipo de campanha">
+            <button type="button" class="active" data-create-mode="template">CAMPANHA PRONTA</button>
+            <button type="button" data-create-mode="blank">EM BRANCO</button>
+            <button type="button" data-create-mode="pdf">IMPORTAR PDF</button>
+          </div>
+          <div id="template-picker-wrap" class="template-picker-wrap">
+            <small>ESCOLHA UMA CAMPANHA BASE</small>
+            <div id="template-picker" class="template-picker"></div>
+          </div>
+          <div id="pdf-create-wrap" class="pdf-create-wrap hidden">
+            <label for="new-campaign-pdf">PDF da campanha</label>
+            <input id="new-campaign-pdf" type="file" accept="application/pdf">
+            <small>O PDF será enviado depois que a mesa for criada.</small>
+          </div>
+          <div id="template-preview" class="template-preview"></div>
+          <div class="builder-roster-shell">
+            <div class="builder-roster-head">
+              <small id="builder-roster-label">Elenco inicial da campanha</small>
+              <div class="builder-roster-counts">
+                <span>Heróis <b id="builder-hero-count">00</b></span>
+                <span>Vilões <b id="builder-villain-count">00</b></span>
+              </div>
+            </div>
+            <div class="builder-roster-columns">
+              <section>
+                <h3>Heróis</h3>
+                <div id="builder-hero-library" class="builder-character-grid"></div>
+              </section>
+              <section>
+                <h3>Vilões</h3>
+                <div id="builder-villain-library" class="builder-character-grid"></div>
+              </section>
+            </div>
+          </div>
+          <label for="new-campaign-name">Nome da campanha</label><input id="new-campaign-name" maxlength="80" placeholder="Ex.: Guerra Secreta">
+          <label for="new-campaign-password">Senha do Mestre</label><input id="new-campaign-password" type="password" minlength="4" placeholder="Crie uma senha">
+          <button id="create-campaign" type="button">CRIAR MESA</button>
+        </div>
+        <span id="campaign-error" class="login-error" role="alert"></span>
+      </div>
+
+      <div id="campaign-access" class="campaign-access hidden">
+        <div class="login-section-head campaign-access-head">
+          <button id="back-campaigns" type="button" class="login-back" aria-label="Trocar campanha">←</button>
+          <div><small id="selected-campaign-code">CÓDIGO</small><strong id="selected-campaign-name">Campanha</strong></div>
+        </div>
+        <div class="login-actions">
+          <button id="player-login" type="button">ENTRAR COMO JOGADOR</button>
+          <button id="master-login" type="button" class="secondary">ENTRAR COMO MESTRE</button>
+        </div>
+        <div id="player-select-area" class="player-select-area hidden" aria-labelledby="player-select-title">
+          <div class="login-section-head">
+            <button id="back-login" type="button" class="login-back" aria-label="Voltar">←</button>
+            <div><small>ESCOLHA SEU PERSONAGEM</small><strong id="player-select-title">Quem você vai jogar?</strong></div>
+          </div>
+          <div id="player-choice-grid" class="player-choice-grid"></div>
+        </div>
+        <div id="password-area" class="password-area hidden">
+          <label for="master-password">Senha do Mestre</label>
+          <div class="password-row">
+            <input id="master-password" type="password" placeholder="Digite a senha" autocomplete="current-password">
+            <button id="confirm-master" type="button">ACESSAR</button>
+          </div>
+          <span id="login-error" role="alert"></span>
         </div>
       </div>
-      <div id="password-area" class="password-area hidden">
-        <label for="master-password">Senha do Mestre</label>
-        <div class="password-row">
-          <input id="master-password" type="password" placeholder="Digite a senha" autocomplete="current-password">
-          <button id="confirm-master" type="button">ACESSAR</button>
-        </div>
-        <span id="login-error" role="alert"></span>
-      </div>
-      <span class="local-badge"><i></i></span>
     </div>
   </div>
 
@@ -47,7 +100,7 @@
     <aside id="sidebar" aria-label="Navegação principal">
       <div class="brand">
         <b aria-hidden="true">A</b>
-        <div><strong>PROJETO<br>ARACHNE</strong><small>MARVEL MULTIVERSE RPG</small></div>
+        <div><strong id="sidebar-campaign-name">PROJETO<br>ARACHNE</strong><small id="sidebar-campaign-code">MARVEL MULTIVERSE RPG</small></div>
       </div>
       <div class="rolebox"><span id="role-label">JOGADOR</span><button id="logout" type="button">Sair</button></div>
       <nav id="nav">
@@ -59,7 +112,7 @@
         <button type="button" data-page="scenario"><span>▦</span><em>Cenário</em></button>
         <button type="button" data-page="notes" data-master="true"><span>✎</span><em>Anotações do Mestre</em></button>
       </nav>
-      <footer><i></i> <span>cache local + banco do servidor</span></footer>
+      <footer>MARVEL MULTIVERSE RPG</footer>
     </aside>
     <button id="sidebar-backdrop" class="sidebar-backdrop hidden" type="button" aria-label="Fechar menu"></button>
 
@@ -69,7 +122,7 @@
           <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
           <div><small>ARQUIVO CONFIDENCIAL</small><h1 id="title">Central da Campanha</h1></div>
         </div>
-        <span id="saved" class="saved"><i></i><span>Pronto</span></span>
+        <span id="saved" class="saved hidden" aria-hidden="true"><i></i><span>Pronto</span></span>
       </header>
 
       <div class="content-shell">
@@ -89,7 +142,7 @@
 
           <div class="stats">
             <article><small>HERÓIS</small><b id="hero-count">03</b><span>equipe principal</span></article>
-            <article><small>AMEAÇA</small><b class="red">ALTA</b><span>Essex detectado</span></article>
+            <article><small>AMEAÇA</small><b class="red">ATIVA</b><span>ameaças da campanha</span></article>
             <article><small>ACESSO</small><b id="home-role">JOGADOR</b><span>permissões ativas</span></article>
             <article data-master="true"><small>CAMPANHA</small><b id="campaign-percent">0%</b><span id="campaign-summary">0/8 sessões</span></article>
           </div>
@@ -107,8 +160,8 @@
                 <button type="button" data-go="notes" data-master="true"><span>✎</span><b>Anotações do Mestre</b><small>Registro privado da sessão</small></button>
                 <button type="button" data-go="dice" data-master="true"><span>⚄</span><b>Dados do Mestre</b><small>D616, dano e iniciativa</small></button>
                 <button type="button" data-go="scenario"><span>▦</span><b>Cenário</b><small>Grade tática e obstáculos</small></button>
-                <button type="button" data-go="campaign" data-master="true"><span>▣</span><b>Campanha</b><small>8 sessões</small></button>
-                <button type="button" data-action="view-campaign-pdf" data-master="true"><span>▤</span><b>PDF da campanha</b><small>Visualizar as 24 páginas</small></button>
+                <button type="button" data-go="campaign" data-master="true"><span>▣</span><b>Campanha</b><small>Sessões e progresso</small></button>
+                <button type="button" data-action="view-campaign-pdf" data-master="true"><span>▤</span><b>Documento da campanha</b><small>PDF ou texto do narrador</small></button>
               </div>
             </article>
           </div>
@@ -117,6 +170,18 @@
         <section id="heroes" class="page">
           <div class="intro"><div><small>DOSSIÊ DOS JOGADORES</small><h2>Heróis</h2></div><div id="selected-player-badge" class="selected-player-badge hidden"></div></div>
           <div id="heroes-grid" class="cards"></div>
+
+          <article id="player-live-dice" class="panel player-live-dice hidden">
+            <div class="player-live-dice-head">
+              <div><small>ROLAGEM AO VIVO</small><h3>Dados do Mestre</h3></div>
+              <span>ÚLTIMAS 5 JOGADAS</span>
+            </div>
+            <div class="player-live-dice-main">
+              <div id="player-live-dice-stage" class="player-live-dice-stage"><div class="live-dice-empty">Aguardando a próxima rolagem.</div></div>
+              <div id="player-live-dice-result" class="player-live-dice-result"><small>RESULTADO</small><strong>—</strong><span></span></div>
+            </div>
+            <div id="player-live-dice-history" class="player-live-dice-history"></div>
+          </article>
 
           <article id="hero-player-notes" class="panel hero-player-notes hidden">
             <div class="notes-toolbar hero-notes-toolbar">
@@ -143,7 +208,27 @@
         </section>
 
         <section id="campaign" class="page">
-          <div class="intro"><div><small>LIVRO DO MESTRE</small><h2>Projeto Arachne</h2></div></div>
+          <div class="intro"><div><small>LIVRO DO MESTRE</small><h2 id="campaign-page-title">Campanha</h2></div><button id="open-campaign-manager" type="button">CONFIGURAR CAMPANHA</button></div>
+          <article id="campaign-manager" class="panel campaign-manager hidden">
+            <div class="panel-head"><div><small>CONFIGURAÇÃO DA MESA</small><h3>Conteúdo e elenco</h3></div><button id="close-campaign-manager" type="button">FECHAR</button></div>
+            <div class="campaign-manager-grid">
+              <div class="campaign-editor-block">
+                <label>Título<input id="campaign-edit-title" maxlength="100"></label>
+                <label>Subtítulo<input id="campaign-edit-subtitle" maxlength="160"></label>
+                <label>Resumo<textarea id="campaign-edit-summary" rows="4"></textarea></label>
+                <label>Texto da campanha<textarea id="campaign-edit-text" rows="10" placeholder="Escreva cenas, notas, estrutura da campanha e informações do narrador..."></textarea></label>
+                <div class="session-editor-head"><div><small>SESSÕES</small><strong>Estrutura da campanha</strong></div><button id="add-campaign-session" type="button">+ SESSÃO</button></div>
+                <div id="campaign-session-editor" class="campaign-session-editor"></div>
+                <div class="campaign-upload-row"><label class="upload-button">ENVIAR PDF<input id="campaign-pdf-upload" type="file" accept="application/pdf"></label><button id="save-campaign-content" type="button">SALVAR CONTEÚDO</button></div>
+              </div>
+              <div class="roster-manager">
+                <div class="roster-head"><div><small>HERÓIS</small><strong>Elenco jogável</strong></div><button id="add-hero" type="button">+ ADICIONAR</button></div>
+                <div id="campaign-hero-roster" class="roster-list"></div>
+                <div class="roster-head"><div><small>VILÕES</small><strong>Ameaças da campanha</strong></div><button id="add-villain" type="button">+ ADICIONAR</button></div>
+                <div id="campaign-villain-roster" class="roster-list"></div>
+              </div>
+            </div>
+          </article>
           <div class="campaign-toolbar panel">
             <div><small>PROGRESSO TOTAL</small><strong id="campaign-toolbar-percent">0%</strong></div>
             <div class="progress-track"><i id="campaign-toolbar-progress"></i></div>
@@ -382,6 +467,7 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="config.js"></script>
   <script src="api-client.js"></script>
   <script src="script.js"></script>
 </body>
