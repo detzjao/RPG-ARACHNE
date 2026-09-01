@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = 28;
+  const APP_VERSION = 29;
   let activeCampaignCacheKey = 'lobby';
   const keyFor = suffix => `arachne_v${APP_VERSION}_${activeCampaignCacheKey}_${suffix}`;
   const STORAGE = {
@@ -496,13 +496,56 @@
     renderCampaignLibrary();
   }
 
+  function showBackendConnection(message='Não foi possível acessar a API.', failedUrl='') {
+    const panel=$('backend-connection'); if(!panel)return;
+    panel.classList.remove('hidden','is-online');
+    if($('backend-connection-message'))$('backend-connection-message').textContent=message;
+    const current=failedUrl || window.ArachneAPI?.getApiBase?.() || window.ARACHNE_API_URL || '';
+    if($('backend-current-url'))$('backend-current-url').textContent=current ? `Tentativa: ${current}` : '';
+    if($('backend-url-input') && !$('backend-url-input').value) $('backend-url-input').value=current;
+  }
+
+  function hideBackendConnection() {
+    const panel=$('backend-connection'); if(!panel)return;
+    panel.classList.add('hidden','is-online');
+  }
+
+  async function connectBackendCandidate(url,{persist=true}={}) {
+    if(!window.ArachneAPI||!url)return false;
+    window.ArachneAPI.setApiBase(url,{persist:false});
+    const health=await window.ArachneAPI.health();
+    if(health?.ok){
+      window.ArachneAPI.setApiBase(url,{persist});
+      hideBackendConnection();
+      return true;
+    }
+    return false;
+  }
+
+  async function initializeOnlineBackend() {
+    if(!window.ArachneAPI)return false;
+    const candidates=[...(window.ARACHNE_API_CANDIDATES||[]),window.ArachneAPI.getApiBase?.()].filter(Boolean);
+    for(const candidate of [...new Set(candidates)]){
+      if(await connectBackendCandidate(candidate,{persist:false})){
+        window.ArachneAPI.setApiBase(candidate,{persist:true});
+        await renderCampaignLibrary();
+        return true;
+      }
+    }
+    const last=window.ArachneAPI.getApiBase?.()||'';
+    showBackendConnection('O site abriu, mas a API não respondeu. Cole abaixo a URL pública do seu backend no Render (terminando ou não em /api).',last);
+    const wrap=$('campaign-library');
+    if(wrap)wrap.innerHTML='<div class="campaign-empty">Servidor da mesa não conectado.</div>';
+    return false;
+  }
+
   async function renderCampaignLibrary() {
     const wrap = $('campaign-library');
     if (!wrap || !window.ArachneAPI) return;
     const saved = campaignLibrary();
     const codes = ['ARACHNE', ...saved.map(item=>item.code)].filter(Boolean);
     let campaigns = [];
-    try { campaigns = await window.ArachneAPI.lookupCampaigns(codes); } catch {}
+    try { campaigns = await window.ArachneAPI.lookupCampaigns(codes); } catch (error) { showBackendConnection(`Falha ao carregar campanhas: ${error.message}`,window.ArachneAPI.getApiBase?.()); }
     const byCode = new Map(campaigns.map(item=>[item.code,item]));
     const ordered = [...new Set(codes)].map(code=>byCode.get(code)).filter(Boolean);
     wrap.innerHTML = ordered.length ? ordered.map(campaign=>`<button type="button" class="campaign-card" data-open-campaign="${escapeHTML(campaign.code)}"><span>${escapeHTML(campaign.code.slice(0,2))}</span><div><b>${escapeHTML(campaign.name)}</b><small>Código ${escapeHTML(campaign.code)}</small></div><i>→</i></button>`).join('') : '<div class="campaign-empty">Nenhuma campanha encontrada.</div>';
@@ -510,15 +553,16 @@
 
   async function loadTemplateLibrary() {
     if (!window.ArachneAPI) return [];
-    try { availableTemplates = await window.ArachneAPI.getTemplates(); } catch { availableTemplates = []; }
+    try { availableTemplates = await window.ArachneAPI.getTemplates(); } catch (error) { availableTemplates = []; showBackendConnection(`Falha ao carregar campanhas prontas: ${error.message}`,window.ArachneAPI.getApiBase?.()); }
     try {
       const library = await window.ArachneAPI.getCharacters();
       availableCharacters = {
         heroes:Array.isArray(library?.heroes)?library.heroes:[],
         villains:Array.isArray(library?.villains)?library.villains:[]
       };
-    } catch {
+    } catch (error) {
       availableCharacters = {heroes:[],villains:[]};
+      showBackendConnection(`Falha ao carregar heróis e vilões: ${error.message}`,window.ArachneAPI.getApiBase?.());
     }
     const preferred = availableTemplates.find(t=>t.id===selectedTemplateId) || availableTemplates[0] || null;
     if (preferred) {
@@ -2581,7 +2625,23 @@
     toast('Anotações limpas');
   });
 
+  $('backend-connect')?.addEventListener('click',async()=>{
+    const input=$('backend-url-input'),button=$('backend-connect');
+    const value=input?.value?.trim();
+    if(!value){showBackendConnection('Informe a URL do backend do Render.');return;}
+    button.disabled=true;button.textContent='CONECTANDO…';
+    const ok=await connectBackendCandidate(value,{persist:true});
+    if(ok){
+      if($('backend-connection-message'))$('backend-connection-message').textContent='Conectado.';
+      await renderCampaignLibrary();
+      if(!$('create-campaign-panel')?.classList.contains('hidden'))await loadTemplateLibrary();
+      toast('Backend conectado');
+    }else showBackendConnection('A API não respondeu nessa URL. Confira o endereço público do serviço no Render.',value);
+    button.disabled=false;button.textContent='CONECTAR';
+  });
+  $('backend-url-input')?.addEventListener('keydown',event=>{if(event.key==='Enter')$('backend-connect')?.click();});
+
   renderAll();
-  renderCampaignLibrary();
+  initializeOnlineBackend();
   document.body.dataset.role = 'guest';
 })();

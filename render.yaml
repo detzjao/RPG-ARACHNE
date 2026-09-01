@@ -5,6 +5,7 @@ services:
     rootDir: backend
     buildCommand: ""
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: SERVE_FRONTEND
         value: "true"

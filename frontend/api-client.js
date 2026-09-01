@@ -3,7 +3,10 @@
 
   const localDev = location.protocol === 'file:' || ['localhost','127.0.0.1'].includes(location.hostname);
   const DEFAULT_API = localDev && location.port !== '3000' ? 'http://localhost:3000/api' : `${location.origin}/api`;
-  const API_BASE = window.ARACHNE_API_URL || DEFAULT_API;
+  let API_BASE = window.ARACHNE_API_URL || DEFAULT_API;
+  const normalizeApiBase = value => { let url=String(value||'').trim().replace(/\/$/,''); if(!url)return ''; if(!/^https?:\/\//i.test(url))url=`https://${url}`; if(!/\/api$/i.test(url))url=`${url}/api`; return url; };
+  function setApiBase(value,{persist=true}={}){ API_BASE=normalizeApiBase(value); window.ARACHNE_API_URL=API_BASE; if(persist&&API_BASE){try{localStorage.setItem(window.ARACHNE_API_STORAGE_KEY||'arachne_api_url',API_BASE);}catch{}} return API_BASE; }
+  function getApiBase(){ return API_BASE; }
   const CLIENT_ID = (() => {
     try {
       let id=sessionStorage.getItem('arachne_client_id');
@@ -36,7 +39,8 @@
   async function uploadAsset(file){if(!file)return null;const dataBase64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||'').split(',')[1]||'');reader.onerror=()=>reject(reader.error||new Error('Falha ao ler arquivo.'));reader.readAsDataURL(file);});const result=await request('/assets/upload',{method:'POST',body:JSON.stringify({fileName:file.name,mimeType:file.type,dataBase64})});return result.data||null;}
   async function savePlayerNote(heroId,note){if(!heroId)return false;try{await request(`/player-notes/${encodeURIComponent(heroId)}`,{method:'PUT',body:JSON.stringify({note})});return true;}catch(error){console.warn(`[Arachne API] falha ao salvar anotações de ${heroId}.`,error.message);return false;}}
   async function publishLiveRoll(payload){try{await request('/roll/live',{method:'POST',body:JSON.stringify(payload||{})});return true;}catch(error){console.warn('[Arachne API] falha ao publicar rolagem.',error.message);return false;}}
-  async function health(){try{return await request('/health',{},false);}catch{return null;}}
+  async function health(){try{return await request('/health',{},false);}catch(error){return {ok:false,error:error?.message||'Falha de conexão',apiBase:API_BASE};}}
+  async function probe(value){const previous=API_BASE;setApiBase(value,{persist:false});const result=await health();if(result?.ok)return result;API_BASE=previous;window.ARACHNE_API_URL=previous;return result;}
 
   function connectRealtime({onState,onPresence,onStatus,onReady,onLiveRoll}={}){
     disconnectRealtime();if(!token||typeof EventSource==='undefined')return null;
@@ -50,5 +54,5 @@
   }
   function disconnectRealtime(){if(eventSource)eventSource.close();eventSource=null;}
 
-  window.ArachneAPI={API_BASE,CLIENT_ID,lookupCampaigns,lookupCampaign,getTemplates,getCharacters,createCampaign,join,setSession,clearSession,loadAll,saveStorageKey,saveMany,saveHero,deleteHero,saveVillain,deleteVillain,uploadAsset,savePlayerNote,publishLiveRoll,health,connectRealtime,disconnectRealtime,stateKeyFromStorage,get profile(){return profile;},get token(){return token;}};
+  window.ArachneAPI={CLIENT_ID,lookupCampaigns,lookupCampaign,getTemplates,getCharacters,createCampaign,join,setSession,clearSession,loadAll,saveStorageKey,saveMany,saveHero,deleteHero,saveVillain,deleteVillain,uploadAsset,savePlayerNote,publishLiveRoll,health,probe,setApiBase,getApiBase,connectRealtime,disconnectRealtime,stateKeyFromStorage,get API_BASE(){return API_BASE;},get profile(){return profile;},get token(){return token;}};
 })();

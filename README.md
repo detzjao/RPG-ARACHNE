@@ -164,3 +164,12 @@ O realtime continua usando SSE por campanha.
 - A tela **+ Adicionar** agora usa `/api/characters` e mostra todos os personagens cadastrados na biblioteca, mesmo quando eles não pertencem a nenhum template de campanha.
 - Os novos heróis da v27 (Pantera Negra, Capitã Marvel, Doutor Estranho, Hulk, Gavião Arqueiro, Feiticeira Escarlate, Shang-Chi, Mulher-Hulk, Visão e Máquina de Combate) passam a aparecer normalmente no seletor.
 - A criação de campanhas também usa a biblioteca completa.
+
+
+## Netlify + Render — conexão da API (v29)
+
+O frontend hospedado no Netlify não pode acessar o banco Supabase diretamente. Ele sempre deve falar com o backend Node hospedado no Render.
+
+A v29 tenta automaticamente o backend correspondente ao nome do site e também permite configurar manualmente a URL do Render na própria tela inicial. Exemplo: `https://rpg-arachne.onrender.com/api`. A URL escolhida fica salva no navegador.
+
+Se campanhas, templates, heróis e vilões aparecerem vazios, abra a caixa **CONEXÃO ONLINE** da tela inicial e cole a URL pública do serviço Render. O endpoint `<URL>/api/health` deve responder com `ok: true`.

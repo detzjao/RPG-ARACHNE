@@ -17,6 +17,12 @@
       <h1 id="login-title">SUAS CAMPANHAS</h1>
       <p>MARVEL MULTIVERSE RPG</p>
       <div id="campaign-hub" class="campaign-hub">
+        <div id="backend-connection" class="backend-connection hidden" role="status">
+          <div class="backend-connection-head"><div><small>CONEXÃO ONLINE</small><strong>Backend não conectado</strong></div><span id="backend-connection-dot"></span></div>
+          <p id="backend-connection-message">O frontend abriu, mas não conseguiu acessar a API. Informe a URL pública do backend do Render.</p>
+          <div class="backend-connection-row"><input id="backend-url-input" type="url" placeholder="https://seu-backend.onrender.com/api" autocomplete="url"><button id="backend-connect" type="button">CONECTAR</button></div>
+          <small id="backend-current-url"></small>
+        </div>
         <div id="campaign-library" class="campaign-library"></div>
         <div class="campaign-hub-actions">
           <button id="join-campaign-toggle" type="button">ENTRAR COM CÓDIGO</button>

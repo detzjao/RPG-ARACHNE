@@ -1,2 +1,10 @@
 [build]
   publish = "frontend"
+
+# Fallback para o serviço Render padrão do projeto.
+# O frontend v29 também permite trocar essa URL pela própria tela caso o seu serviço tenha outro domínio.
+[[redirects]]
+  from = "/api/*"
+  to = "https://rpg-arachne.onrender.com/api/:splat"
+  status = 200
+  force = true
