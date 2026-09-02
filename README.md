@@ -2,7 +2,7 @@
 
 Mesa virtual online para campanhas de **Marvel Multiverse RPG**.
 
-A v20 muda a arquitetura de criação de campanhas: novas mesas não clonam mais automaticamente o Projeto Arachne. O Mestre escolhe como a campanha será criada e depois pode editar elenco, fichas, PDF e sessões sem modificar os modelos originais.
+A versão atual muda a arquitetura de criação de campanhas: novas mesas não clonam mais automaticamente o Projeto Arachne. O Mestre escolhe como a campanha será criada e depois pode editar elenco, fichas, PDF e sessões sem modificar os modelos originais.
 
 ## Criação de campanha
 
