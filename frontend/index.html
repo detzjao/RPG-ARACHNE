@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#090b10">
   <meta name="description" content="Mesa virtual multi-campanha para Marvel Multiverse RPG.">
   <title>RPG Arachne — Marvel Multiverse RPG</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=33.4.4-repeatable-generics">
 </head>
 <body>
   <div id="login" class="login" aria-labelledby="login-title">
@@ -116,6 +116,8 @@
                 <button type="button" data-page="campaign" data-master="true"><span>▣</span><em>Campanha</em></button>
         <button type="button" data-page="dice" data-master="true"><span>⚄</span><em>Dados do Mestre</em></button>
         <button type="button" data-page="scenario"><span>▦</span><em>Cenário</em></button>
+        <button type="button" data-page="combat"><span>⚔</span><em>Combate</em></button>
+        <button type="button" data-page="rules"><span>?</span><em>Regras</em></button>
         <button type="button" data-page="notes" data-master="true"><span>✎</span><em>Anotações do Mestre</em></button>
       </nav>
       <footer>MARVEL MULTIVERSE RPG</footer>
@@ -133,43 +135,20 @@
 
       <div class="content-shell">
         <section id="home" class="page active">
-          <div class="banner">
-            <div class="banner-copy">
-              <label>OPERAÇÃO ATIVA</label>
-              <h2>PROJETO ARACHNE</h2>
-              <p>Três heróis. Um experimento. Uma mente por trás de tudo.</p>
-              <div class="banner-actions">
-                <button type="button" data-go="heroes">ABRIR HERÓIS →</button>
-                <button type="button" class="ghost" data-go="dice" data-master="true">ABRIR DADOS</button>
-              </div>
+          <div id="session-central" class="session-central" aria-live="polite">
+            <article class="central-panel central-loading-fallback"><small>CENTRAL DA SESSÃO</small><h3>Carregando mesa...</h3><p>Sincronizando campanha, personagens, cenário e combate.</p></article>
+          </div>
+          <article id="master-recent-rolls" class="central-panel master-recent-rolls hidden" aria-live="polite">
+            <div class="central-panel-head"><div><small>DADOS DA SESSÃO</small><h3>Rolagens em tempo real</h3></div><div class="central-inline-actions"><span id="master-live-roll-status">AGUARDANDO</span><button type="button" data-go="dice">ABRIR DADOS COMPLETOS</button></div></div>
+            <div class="master-live-roll-grid">
+              <div id="master-live-dice-stage" class="dice-stage-3d master-live-dice-stage" aria-label="Rolagem D616 do jogador"></div>
+              <div id="master-live-roll-result" class="master-live-roll-result"><small>ÚLTIMA ROLAGEM</small><strong>—</strong><b>Aguardando jogador</b><span>As rolagens validadas pelo servidor aparecerão aqui.</span></div>
             </div>
-            <div class="arachne-orb" aria-hidden="true"><span>A</span></div>
-          </div>
-
-          <div class="stats">
-            <article><small>HERÓIS</small><b id="hero-count">03</b><span>equipe principal</span></article>
-            <article><small>AMEAÇA</small><b class="red">ATIVA</b><span>ameaças da campanha</span></article>
-            <article><small>ACESSO</small><b id="home-role">JOGADOR</b><span>permissões ativas</span></article>
-            <article data-master="true"><small>CAMPANHA</small><b id="campaign-percent">0%</b><span id="campaign-summary">0/8 sessões</span></article>
-          </div>
-
-          <div class="dashboard-grid">
-            <article class="panel mission-panel" data-master="true">
-              <div class="panel-head"><div><small>LINHA DE INVESTIGAÇÃO</small><h3>Progresso da operação</h3></div><span id="phase-label">FASE 1</span></div>
-              <div class="progress-track"><i id="campaign-progress"></i></div>
-              <div id="home-session-list" class="mini-session-list"></div>
-            </article>
-            <article class="panel quick-panel">
-              <div class="panel-head"><div><small>ACESSO RÁPIDO</small><h3>Mesa pronta</h3></div></div>
-              <div class="quick-actions">
-                <button type="button" data-go="heroes"><span>♙</span><b>Fichas dos heróis</b><small>Consultar e editar</small></button>
-                <button type="button" data-go="notes" data-master="true"><span>✎</span><b>Anotações do Mestre</b><small>Registro privado da sessão</small></button>
-                <button type="button" data-go="dice" data-master="true"><span>⚄</span><b>Dados do Mestre</b><small>D616, dano e iniciativa</small></button>
-                <button type="button" data-go="scenario"><span>▦</span><b>Cenário</b><small>Grade tática e obstáculos</small></button>
-                <button type="button" data-go="campaign" data-master="true"><span>▣</span><b>Campanha</b><small>Sessões e progresso</small></button>
-                <button type="button" data-action="view-campaign-pdf" data-master="true"><span>▤</span><b>Documento da campanha</b><small>PDF ou texto do narrador</small></button>
-              </div>
-            </article>
+            <div class="master-roll-history-columns"><section><div class="central-subhead"><b>Jogadores</b><small>Histórico autoritativo</small></div><div id="master-recent-roll-list" class="master-recent-roll-list"><div class="central-empty compact"><span>Nenhuma rolagem de jogador registrada ainda.</span></div></div></section><section><div class="central-subhead"><b>Mestre</b><small>Últimas rolagens</small></div><div id="master-master-roll-list" class="master-recent-roll-list"><div class="central-empty compact"><span>Nenhuma rolagem do Mestre registrada ainda.</span></div></div></section></div>
+          </article>
+          <div class="legacy-home-metrics hidden" aria-hidden="true">
+            <span id="hero-count">00</span><span id="home-role">JOGADOR</span><span id="campaign-percent">0%</span><span id="campaign-summary">0/0 sessões</span><span id="phase-label">FASE 1</span>
+            <i id="campaign-progress"></i><div id="home-session-list"></div><div id="home-live-rolls"></div>
           </div>
         </section>
 
@@ -253,7 +232,6 @@
 
           <div class="master-dice-tabs panel" role="tablist" aria-label="Ferramentas de dados">
             <button type="button" class="active" data-master-dice-tab="d616" role="tab" aria-selected="true"><span>⚄</span><b>D616</b><small>Action Check</small></button>
-            <button type="button" data-master-dice-tab="damage" role="tab" aria-selected="false"><span>✹</span><b>Dano</b><small>Marvel Die × multiplicador</small></button>
             <button type="button" data-master-dice-tab="initiative" role="tab" aria-selected="false"><span>▶</span><b>Iniciativa</b><small>Quem começa o turno</small></button>
             <button type="button" data-master-dice-tab="generic" role="tab" aria-selected="false"><span>◆</span><b>Outros dados</b><small>d4 até d100</small></button>
           </div>
@@ -263,6 +241,7 @@
               <div class="panel-head"><div><small>ACTION CHECK</small><h3 id="challenge-title">Ação sem título</h3></div><span id="challenge-badge">TN 14</span></div>
               <div class="challenge-grid threat-aware-grid">
                 <label>Nome da ação<input id="action-name" maxlength="80" placeholder="Ex.: Invadir o laboratório"></label>
+                <label>Tipo da rolagem<select id="roll-type"><option value="test">Teste / Action Check</option><option value="attack">Ataque</option></select></label>
                 <label>TN<input id="target-number" type="number" min="0" max="99" value="14" inputmode="numeric"></label>
                 <label>Rolagem de<select id="roll-source"><option value="hero">Herói</option><option value="threat">Ameaça</option></select></label>
                 <label id="hero-roll-field">Herói<select id="roll-actor"></select></label>
@@ -273,6 +252,8 @@
                 <label>Mod. extra<input id="extra-modifier" type="number" min="-30" max="30" value="0" inputmode="numeric"></label>
                 <label>Edge<input id="edge-count" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
                 <label>Trouble<input id="trouble-count" type="number" min="0" max="6" value="0" inputmode="numeric"></label>
+                <label id="attack-multiplier-field" class="hidden">Multiplicador de dano ×<input id="attack-damage-multiplier" type="number" min="0" max="30" placeholder="Automático" inputmode="numeric"></label>
+                <label id="attack-reduction-field" class="hidden">Redução do alvo<input id="attack-damage-reduction" type="number" min="0" max="20" value="0" inputmode="numeric"></label>
               </div>
               <div class="challenge-summary" aria-live="polite"><span id="challenge-actor">Homem-Aranha · Agility +7</span><strong id="advantage-state">SEM EDGE / TROUBLE</strong><small id="advantage-explain">Nenhum modificador de circunstância.</small></div>
             </article>
@@ -289,6 +270,7 @@
                 <div id="roll-guidance" class="roll-guidance">Configure a ação e role os dados.</div>
                 <div class="dice-total"><small>RESULTADO DO ACTION CHECK</small><strong id="d616-total">—</strong><span id="d616-detail">D616 + habilidade + modificadores</span></div>
                 <div id="roll-outcome" class="roll-outcome neutral"><b>AGUARDANDO ROLAGEM</b><span id="roll-outcome-detail">O resultado será comparado ao TN configurado.</span></div>
+                <div id="attack-damage-result" class="attack-damage-result hidden" aria-live="polite"></div>
                 <div class="roll-actions"><button id="roll-d616" class="roll-primary" type="button">ROLAR D616</button><button id="finalize-roll" class="secondary-action hidden" type="button">FINALIZAR ROLAGEM</button></div>
                 <div id="reroll-log" class="reroll-log" aria-live="polite"></div>
               </article>
@@ -310,45 +292,22 @@
             </article>
           </div>
 
-          <div id="master-dice-damage" class="master-dice-panel">
-            <article class="panel damage-panel">
-              <div class="panel-head"><div><small>CÁLCULO DE DANO</small><h3>1 Marvel Die</h3></div><span>EDITÁVEL</span></div>
-              <div class="damage-grid">
-                <label>Origem<select id="damage-source"><option value="hero">Herói</option><option value="threat">Ameaça</option><option value="custom">Personalizado</option></select></label>
-                <label id="damage-hero-field">Herói<select id="damage-hero"></select></label>
-                <label id="damage-threat-tier-field" class="hidden">AMEAÇA<select id="damage-threat-tier"><option value="minion">Capanga</option><option value="special">Capanga especial</option><option value="main">Vilão principal</option></select></label>
-                <label id="damage-threat-choice-field" class="hidden">Tipo / identidade<select id="damage-threat-choice"></select></label>
-                <label>Perfil de dano<select id="damage-profile"><option value="Melee">Melee</option><option value="Agility">Agility</option><option value="Ego">Ego</option><option value="Logic">Logic</option></select></label>
-                <label>Multiplicador ×<input id="damage-multiplier" type="number" min="0" max="30" value="4" inputmode="numeric"></label>
-                <label>Bônus fixo<input id="damage-bonus" type="number" min="-99" max="99" value="0" inputmode="numeric"></label>
-                <label>Redução do alvo<input id="damage-reduction" type="number" min="0" max="20" value="0" inputmode="numeric"></label>
-                <label>Modo<select id="damage-mode"><option value="normal">Normal</option><option value="fantastic">Fantastic Success (×2)</option></select></label>
-              </div>
-              <div class="single-marvel-zone">
-                <div class="single-marvel-die" id="damage-marvel-die"><span class="cube-wrap"><span class="cube marvel-cube" id="damage-cube"><i class="face f1">M</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span><small>MARVEL DIE</small></div>
-                <div class="damage-equation"><small>FÓRMULA</small><b id="damage-formula">M × 4 + 0</b><strong id="damage-total">—</strong><span id="damage-detail">Role o Marvel Die para calcular o dano.</span></div>
-              </div>
-              <div class="roll-actions"><button id="roll-damage" class="roll-primary" type="button">ROLAR DANO</button><button id="apply-damage-profile" class="secondary-action" type="button">CARREGAR VALORES DA FICHA</button></div>
-            </article>
-          </div>
-
           <div id="master-dice-initiative" class="master-dice-panel">
             <div class="initiative-layout">
               <article class="panel initiative-builder">
-                <div class="panel-head"><div><small>ORDEM DE TURNO</small><h3>Participantes</h3></div><span>1 MARVEL DIE</span></div>
+                <div class="panel-head"><div><small>ORDEM DE TURNO</small><h3>Participantes</h3></div><span>D616</span></div>
                 <div class="initiative-quick"><button type="button" data-init-add-hero="spider">+ Homem-Aranha</button><button type="button" data-init-add-hero="wolverine">+ Wolverine</button><button type="button" data-init-add-hero="cap">+ Capitão América</button></div>
                 <div class="initiative-threat-add">
                   <label>AMEAÇA<select id="init-threat-tier"><option value="minion">Capanga</option><option value="special">Capanga especial</option><option value="main">Vilão principal</option></select></label>
                   <label>Tipo / identidade<select id="init-threat-choice"></select></label>
-                  <label>Quantidade<input id="init-threat-qty" type="number" min="1" max="20" value="1"></label>
                   <button id="init-add-threat" type="button">ADICIONAR</button>
                 </div>
                 <div id="initiative-participants" class="initiative-participants"></div>
-                <div class="roll-actions"><button id="roll-initiative" class="roll-primary" type="button">ROLAR INICIATIVA</button><button id="clear-initiative" class="secondary-action" type="button">LIMPAR</button></div>
+                <div class="roll-actions"><button id="roll-initiative" class="roll-primary" type="button">ROLAR INICIATIVAS</button><button id="clear-initiative" class="secondary-action" type="button">LIMPAR</button></div>
               </article>
               <article class="panel initiative-result-panel">
                 <div class="panel-head"><div><small>ROLAGEM ATUAL</small><h3>Quem começa?</h3></div></div>
-                <div class="initiative-cube-stage"><span class="cube-wrap"><span class="cube marvel-cube" id="initiative-cube"><i class="face f1">M</i><i class="face f2">2</i><i class="face f3">3</i><i class="face f4">4</i><i class="face f5">5</i><i class="face f6">6</i></span></span><div id="initiative-current">Aguardando rolagem</div></div>
+                <div class="initiative-cube-stage"><div id="initiative-dice-stage" class="dice-stage-3d initiative-d616-stage" aria-label="Rolagem D616 de iniciativa"></div><div id="initiative-current">Aguardando rolagem</div></div>
                 <div id="initiative-order" class="initiative-order"><div class="history-empty">Adicione participantes para montar a ordem.</div></div>
               </article>
             </div>
@@ -447,6 +406,27 @@
           </div>
         </section>
 
+        <section id="combat" class="page">
+          <div class="intro"><div><small>MESA EM TEMPO REAL</small><h2>Combate e Turnos</h2></div></div>
+          <div id="combat-console" class="combat-console">
+            <article class="central-panel combat-page-head"><div><small>COMBATE</small><h3>Carregando estado da mesa...</h3></div></article>
+            <article class="central-panel central-loading-fallback"><p>A ordem de iniciativa aparecerá aqui assim que a sessão for sincronizada.</p></article>
+          </div>
+        </section>
+
+        <section id="rules" class="page">
+          <div class="intro"><div><small>COMO O ARACHNE EXECUTA A MESA</small><h2>Regras do Sistema</h2></div></div>
+          <div class="rules-grid">
+            <article class="panel"><small>D616</small><h3>Action Check</h3><p>O Arachne usa dois d6 comuns e um Marvel Die. Quando o Marvel Die mostra 1, ele vale 6 no total e marca o resultado como Fantastic. O resultado final soma os três dados, o valor da habilidade e o modificador extra configurado pelo Mestre, e é comparado ao TN.</p></article>
+            <article class="panel"><small>ATAQUES</small><h3>Uma única rolagem</h3><p>Um ataque usa a própria rolagem D616 para resolver o teste e, quando acerta, calcular o dano. O Marvel Die é sempre o dado central da mesma rolagem: seu valor efetivo é multiplicado pelo multiplicador de dano do perfil e somado ao modificador da habilidade. Na Central, o Mestre seleciona atacante, alvo e o TN/Defesa utilizado pela mesa; ao aplicar o dano, o backend recalcula o valor a partir da mesma rollId antes de alterar Health ou Focus e sincroniza o recurso pelo SSE existente. Não existe uma segunda rolagem de dano. O Fantastic Success preserva o multiplicador adicional já implementado pelo sistema.</p></article>
+            <article class="panel"><small>EDGE / TROUBLE</small><h3>Rerrolagens</h3><p>Edge e Trouble se cancelam entre si. Trouble rerrola o melhor dado e mantém o pior resultado. Edge permite rerrolar um dado escolhido e mantém o melhor resultado. Um 6 · M · 6 é tratado pela implementação existente como Ultimate Fantastic.</p></article>
+            <article class="panel"><small>TURNOS</small><h3>Combate</h3><p>O Mestre adiciona participantes e rola a iniciativa D616 diretamente na preparação de combate. O servidor usa o modificador de iniciativa da ficha, registra a mesma rolagem no histórico e ordena a lista por resultado, modificador e nome. Participantes duplicados são bloqueados. Depois, o Mestre inicia o combate e controla a passagem de turnos. Quando há combate ativo, a Central do Jogador bloqueia Action Checks comuns fora do turno e informa quem está agindo.</p></article>
+            <article class="panel"><small>PERMISSÕES</small><h3>Mestre e Jogador</h3><p>Ficha, Health, Focus, iniciativa, cenário administrativo e imagens são alterações do Mestre validadas no backend. O jogador controla suas anotações e executa Action Checks apenas com o personagem vinculado à própria sessão.</p></article>
+            <article class="panel"><small>CENÁRIO</small><h3>Mesa tática</h3><p>O Mestre edita a grade, peças, terreno e obstáculos. Durante combate ativo, o jogador pode selecionar e movimentar somente o próprio personagem quando for seu turno; fora do turno e para qualquer outra peça, o backend bloqueia a ação. O orçamento de movimento daquele token é renovado quando um novo turno dele começa. As posições são sincronizadas pelo SSE existente.</p></article>
+            <article class="panel"><small>MODIFICADORES</small><h3>Valores da ficha</h3><p>Os Action Checks utilizam o valor da habilidade armazenado na ficha somado ao modificador extra do desafio atual. A Central não grava bônus temporários por cima do valor original da habilidade.</p></article>
+          </div>
+        </section>
+
         <section id="notes" class="page" data-master="true">
           <div class="intro"><div><small>ANOTAÇÕES PRIVADAS</small><h2>Anotações do Mestre</h2></div></div>
           <div class="notes-wrap panel">
@@ -473,8 +453,8 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="config.js"></script>
-  <script src="api-client.js"></script>
-  <script src="script.js"></script>
+  <script src="config.js?v=33.4.0-player-movement"></script>
+  <script src="api-client.js?v=33.4.4-repeatable-generics"></script>
+  <script src="script.js?v=33.4.4-repeatable-generics"></script>
 </body>
 </html>

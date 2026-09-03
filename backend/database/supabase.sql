@@ -1,4 +1,4 @@
--- RPG Arachne v18 — banco multi-campanha.
+-- RPG Arachne v31.1 — banco multi-campanha (schema preservado).
 -- Execute no SQL Editor do Supabase.
 
 create table if not exists public.campaigns (

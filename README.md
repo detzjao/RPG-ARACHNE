@@ -1,476 +1,475 @@
-🕷️ RPG Arachne
+# RPG Arachne — v33.4
 
-Mesa virtual online para campanhas de Marvel Multiverse RPG.
+Mesa virtual online para campanhas de **Marvel Multiverse RPG**, preservando a arquitetura existente do projeto: frontend estático, backend Node.js, persistência SQLite/Supabase, Supabase Storage para uploads e realtime por Server-Sent Events (SSE).
 
-O RPG Arachne é uma plataforma para criação e gerenciamento de mesas virtuais de Marvel Multiverse RPG, permitindo que Mestres criem campanhas, gerenciem personagens, sessões, fichas, PDFs, cenários e acompanhem o progresso da aventura em um único sistema.
+A **v33.4** consolida a movimentação autoritativa do jogador no grid existente e, nas etapas posteriores de Health/Focus, permite que cada jogador ajuste somente o `currentHealth` e o `currentFocus` do próprio herói. O backend valida o `heroId` da sessão, mantém os limites `0..maxHealth` e `0..maxFocus`, sincroniza a ordem de combate quando necessário, persiste as alterações, distribui o novo estado pelo SSE existente e registra mudanças efetivas no `actionHistory`. A edição completa da ficha continua exclusiva do Mestre.
 
-O projeto foi desenvolvido para permitir tanto campanhas prontas quanto campanhas totalmente personalizadas, mantendo cada mesa independente das demais.
+O núcleo funcional continua preservando as frentes anteriores: Central do Mestre/Jogador, busca e persistência de imagens, performance/realtime/segurança e movimentação autoritativa. O projeto não foi recriado e não recebeu um segundo backend, banco, grid, animação D616 ou sistema realtime.
 
-⸻
 
-🎲 Principais funcionalidades
+> **Iniciativa → Grid v33.3:** adicionar um participante pela preparação de iniciativa também garante seu token no cenário. O vínculo usa o mesmo identificador de personagem e o mesmo estado `scenario`; não existe um segundo grid ou sistema de tokens.
 
-📚 Criação de campanhas
+> **Ataques v33.0:** o backend gera a única D616 do ataque. O dado central é o Marvel Die; quando o ataque acerta, o dano é derivado da mesma `rollId` usando o valor efetivo do Marvel Die, o multiplicador de dano do perfil e o modificador da habilidade. Não existe mais `ROLAR DANO`, cubo de dano ou evento de histórico `DMG`.
 
-Ao criar uma nova mesa, o Mestre pode escolher entre três opções:
+> **Movimentação v33.4:** durante combate ativo, cada jogador pode selecionar e mover somente o próprio token quando for seu turno. O backend valida sessão, campanha, propriedade, turno, posição, modo, orçamento, terreno, obstáculos e ocupação antes de persistir a nova posição. Ao começar um novo turno daquele participante, seu orçamento é renovado. O Mestre continua podendo mover qualquer peça.
 
-* Campanha pronta — cria uma cópia editável de um template existente.
-* Em branco — inicia uma campanha sem heróis, vilões ou sessões.
-* Importar PDF — cria uma campanha vazia e permite enviar o PDF utilizado pelo narrador.
+> **Health/Focus do jogador:** na Central do Jogador, os controles `−/+` alteram somente os recursos atuais do herói vinculado à sessão. O backend rejeita alterações em outro personagem, `maxHealth`, `maxFocus` ou outros atributos, mantém os valores entre zero e o máximo da ficha e sincroniza as mudanças por SSE. Alterações efetivas são registradas no `actionHistory` com personagem, valor anterior, novo valor, autor e horário.
 
-Cada campanha criada possui seus próprios dados. Alterações realizadas em uma mesa não modificam os templates ou outras campanhas.
+> **Correção v31.2:** os arquivos principais do frontend usam versionamento de URL e revalidação de cache. Isso evita o cenário em que o `index.html` novo era carregado junto com um `script.js` antigo, deixando **Central** e **Combate** sem conteúdo. A renderização desses dois painéis também foi isolada das demais áreas da interface.
 
-⸻
 
-🦸 Elenco de personagens
+## Arquitetura
 
-O Mestre possui controle completo sobre o elenco da campanha.
+```text
+Jogador / Mestre
+       |
+       v
+Frontend estático (Netlify / Vercel)
+       |
+       v
+Backend/API Node.js (Render)
+       |
+       +---- SSE realtime por campanha
+       |
+       +---- Supabase Storage / uploads locais
+       |
+       v
+Supabase/PostgreSQL ou SQLite
+```
 
-É possível:
+O navegador não recebe `SUPABASE_SERVICE_ROLE_KEY`. Permissões administrativas e validações de gameplay são feitas no backend.
 
-* Adicionar heróis;
-* Remover heróis;
-* Adicionar vilões;
-* Remover vilões;
-* Utilizar personagens da biblioteca do sistema;
-* Criar personagens personalizados;
-* Editar fichas completas;
-* Adicionar imagens aos personagens;
-* Enviar fichas em PDF.
+## Interface de sessão
 
-A tela de entrada dos jogadores apresenta apenas os personagens que realmente pertencem à campanha.
+### Central do Mestre
 
-O jogador pode selecionar seu personagem e editar somente as informações permitidas pelo sistema.
+A primeira página do Mestre funciona como uma central de controle da sessão, com acesso rápido a:
 
-⸻
+- heróis e vilões;
+- rolagens;
+- cenário;
+- combate, iniciativa, rodada e turno;
+- Health e Focus dos participantes;
+- Central de Ações;
+- informações da campanha;
+- anotações e regras.
 
-📖 Biblioteca de personagens
+Os controles administrativos continuam separados dos controles de jogador.
 
-O projeto possui uma biblioteca de personagens do universo Marvel que pode ser utilizada na criação das campanhas.
+### Central do Jogador
 
-Entre os personagens disponíveis estão:
+A primeira página do jogador apresenta:
 
-* Homem-Aranha
-* Wolverine
-* Capitão América
-* Pantera Negra
-* Capitã Marvel
-* Doutor Estranho
-* Hulk
-* Gavião Arqueiro
-* Feiticeira Escarlate
-* Shang-Chi
-* Mulher-Hulk
-* Visão
-* Máquina de Combate
-* Luke Cage
-* Barão Zemo
-* Encantadora
-* Gambit
-* Iceman
-* Deadpool
-* Entre outros.
+- personagem controlado pela sessão;
+- retrato, Health, Focus e iniciativa;
+- estado `SEU TURNO` ou `AGUARDANDO`;
+- cenário atual;
+- combate e ordem atual;
+- Central de Ações;
+- histórico público aplicável.
 
-Os personagens possuem informações de jogo como:
+O jogador visualiza o cenário e o estado da mesa sem receber os controles administrativos do Mestre.
 
-* Atributos;
-* Health;
-* Focus;
-* Rank;
-* Tier;
-* Initiative;
-* Speed;
-* Powers;
-* Traits;
-* Tags;
-* Role;
-* Hook;
-* Movement;
-* Identidade;
-* Ocupação;
-* Origem;
-* Equipes;
-* Base;
-* PDFs de ficha;
-* Imagens/portraits.
+## Polimento visual v32
 
-A biblioteca também pode ser utilizada independentemente dos templates de campanha.
+A v32 usa o comportamento visual dos dados D616 como referência de interação: resposta curta, contraste claro e feedback imediato sem efeitos decorativos longos.
 
-⸻
+- botões principais possuem estados coerentes de `hover`, clique, foco e desabilitado;
+- `ROLAR`, controles de Action Check e `PASSAR TURNO` recebem prioridade visual sem alterar suas funções;
+- categorias de ação e poderes selecionados possuem estado ativo inequívoco;
+- o participante do turno atual recebe uma transição curta quando a ordem é atualizada;
+- o token selecionado recebe feedback visual curto após a atualização da posição;
+- resultados de rolagem usam entrada curta e diferenciação de sucesso/falha já existente;
+- breakpoints adicionais evitam ações espremidas em notebook e telas menores;
+- `prefers-reduced-motion: reduce` desativa animações/transições decorativas;
+- a pulsação contínua antiga de botões administrativos foi removida.
 
-⚔️ Gerenciamento da campanha
+A implementação desta etapa está concentrada em CSS; não há polling, timers ou loops JavaScript novos para os efeitos da v32.
 
-O Mestre pode administrar diferentes aspectos da aventura diretamente pela plataforma.
+## Dados do Mestre e ataques v33.0
 
-Conteúdo
+A aba **Dados do Mestre** é o registro central das rolagens. Ela mantém D616, histórico, iniciativa e dados genéricos, mas não possui mais uma aba ou cubo separado de dano.
 
-É possível:
+Para ataques:
 
-* Alterar título;
-* Alterar subtítulo;
-* Editar o resumo;
-* Escrever o conteúdo da campanha;
-* Enviar ou substituir o PDF da campanha.
+1. o frontend solicita uma D616 ao backend;
+2. o backend gera os três dados e conserva o Marvel Die como o segundo valor da mesma rolagem;
+3. a animação D616 existente apenas apresenta os valores retornados pelo servidor;
+4. o total do teste é comparado ao TN/Defesa informado;
+5. em caso de sucesso, o backend deriva o dano da mesma rolagem;
+6. o histórico registra teste, Marvel Die e dano sob a mesma `rollId` e o mesmo evento `D616`.
 
-Sessões
+A fórmula implementada preserva os perfis já existentes no projeto: `Marvel Die efetivo × multiplicador de dano + modificador da habilidade`. Quando o Marvel Die mostra `M` (valor bruto `1`), seu valor efetivo continua sendo `6`. O multiplicador adicional de Fantastic Success já existente foi preservado. Em falha, não é produzido dano calculado.
 
-O Mestre pode:
+### Ataque e aplicação de dano pela Central v33.2
 
-* Criar sessões;
-* Editar sessões;
-* Remover sessões;
-* Acompanhar o progresso;
-* Organizar o andamento da campanha.
+A Central do Mestre passa a resolver o ataque ponta a ponta sem sair da mesa principal:
 
-⸻
+1. o Mestre escolhe atacante, ação e alvo;
+2. informa o TN/Defesa usando o mesmo campo de dificuldade já existente no sistema;
+3. o backend valida os participantes e gera uma única D616;
+4. a mesma `ArachneDiceAnimation` apresenta os três resultados reais;
+5. a resposta mostra total, TN/Defesa, sucesso/falha, Marvel Die, multiplicador e dano calculado;
+6. em um ataque bem-sucedido, `APLICAR DANO` envia apenas a `rollId`;
+7. o backend reabre a entrada persistida, recalcula o dano com a mesma `damageFromRoll`, valida o alvo e aplica o valor uma única vez em Health ou Focus;
+8. a alteração de recurso é distribuída pelo SSE já existente.
 
-🎭 Cenário e mesa virtual
+O frontend não envia o valor final do dano ao endpoint de aplicação. A própria entrada D616 do histórico recebe alvo, dano calculado e, após a aplicação, recurso afetado, valor aplicado e recursos antes/depois. Não é criado um evento de dados adicional.
 
-O sistema permite acompanhar a situação da mesa durante a sessão, incluindo elementos como:
+## Personagens
 
-* Cenário;
-* Peças/personagens;
-* Iniciativa;
-* Health;
-* Focus;
-* Rolagens;
-* Histórico de ações;
-* Estado da campanha.
+A biblioteca embarcada contém **53 personagens** (26 heróis e 27 vilões/ameaças). Os 53 retratos locais estão referenciados e disponíveis em `frontend/assets/portraits/`.
 
-Cada campanha possui seu próprio estado, permitindo que diferentes mesas sejam executadas de forma independente.
+**Retratos oficiais confirmados pelo usuário (patch 33.4.1):** 35 personagens receberam os arquivos fornecidos diretamente no projeto, associados pelos IDs internos (`character_id`/`id`) aos mesmos caminhos canônicos de `CHARACTER_ASSETS`. Foram atualizados 18 heróis e 17 vilões. Como os caminhos existentes foram preservados, fichas, Central, listas, combate/iniciativa e tokens que já apontavam para esses assets passam a usar as novas imagens sem criar outro sistema de armazenamento ou alterar regras/fichas.
 
-⸻
+As fichas armazenam, conforme o personagem:
 
-🎲 Rolagens e histórico
+- nome e identidade;
+- Rank/Tier;
+- Health e Focus;
+- Karma;
+- iniciativa;
+- Melee, Agility, Resilience, Vigilance, Ego e Logic;
+- movimento;
+- redução de dano quando cadastrada;
+- origem, ocupação, equipes e base;
+- Powers, Traits e Tags;
+- imagem;
+- ficha em PDF quando disponível.
 
-O sistema possui suporte para rolagens utilizadas durante o RPG.
+A atualização completa da ficha continua exclusiva do Mestre. O jogador pode ajustar somente `currentHealth` e `currentFocus` do próprio herói pelo endpoint dedicado de recursos; não pode alterar `maxHealth`, `maxFocus`, atributos, iniciativa, imagem, outro herói ou vilão.
 
-As ações realizadas durante a sessão podem ser acompanhadas através do histórico da campanha.
+## Sistema de imagens
 
-Isso permite que Mestre e jogadores acompanhem os acontecimentos da mesa em tempo real.
+### Retratos locais
 
-⸻
+O acervo local utiliza WebP e é servido diretamente por `frontend/assets/portraits/`. A auditoria v31.1 havia reduzido o pacote anterior para 2.928.394 bytes. No patch 33.4.1, **35 desses retratos foram substituídos exatamente pelos arquivos confirmados pelo usuário**, sem gerar, pesquisar ou recomprimir as imagens enviadas.
 
-📝 Anotações
+Estado atual do acervo:
 
-A plataforma possui espaços de anotação para diferentes necessidades:
+- retratos locais: **53**;
+- retratos substituídos pelo lote confirmado: **35**;
+- tamanho atual dos 53 retratos: **4.098.026 bytes**;
+- retratos acima de 500 KB: **0**;
+- referências de retrato em templates: **53**;
+- referências ausentes: **0**.
 
-Jogadores
+A interface usa carregamento preguiçoso/decodificação assíncrona onde aplicável e reutiliza a imagem persistida em vez de pesquisar novamente a cada tela ou evento realtime.
 
-Cada jogador pode manter suas próprias anotações durante a campanha.
+### Busca web de imagens
 
-Mestre
+Somente o Mestre pode abrir `🔎 BUSCAR IMAGEM`.
 
-O Mestre possui um espaço separado para suas anotações e informações de controle da aventura.
+Fluxo:
 
-⸻
+```text
+Personagem
+  -> pesquisar candidatos na web
+  -> visualizar fonte / dimensão / licença disponível
+  -> Mestre escolhe
+  -> backend importa a imagem
+  -> Storage/uploads existente recebe uma cópia
+  -> URL persistente é salva no personagem
+  -> cards, ficha, combate e Central reutilizam essa URL
+```
 
-🔄 Sincronização em tempo real
+A pesquisa automática consulta fontes públicas indexáveis:
 
-As campanhas possuem sincronização em tempo real através de SSE (Server-Sent Events).
+- Wikimedia Commons;
+- Wikipedia;
+- Openverse.
 
-Isso permite que alterações realizadas durante a sessão sejam atualizadas para os participantes da campanha sem a necessidade de recarregar constantemente a página.
+A interface também fornece atalho para a busca oficial da Marvel e permite importar uma URL HTTPS confiável. Nenhuma imagem é gerada por IA e a seleção final nunca é automática.
 
-São sincronizados, entre outros:
+### Proteção na importação remota
 
-* Heróis;
-* Vilões;
-* Health;
-* Focus;
-* Campanha;
-* Progresso;
-* Cenário;
-* Peças;
-* Iniciativa;
-* Rolagens;
-* Histórico;
-* Anotações dos jogadores;
-* Anotações do Mestre.
+A importação de URL implementa proteções para não transformar o backend em um proxy arbitrário:
 
-⸻
+- apenas HTTPS;
+- bloqueio de localhost e endereços privados;
+- resolução DNS antes do download;
+- limite de redirecionamentos;
+- timeout;
+- limite de 12 MB para imagem remota;
+- MIME restrito a JPEG, PNG e WebP.
 
-🗂️ Templates de campanhas
+Uploads normais continuam aceitando PDF, PNG, JPEG e WebP no limite configurado pelo backend.
 
-O projeto possui campanhas prontas que funcionam como modelos para novas mesas.
+## Central de Ações e D616
 
-Atualmente estão disponíveis:
+A Central usa a ficha armazenada em vez de exigir que o jogador digite valores que o sistema já conhece.
 
-🕷️ Projeto Arachne
+Categorias:
 
-Campanha principal utilizada como base do projeto.
+- **Combate**;
+- **Testes**;
+- **Poderes**;
+- **Movimento**.
 
-🛡️ Os Vingadores — Protocolo Destino
+A rolagem D616 definitiva acontece no backend com `crypto.randomInt`.
 
-Campanha focada nos Vingadores clássicos e ameaças de grande escala.
+- o dado central é o Marvel Die;
+- `1` no Marvel Die é exibido como `M` e vale 6 no total;
+- `6 · M · 6` é reconhecido como Ultimate Fantastic Success;
+- TN e habilidade autoritativos são obtidos do estado/ficha no backend para jogadores;
+- o frontend não escolhe os valores finais dos dados.
 
-❌ X-Men — Era do Apocalipse
+Edge/Trouble continuam seguindo a implementação já existente no projeto, sem convertê-los em simples +1/-1.
 
-Campanha focada no universo mutante e em uma realidade dominada pelo Apocalipse.
+## Combate, iniciativa e turnos
 
-4️⃣ Quarteto Fantástico — A Zona Negativa
+O estado de combate é persistido por campanha e inclui:
 
-Campanha focada no Quarteto Fantástico e nas ameaças da Zona Negativa.
+- ativo/inativo;
+- rodada;
+- índice do turno;
+- participantes;
+- iniciativa;
+- imagem e recursos usados na apresentação da ordem.
 
-🌃 Sombras de Hell’s Kitchen
+O Mestre pode iniciar/encerrar combate, passar turno, ajustar iniciativa, administrar participantes, Health e Focus. Na preparação, Capangas e ameaças com `tier: LACAIO` podem ser adicionados em múltiplas instâncias; personagens únicos continuam limitados a uma entrada.
 
-Campanha focada nos heróis urbanos da Marvel.
+Na preparação de combate, a iniciativa é rolada diretamente na Central com a mesma animação D616 do sistema. O backend gera os três dados, aplica o modificador armazenado na ficha, persiste o resultado e reordena os participantes por total, modificador e nome. O botão **ROLAR INICIATIVAS** atua somente sobre participantes ainda sem resultado. Personagens únicos não podem ser adicionados duas vezes; Capangas, Agente da Hydra, Agente da I.M.A. e demais ameaças classificadas como `LACAIO` são instâncias repetíveis, cada uma com participante e token próprios no grid.
 
-Os templates armazenam informações como:
+Durante combate, ações normais de jogador são bloqueadas no backend quando não é o turno do personagem vinculado à sessão. A interface apresenta `AGUARDANDO` e identifica o participante atual.
 
-* Estrutura da campanha;
-* Elenco recomendado;
-* Antagonistas;
-* Sessões;
-* Conteúdo inicial.
+Powers em formato apenas textual não recebem custos ou efeitos inventados. Reações automáticas exigem metadados estruturados existentes.
 
-Ao criar uma campanha a partir de um template, o sistema cria uma cópia independente.
+## Realtime / SSE
 
-⸻
+O projeto continua usando **uma arquitetura SSE**, sem WebSocket adicional.
 
-📎 Uploads
+A v31.1:
 
-O sistema permite o envio de arquivos relacionados às campanhas e personagens.
+- indexa conexões por campanha;
+- substitui a conexão anterior do mesmo cliente/sessão;
+- limpa assinantes encerrados;
+- envia heartbeat controlado;
+- não hidrata novamente toda a aplicação ao receber o evento `ready`;
+- aplica eventos de estado por chave, atualizando somente as áreas relacionadas;
+- não retransmite para o próprio `sourceClientId` quando a alteração já foi aplicada localmente.
 
-Formatos aceitos
+Health, Focus, combate, iniciativa, cenário, histórico, notas e demais estados permitidos continuam sincronizados sem remover realtime.
 
-* PDF
-* PNG
-* JPEG
-* WebP
+## Performance
 
-Limite
+Problemas confirmados e tratados na auditoria:
 
-30 MB por arquivo.
+### Carregamento inicial
 
-Os arquivos podem ser armazenados localmente ou no Supabase Storage, dependendo da configuração utilizada.
+O fluxo de entrada realizava hidratação/renderização e podia disparar uma nova hidratação ao abrir o SSE. O evento `ready` agora apenas marca o realtime como online.
 
-⸻
+### Consultas de campanhas
 
-💾 Armazenamento
+A consulta de múltiplas campanhas/rosters foi agrupada:
 
-SQLite / Local
+- `getCampaignsByCodes` busca códigos em lote;
+- `getManyCampaignStates` busca `heroes`/`campaignContent` para várias campanhas numa única operação por repositório.
 
-Quando utilizado localmente, os arquivos são armazenados em:
+Isso evita a sequência `campanha -> heroes -> conteúdo` repetida para cada item do hub.
 
-backend/uploads/
+### Concorrência de gravações
 
-O banco de dados local fica dentro de:
+As mutações são serializadas **por `campaignId`**, e não por uma fila global. Alterações numa campanha não precisam esperar mutações de outra mesa.
 
-backend/database/
+### Frontend
 
-⸻
+O cliente possui deduplicação de requisições GET em andamento/cache curto para dados apropriados. Atualizações SSE chamam renderizações específicas por chave, e o cenário pesado só é montado quando a página correspondente precisa do tabuleiro.
 
-☁️ Supabase
+### Imagens
 
-Quando o projeto utiliza Supabase, os arquivos são armazenados no Supabase Storage.
+A maior redução mensurável desta versão foi no peso dos retratos locais: aproximadamente **87,8%**.
 
-Configuração padrão:
+Não foram inventados tempos de rede ou latência do Render/Supabase. Cold start e latência externa continuam dependentes do ambiente de deploy.
 
-DB_PROVIDER=supabase
-SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=sua-chave-secreta
-SUPABASE_STORAGE_BUCKET=arachne-assets
-SESSION_SECRET=uma-chave-grande-e-aleatoria
-SERVE_FRONTEND=true
-CORS_ORIGIN=*
+## Segurança
 
-A SUPABASE_SERVICE_ROLE_KEY é uma informação secreta e nunca deve ser exposta no frontend ou enviada para o GitHub.
+A autoridade de ações sensíveis permanece no backend.
 
-Antes do primeiro deploy utilizando Supabase, execute:
+O backend impede que um jogador:
 
-backend/database/supabase.sql
+- edite uma ficha completa;
+- altere Health ou Focus de outro personagem, ou ultrapasse os limites da própria ficha;
+- altere imagem;
+- altere iniciativa ou participantes;
+- controle outro personagem usando `actorId` adulterado;
+- forneça os dados definitivos de uma rolagem;
+- forneça TN autoritativo para a própria ação;
+- execute ação normal fora do próprio turno;
+- acesse estado de outra campanha com o token atual.
 
-no SQL Editor do Supabase.
+Sessões são tokens HMAC assinados contendo role, `heroId` quando aplicável, `campaignId`, código, expiração e session id.
 
-⸻
+## Isolamento entre campanhas
 
-🌐 Netlify + Render
+Estado persistente usa chave por `campaign_id`. SSE, personagens, imagens, cenário, combate e notas permanecem vinculados à campanha da sessão.
 
-O projeto pode utilizar uma arquitetura separada:
+Nenhuma nova tabela foi necessária para a v31.1.
 
-┌──────────────┐
-│   Netlify    │
-│   Frontend   │
-└──────┬───────┘
-       │
-       │ API
-       ▼
-┌──────────────┐
-│    Render    │
-│   Backend    │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│   Supabase   │
-│ Database +   │
-│   Storage    │
-└──────────────┘
+## Banco de dados
 
-O frontend hospedado no Netlify não acessa diretamente o banco de dados.
+Tabelas existentes:
 
-A comunicação acontece através da API do backend Node.js hospedado no Render.
+```text
+campaigns
+app_state
+```
 
-Caso a conexão automática não funcione, a tela inicial possui a opção CONEXÃO ONLINE, onde o Mestre pode informar manualmente a URL pública do backend.
+`app_state` usa chave composta por `campaign_id` + `state_key`.
 
-Exemplo:
+Estados usados incluem, entre outros:
 
-https://rpg-arachne.onrender.com/api
+```text
+heroes
+villains
+campaign
+campaignContent
+dice
+challenge
+scenario
+initiative
+combat
+actionHistory
+playerNotes
+notesPlayer
+notesMaster
+```
 
-A URL configurada fica salva no navegador.
+O schema de banco não precisou mudar para o sistema de imagens: a URL persistente permanece no objeto do personagem e o binário usa o sistema de uploads/Storage já existente.
 
-Para verificar se o backend está funcionando, acesse:
+## Estrutura do projeto
 
-https://seu-backend.onrender.com/api/health
-
-O resultado esperado é semelhante a:
-
-{
-  "ok": true
-}
-
-⸻
-
-🔐 Autenticação e segurança
-
-O backend possui sistema de autenticação e gerenciamento de sessão.
-
-O projeto utiliza uma variável SESSION_SECRET para proteger as sessões.
-
-Exemplo:
-
-SESSION_SECRET=uma-chave-grande-e-aleatoria
-
-Nunca publique chaves secretas no frontend, GitHub ou arquivos públicos.
-
-⸻
-
-🚀 Como executar localmente
-
-1. Entre na pasta do backend
-
-cd backend
-
-2. Instale as dependências
-
-npm install
-
-3. Inicie o servidor
-
-npm start
-
-4. Acesse no navegador
-
-http://localhost:3000
-
-Para testar login, uploads, sincronização, banco de dados e múltiplas campanhas, utilize o servidor através do npm start em vez de abrir diretamente o arquivo frontend/index.html.
-
-⸻
-
-📁 Estrutura do projeto
-
-projeto-arachne/
-│
+```text
+RPG-ARACHNE/
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
 │   ├── script.js
 │   ├── api-client.js
+│   ├── config.js
 │   └── assets/
-│
+│       ├── portraits/
+│       └── pdfs/
 ├── backend/
 │   ├── src/
 │   │   ├── server.js
-│   │   ├── templates.js
+│   │   ├── gameplay.js
+│   │   ├── image-search.js
 │   │   ├── files.js
+│   │   ├── templates.js
 │   │   ├── auth.js
 │   │   └── db/
-│   │
+│   ├── tests/
+│   │   ├── api.test.js
+│   │   └── gameplay.test.js
 │   ├── database/
-│   ├── uploads/
+│   │   ├── supabase.sql
+│   │   └── schema.sqlite.sql
 │   └── package.json
-│
-├── render.yaml
+├── AUDIT_V31.1.md
+├── CHANGELOG.md
+├── CHARACTER_COVERAGE.md
+├── README.md
 ├── netlify.toml
-└── README.md
+├── render.yaml
+└── start.*
+```
 
-⸻
+## Executar localmente
 
-🆕 Últimas atualizações
+Requer Node.js **22.5+**.
 
-Biblioteca de personagens
+```bash
+cd backend
+npm start
+```
 
-* Expansão da biblioteca de personagens Marvel.
-* Inclusão de novos heróis e vilões.
-* Fichas completas com atributos, poderes, traits, tags e informações adicionais.
-* Inclusão de portraits para os personagens.
-* PDFs individuais das fichas.
-* A biblioteca completa agora pode ser utilizada na criação de novas campanhas.
+Com `SERVE_FRONTEND=true`, abra:
 
-Sistema de campanhas
+```text
+http://localhost:3000
+```
 
-* Campanhas agora são independentes umas das outras.
-* Templates são utilizados como modelos para novas mesas.
-* Alterações feitas em uma campanha não modificam seu template original.
-* Criação de campanhas em branco.
-* Importação de PDF para novas campanhas.
-* Elenco completamente editável pelo Mestre.
+### Testes
 
-Gerenciamento de personagens
+```bash
+cd backend
+npm test
+```
 
-* Adição e remoção de heróis e vilões.
-* Criação de personagens personalizados.
-* Edição completa das fichas.
-* Upload de imagens.
-* Upload de PDFs.
-* Seleção de personagens baseada no elenco real da campanha.
+Validação automatizada da v33.4 no pacote entregue:
 
-Mesa virtual
+```text
+79 testes
+79 aprovados
+0 falhas
+```
 
-* Sistema de iniciativa.
-* Controle de Health e Focus.
-* Rolagens.
-* Histórico de ações.
-* Cenário e peças.
-* Anotações para Mestre e jogadores.
-* Sincronização em tempo real.
+A suíte cobre health/versionamento, sanitização de jogador, proteção de ficha/recursos, ajustes de `currentHealth`/`currentFocus` pelo próprio jogador, limites 0..máximo, recursos do Mestre, persistência, `actionHistory`, sincronização SSE com Mestre e outros jogadores, TN e habilidade autoritativos, bloqueio fora do turno, isolamento entre campanhas, permissões de imagens, D616, Central do Mestre, movimentação do grid com Mestre + dois jogadores e os contratos visuais da v32. A v33.0 acrescentou o ataque com uma única D616 e dano derivado; a v33.1 acrescentou iniciativa D616 server-side; a v33.2 cobre aplicação autoritativa de dano; a v33.3 valida iniciativa → grid; a v33.4 mantém essas frentes enquanto adiciona movimentação autoritativa e ajuste seguro de Health/Focus do próprio herói; e a v33.4.4 permite múltiplas instâncias de ameaças genéricas/LACAIOS na preparação sem duplicar personagens únicos.
 
-Infraestrutura
+## Variáveis de ambiente
 
-* Backend Node.js.
-* Banco de dados SQLite para utilização local.
-* Suporte ao Supabase.
-* Supabase Storage para arquivos.
-* Deploy do frontend no Netlify.
-* Deploy do backend no Render.
-* Comunicação entre frontend e backend através de API.
-* Configuração manual da URL do backend pela tela inicial.
-* Endpoint de verificação /api/health.
+Base: `backend/.env.example`.
 
-⸻
+```env
+PORT=3000
+SERVE_FRONTEND=true
+CORS_ORIGIN=*
+DB_PROVIDER=supabase
 
-🛠️ Tecnologias
+MASTER_PASSWORD=troque-esta-senha
+SESSION_SECRET=uma-chave-longa-e-aleatoria
+SESSION_TTL_HOURS=24
 
-O projeto utiliza principalmente:
+SUPABASE_URL=https://seu-projeto.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=sua-service-role-key
+SUPABASE_STORAGE_BUCKET=arachne-assets
+```
 
-* HTML
-* CSS
-* JavaScript
-* Node.js
-* SQLite
-* Supabase
-* Server-Sent Events (SSE)
-* Netlify
-* Render
+SQLite local:
 
-⸻
+```env
+DB_PROVIDER=sqlite
+SQLITE_FILE=./data/arachne.sqlite
+```
 
-🎯 Objetivo do projeto
+## Deploy
 
-O RPG Arachne tem como objetivo oferecer uma experiência simples e centralizada para jogar Marvel Multiverse RPG online, permitindo que o Mestre tenha controle da campanha enquanto os jogadores acompanham seus personagens e o andamento da aventura.
+### Backend — Render
 
-A plataforma busca unir:
+`render.yaml` configura:
 
-📚 Campanhas + 🦸 Personagens + 🎲 Rolagens + ⚔️ Combate + 📝 Anotações + 🔄 Sincronização
+```text
+Root Directory: backend
+Start Command: npm start
+Health Check: /api/health
+```
 
-em uma única mesa virtual.
+O health endpoint da versão atual informa `version: 33.0`, `realtime: sse`, suporte multi-campanha, uploads e image search.
+
+### Frontend — Netlify/Vercel
+
+`netlify.toml` publica `frontend/`, mantém proxy `/api/*` para o backend Render padrão e habilita cache de assets estáticos.
+
+`frontend/config.js` mantém a resolução de API já existente no projeto.
+
+## Página de Regras
+
+A página de Regras permanece no frontend. Ela documenta as mecânicas efetivamente implementadas, incluindo que ataques usam uma única D616 e que o dano deriva do Marvel Die dessa mesma rolagem. Não cria fórmulas inexistentes para defesa, Powers ou reações.
+
+## Limitações conhecidas
+
+- a qualidade/quantidade de candidatos da busca web depende da disponibilidade das fontes externas;
+- a busca oficial Marvel é aberta como link, pois não existe neste projeto uma API oficial Marvel autenticada para busca de imagens;
+- cold start do Render e latência externa de Supabase/DNS não podem ser eliminados somente por código do frontend;
+- não há fórmula estruturada de defesa automática por alvo;
+- Powers armazenados apenas como texto não aplicam custo/efeito automaticamente;
+- o movimento do jogador depende de combate ativo e do próprio turno; fora dele o backend bloqueia a ação;
+- o ambiente usado na auditoria não permitiu uma bateria automatizada de navegador real, portanto a validação entregue combina testes HTTP/backend, checagem sintática e inspeção estrutural do frontend.
+
+Para o relatório técnico detalhado da auditoria, consulte `AUDIT_V31.1.md`.
+
+
+## Otimização de imagens v33.4.3
+
+O banco não armazena arquivos/BLOBs de imagem: personagens mantêm apenas o caminho/URL em `image`. Retratos oficiais ficam em `frontend/assets/portraits`, enquanto uploads continuam usando o Supabase Storage existente (ou `backend/uploads` no modo local). A v33.4.3 adiciona thumbnails de até 320 px para avatares/tokens, cache versionado/imutável e deduplicação SHA-256 para novos uploads de imagem. Consulte `IMAGE_AUDIT_V33.4.3.md` para as medições.

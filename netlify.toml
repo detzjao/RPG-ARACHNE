@@ -2,9 +2,37 @@
   publish = "frontend"
 
 # Fallback para o serviço Render padrão do projeto.
-# O frontend v29 também permite trocar essa URL pela própria tela caso o seu serviço tenha outro domínio.
+# O frontend também permite trocar essa URL pela própria tela caso o seu serviço tenha outro domínio.
 [[redirects]]
   from = "/api/*"
   to = "https://rpg-arachne.onrender.com/api/:splat"
   status = 200
   force = true
+
+# Assets versionados/otimizados do frontend podem ficar em cache no CDN e no navegador.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Retratos usam query de versão no frontend; por isso podem ficar imutáveis no CDN.
+[[headers]]
+  for = "/assets/portraits/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# HTML/JS/CSS principais devem revalidar a cada deploy. Os URLs também recebem ?v=31.2.0.
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "no-cache, must-revalidate"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "no-cache, must-revalidate"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, must-revalidate"

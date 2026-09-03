@@ -43,10 +43,19 @@ export function createSupabaseRepository({ url, serviceRoleKey }) {
       return mapCampaign(rows[0]);
     },
     async getCampaignsByCodes(codes = []) {
-      const unique = [...new Set(codes.map(code=>String(code||'').trim().toUpperCase()).filter(Boolean))].slice(0,30);
-      const out=[];
-      for (const code of unique) { const row=await this.getCampaignByCode(code); if(row) out.push(row); }
-      return out;
+      const unique=[...new Set(codes.map(code=>String(code||'').trim().toUpperCase()).filter(Boolean))].slice(0,30);
+      if(!unique.length)return[];
+      const encoded=unique.map(code=>`\"${code.replace(/[\"\\]/g,'')}\"`).join(',');
+      const rows=await call(`/campaigns?code=in.(${encodeURIComponent(encoded)})&select=id,code,name,password_hash,template,created_at,updated_at`)||[];
+      const byCode=new Map(rows.map(row=>[String(row.code||'').toUpperCase(),mapCampaign(row)]));
+      return unique.map(code=>byCode.get(code)).filter(Boolean);
+    },
+    async getManyCampaignStates(campaignIds=[],keys=[]) {
+      const ids=[...new Set(campaignIds.map(String).filter(Boolean))].slice(0,30),stateKeys=[...new Set(keys.map(String).filter(Boolean))].slice(0,20);
+      if(!ids.length||!stateKeys.length)return{};
+      const quote=list=>list.map(value=>`\"${value.replace(/[\"\\]/g,'')}\"`).join(',');
+      const rows=await call(`/app_state?campaign_id=in.(${encodeURIComponent(quote(ids))})&state_key=in.(${encodeURIComponent(quote(stateKeys))})&select=campaign_id,state_key,state_value`)||[];
+      const out={};for(const row of rows){(out[row.campaign_id]??={})[row.state_key]=row.state_value;}return out;
     },
     async getAll(campaignId) {
       const rows = await call(`/app_state?campaign_id=eq.${encodeURIComponent(campaignId)}&select=state_key,state_value`) || [];

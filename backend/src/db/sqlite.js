@@ -78,12 +78,16 @@ export function createSqliteRepository({ file }) {
     async getCampaignById(id) { return campaignByIdStmt.get(id) || null; },
     async getCampaignsByCodes(codes = []) {
       const unique = [...new Set(codes.map(code => String(code || '').trim().toUpperCase()).filter(Boolean))].slice(0,30);
-      const rows = [];
-      for (const code of unique) {
-        const row = campaignByCodeStmt.get(code);
-        if (row) rows.push(row);
-      }
-      return rows;
+      if (!unique.length) return [];
+      const marks=unique.map(()=>'?').join(',');
+      return db.prepare(`SELECT id,code,name,password_hash,template,created_at,updated_at FROM campaigns WHERE upper(code) IN (${marks})`).all(...unique);
+    },
+    async getManyCampaignStates(campaignIds=[],keys=[]) {
+      const ids=[...new Set(campaignIds.map(String).filter(Boolean))].slice(0,30),stateKeys=[...new Set(keys.map(String).filter(Boolean))].slice(0,20);
+      if(!ids.length||!stateKeys.length)return{};
+      const idMarks=ids.map(()=>'?').join(','),keyMarks=stateKeys.map(()=>'?').join(',');
+      const rows=db.prepare(`SELECT campaign_id,state_key,state_value FROM app_state WHERE campaign_id IN (${idMarks}) AND state_key IN (${keyMarks})`).all(...ids,...stateKeys);
+      const out={};for(const row of rows){(out[row.campaign_id]??={})[row.state_key]=parseValue(row.state_value);}return out;
     },
     async getAll(campaignId) {
       const rows = getAllStmt.all(campaignId);
