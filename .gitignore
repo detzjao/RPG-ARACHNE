@@ -5,3 +5,5 @@ backend/data/*.sqlite-*
 Thumbs.db
 backend/uploads/*
 !backend/uploads/.gitkeep
+pc
+pc.pub
