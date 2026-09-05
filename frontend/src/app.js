@@ -17,6 +17,41 @@
     'minion-support':{id:'minion-support',n:'Capanga · Suporte',tier:'CAPANGA',maxHealth:30,currentHealth:30,maxFocus:40,currentFocus:40,initiative:'+2',abilities:{Melee:0,Agility:1,Resilience:1,Vigilance:2,Ego:1,Logic:2},movement:{run:5,climb:3,swim:3,jump:3}}
   };
   const MOVE_LABEL = {run:'Correr',climb:'Escalar',swim:'Nadar',jump:'Pular',flight:'Voar',glide:'Planar',swingline:'Balanço',mounted:'Montado'};
+  const MOVE_META = {
+    run:{label:'Correr',abbr:'RUN'},climb:{label:'Escalar',abbr:'CLIMB'},swim:{label:'Nadar',abbr:'SWIM'},jump:{label:'Pular',abbr:'JUMP'},
+    flight:{label:'Voar',abbr:'FLIGHT'},glide:{label:'Planar',abbr:'GLIDE'},swingline:{label:'Balançar',abbr:'SWING'},mounted:{label:'Montado',abbr:'MOUNT'}
+  };
+  const ENVIRONMENTS = {
+    closed:{label:'Ambiente fechado',base:'floor'},'small-room':{label:'Sala pequena',base:'floor'},'large-room':{label:'Sala grande',base:'floor'},
+    lab:{label:'Laboratório',base:'labfloor'},garage:{label:'Garagem / estacionamento',base:'parking'},rooftop:{label:'Telhado',base:'roof'},
+    forest:{label:'Floresta',base:'grass'},lumber:{label:'Madeireira / margem do rio',base:'grass'},inn:{label:'Taverna / pousada',base:'wood'},
+    ruins:{label:'Ruínas / beco',base:'stone'},city:{label:'Rua da cidade',base:'road'}
+  };
+  const TERRAIN_META = {
+    floor:{label:'Piso',elevation:0,land:true},labfloor:{label:'Piso técnico',elevation:0,land:true},parking:{label:'Concreto',elevation:0,land:true},roof:{label:'Telhado',elevation:0,land:true},wood:{label:'Madeira',elevation:0,land:true},stone:{label:'Pedra',elevation:0,land:true},grass:{label:'Solo',elevation:0,land:true},road:{label:'Asfalto',elevation:0,land:true},
+    elev1:{label:'Elevação 1',elevation:1,land:true,raised:true,climbable:true},elev2:{label:'Elevação 2',elevation:2,land:true,raised:true,climbable:true},
+    ramp1:{label:'Rampa 1',elevation:1,land:true,ramp:true,climbable:true},ramp2:{label:'Rampa 2',elevation:2,land:true,ramp:true,climbable:true},
+    water:{label:'Água',elevation:0,water:true},gap:{label:'Vão',elevation:-1,gap:true}
+  };
+  const TERRAIN_TOOLS = new Set(['elev1','elev2','ramp1','ramp2','water','gap']);
+  const OBSTACLE_META = {
+    wall:{label:'Parede',block:true,symbol:'▰'},crate:{label:'Caixa',block:true,symbol:'□'},terminal:{label:'Terminal',block:true,symbol:'T'},barrel:{label:'Barril',block:true,symbol:'●'},
+    door:{label:'Porta',block:false,symbol:'↔'},pillar:{label:'Pilar',block:true,symbol:'◆'},cover:{label:'Cobertura',block:true,symbol:'▱'},rubble:{label:'Entulho',block:false,cost:2,symbol:'✦'},
+    tree:{label:'Árvore',block:true,symbol:'♣'},rock:{label:'Rocha',block:true,symbol:'⬟'},car:{label:'Veículo',block:true,symbol:'▣'},table:{label:'Mesa',block:true,symbol:'▭'},
+    bed:{label:'Cama',block:true,symbol:'▤'},counter:{label:'Balcão',block:true,symbol:'▥'},shelf:{label:'Estante',block:true,symbol:'▧'},dock:{label:'Cais',block:false,symbol:'═'},
+    log:{label:'Tora',block:true,symbol:'▬'},stump:{label:'Toco',block:true,symbol:'●'},campfire:{label:'Fogueira',block:false,symbol:'♨'},booth:{label:'Cabine',block:true,symbol:'▦'},statue:{label:'Estátua',block:true,symbol:'♟'},fence:{label:'Grade',block:true,symbol:'╫'}
+  };
+  const DECOR_META = {lane:{label:'Faixa',symbol:'━'},hazard:{label:'Faixa de risco',symbol:'⚠'},lamp:{label:'Luz',symbol:'✦'},stain:{label:'Marca',symbol:'●'},rug:{label:'Tapete',symbol:'▧'},books:{label:'Livros',symbol:'≡'},shrub:{label:'Arbusto',symbol:'♧'},pier:{label:'Passarela',symbol:'═'},debris:{label:'Destroços',symbol:'·'},tarp:{label:'Lona',symbol:'▱'}};
+  const SCENARIO_PRESETS = {
+    empty:{label:'Vazio',env:'large-room',w:18,h:12,obstacles:[],terrain:[]},
+    lab:{label:'Laboratório',env:'lab',w:20,h:14,obstacles:[['wall',9,2],['wall',9,3],['wall',9,4],['door',9,5],['wall',9,6],['wall',9,7],['terminal',15,3],['terminal',16,3],['crate',13,9],['crate',14,9],['barrel',16,9],['pillar',4,4],['pillar',17,4],['shelf',2,2],['counter',3,10],['counter',4,10]],terrain:[['elev1',14,2],['elev1',15,2],['elev1',16,2],['ramp1',13,2]]},
+    hydra:{label:'Base da Hydra',env:'closed',w:20,h:14,obstacles:[['wall',4,2],['wall',5,2],['wall',6,2],['door',7,2],['wall',8,2],['wall',9,2],['cover',8,8],['cover',9,8],['crate',4,10],['crate',5,10],['barrel',14,9],['terminal',17,3],['pillar',2,6],['pillar',17,11],['fence',12,4],['fence',12,5]],terrain:[['elev1',14,3],['elev1',15,3],['elev1',16,3],['ramp1',13,3]]},
+    rooftop:{label:'Telhado',env:'rooftop',w:18,h:14,obstacles:[['wall',1,1],['wall',2,1],['wall',3,1],['wall',14,1],['wall',15,1],['wall',16,1],['crate',8,6],['crate',9,6],['cover',12,8],['barrel',15,10],['rock',5,10]],terrain:[['gap',6,3],['gap',7,3],['gap',6,4],['gap',7,4],['elev1',11,3],['elev1',12,3],['elev1',11,4],['elev1',12,4],['ramp1',10,4]]},
+    hangar:{label:'Hangar',env:'large-room',w:22,h:14,obstacles:[['wall',3,2],['wall',4,2],['wall',5,2],['door',6,2],['wall',7,2],['wall',8,2],['cover',7,8],['cover',8,8],['cover',14,8],['cover',15,8],['crate',11,6],['crate',12,6],['barrel',3,11],['barrel',18,11],['terminal',19,3],['pillar',2,7],['pillar',19,7]],terrain:[['elev1',16,2],['elev1',17,2],['elev1',18,2],['ramp1',15,2]]},
+    garage:{label:'Garagem',env:'garage',w:20,h:14,obstacles:[['car',4,3],['car',7,3],['car',10,3],['car',13,3],['car',4,8],['car',7,8],['car',10,8],['car',13,8],['booth',17,2],['crate',16,10],['barrel',17,10]],terrain:[['elev1',1,11],['elev1',2,11],['ramp1',3,11]]},
+    inn:{label:'Taverna / pousada',env:'inn',w:20,h:14,obstacles:[['wall',6,2],['wall',6,3],['wall',6,4],['door',6,5],['wall',14,3],['wall',14,4],['counter',10,8],['counter',11,8],['counter',12,8],['table',3,4],['table',4,4],['table',4,10],['table',15,10],['bed',3,2],['bed',16,2],['shelf',9,10],['shelf',10,10]],terrain:[]},
+    ruins:{label:'Ruínas',env:'ruins',w:20,h:14,obstacles:[['wall',3,3],['wall',4,3],['wall',5,3],['wall',14,4],['wall',15,4],['wall',16,4],['pillar',9,6],['statue',10,7],['cover',6,9],['rock',13,9],['rubble',8,8],['fence',2,11],['fence',3,11]],terrain:[['gap',11,2],['gap',12,2],['elev1',14,9],['elev1',15,9],['ramp1',13,9]]}
+  };
   const NAV = [
     ['central','⌂','Central'], ['heroes','♙','Heróis'], ['villains','☠','Vilões'], ['campaign','▣','Campanha'], ['scenario','▦','Cenário'], ['rules','?','Regras'], ['notes','✎','Anotações']
   ];
@@ -27,6 +62,26 @@
   const signed = n => `${Number(n)>=0?'+':''}${Number(n)||0}`;
   const monogram = name => String(name||'?').split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase();
   const thumb = src => { const value=String(src||''); return value.includes('/portraits/')&&!value.includes('/thumbs/') ? value.replace('/portraits/','/portraits/thumbs/').replace(/\.(png|jpe?g|webp)$/i,'.webp') : value; };
+  const scenarioKey=(x,y)=>`${x},${y}`;
+  const scenarioSize=scenario=>({w:clamp(scenario?.width||20,8,30),h:clamp(scenario?.height||14,7,24)});
+  const scenarioTerrain=(scenario,x,y)=>{const type=scenario?.terrain?.[scenarioKey(x,y)]||scenario?.baseTerrain||'floor';return{type,...(TERRAIN_META[type]||TERRAIN_META.floor)};};
+  const scenarioObstacle=(scenario,x,y)=>scenario?.obstacles?.[scenarioKey(x,y)]||null;
+  const scenarioPieceAt=(scenario,x,y)=>(scenario?.pieces||[]).find(p=>Number(p?.x)===Number(x)&&Number(p?.y)===Number(y))||null;
+  function normalizedScenario(raw){const scenario={...DEFAULT_DATA.scenario,...(raw||{})};scenario.width=clamp(scenario.width||20,8,30);scenario.height=clamp(scenario.height||14,7,24);scenario.environment=scenario.environment||'large-room';scenario.baseTerrain=scenario.baseTerrain||ENVIRONMENTS[scenario.environment]?.base||'floor';scenario.obstacles={...(scenario.obstacles||{})};scenario.terrain={...(scenario.terrain||{})};scenario.decor={...(scenario.decor||{})};scenario.turnMovement={...(scenario.turnMovement||{})};scenario.movementSpent={...(scenario.movementSpent||{})};scenario.minionVitals={...(scenario.minionVitals||{})};scenario.pieces=(Array.isArray(scenario.pieces)?scenario.pieces:[]).map(p=>({...p,movement:{...(p.movement||{})}}));return scenario;}
+  function movementForBoardPiece(piece,entity){const direct=piece?.movement&&typeof piece.movement==='object'?piece.movement:null;if(direct&&Object.keys(direct).length)return{...direct};return{...(entity?.movement||{})};}
+  function scenarioOccupied(scenario,x,y,piece){return(scenario?.pieces||[]).some(item=>item?.id!==piece?.id&&Number(item?.x)===Number(x)&&Number(item?.y)===Number(y));}
+  function scenarioInBounds(scenario,x,y){const{w,h}=scenarioSize(scenario);return x>=0&&y>=0&&x<w&&y<h;}
+  function scenarioBlocked(scenario,x,y,piece){if(!scenarioInBounds(scenario,x,y)||scenarioOccupied(scenario,x,y,piece))return true;return!!OBSTACLE_META[scenarioObstacle(scenario,x,y)]?.block;}
+  function scenarioCellCost(scenario,x,y,mode){return mode==='run'&&scenarioObstacle(scenario,x,y)==='rubble'?2:1;}
+  function canScenarioRun(scenario,fx,fy,tx,ty,piece){if(scenarioBlocked(scenario,tx,ty,piece))return false;const from=scenarioTerrain(scenario,fx,fy),to=scenarioTerrain(scenario,tx,ty);if(from.water||from.gap||to.water||to.gap)return false;const diff=Math.abs((to.elevation||0)-(from.elevation||0));if(diff===0)return true;if(diff>1)return false;return!!(from.ramp||to.ramp);}
+  function canScenarioSwim(scenario,fx,fy,tx,ty,piece){if(scenarioBlocked(scenario,tx,ty,piece))return false;const to=scenarioTerrain(scenario,tx,ty),from=scenarioTerrain(scenario,fx,fy);if(!to.water)return false;return from.water||(!from.water&&!from.gap);}
+  function scenarioNeighbors(x,y){const out=[];for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(dx||dy)out.push([x+dx,y+dy]);}return out;}
+  function scenarioDirectCost(scenario,piece,x,y){const horizontal=Math.max(Math.abs(x-Number(piece.x)),Math.abs(y-Number(piece.y)));return Math.max(horizontal,Math.abs(Number(scenarioTerrain(scenario,x,y).elevation||0)-Number(scenarioTerrain(scenario,Number(piece.x),Number(piece.y)).elevation||0)));}
+  function scenarioDirectAllowed(scenario,piece,x,y,mode){if(!scenarioInBounds(scenario,x,y)||scenarioOccupied(scenario,x,y,piece))return false;const terrain=scenarioTerrain(scenario,x,y),obs=OBSTACLE_META[scenarioObstacle(scenario,x,y)];if(obs?.block)return false;if(mode==='flight'||mode==='swingline')return true;if(mode==='glide')return!terrain.water&&!terrain.gap;if(mode==='jump')return!!terrain.land&&!terrain.water&&!terrain.gap;if(mode==='climb'){const from=scenarioTerrain(scenario,Number(piece.x),Number(piece.y)),horizontal=Math.max(Math.abs(x-Number(piece.x)),Math.abs(y-Number(piece.y)));return horizontal<=1&&!from.water&&!from.gap&&!!terrain.land&&!!terrain.climbable&&terrain.elevation!==from.elevation;}return false;}
+  function reachableScenarioCellsUI(scenario,piece,mode,budget){const result=new Map(),limit=Number(budget||0);if(!piece||limit<=0)return result;if(['jump','flight','glide','swingline','climb'].includes(mode)){const{w,h}=scenarioSize(scenario);for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(x===Number(piece.x)&&y===Number(piece.y))continue;if(!scenarioDirectAllowed(scenario,piece,x,y,mode))continue;const cost=scenarioDirectCost(scenario,piece,x,y);if(cost>0&&cost<=limit)result.set(scenarioKey(x,y),cost);}return result;}if(mode==='run'&&scenarioTerrain(scenario,Number(piece.x),Number(piece.y)).water)return result;const q=[[Number(piece.x),Number(piece.y),0]],best=new Map([[scenarioKey(Number(piece.x),Number(piece.y)),0]]);while(q.length){const[x,y,cost]=q.shift();for(const[nx,ny]of scenarioNeighbors(x,y)){if(!scenarioInBounds(scenario,nx,ny))continue;const ok=mode==='swim'?canScenarioSwim(scenario,x,y,nx,ny,piece):canScenarioRun(scenario,x,y,nx,ny,piece);if(!ok)continue;const nextCost=cost+scenarioCellCost(scenario,nx,ny,mode),key=scenarioKey(nx,ny);if(nextCost>limit)continue;if(best.has(key)&&best.get(key)<=nextCost)continue;best.set(key,nextCost);q.push([nx,ny,nextCost]);if(!(nx===Number(piece.x)&&ny===Number(piece.y)))result.set(key,nextCost);}}return result;}
+  function movementStatusUI(scenario,piece,entity,preferredMode='run'){const movement=movementForBoardPiece(piece,entity),valid=Object.entries(movement).filter(([,value])=>Number(value)>0),locked=scenario?.turnMovement?.[piece?.id]||null;let mode=locked?.mode||String(preferredMode||'');if(!valid.some(([key])=>key===mode))mode=valid[0]?.[0]||'run';const max=Number(movement[mode]||0),spent=locked&&locked.mode===mode?Number(locked.spent||0):0;return{movement,valid,mode,max,spent,remaining:Math.max(0,max-spent),locked};}
+  function safePlacementCells(scenario){const{w,h}=scenarioSize(scenario),out=[];for(let y=0;y<h;y++)for(let x=0;x<w;x++){const terrain=scenarioTerrain(scenario,x,y),obs=OBSTACLE_META[scenarioObstacle(scenario,x,y)];if(!terrain.water&&!terrain.gap&&!scenarioObstacle(scenario,x,y))out.push({x,y});}return out;}
+  function placePiecesSafely(scenario){const next=normalizedScenario(scenario),spots=safePlacementCells(next),used=new Set();let cursor=0;next.pieces=next.pieces.map(piece=>{let x=clamp(piece.x,0,next.width-1),y=clamp(piece.y,0,next.height-1),key=scenarioKey(x,y),terrain=scenarioTerrain(next,x,y),blocked=OBSTACLE_META[scenarioObstacle(next,x,y)]?.block;if(used.has(key)||terrain.water||terrain.gap||blocked){while(cursor<spots.length&&used.has(scenarioKey(spots[cursor].x,spots[cursor].y)))cursor++;const spot=spots[cursor++]||{x:0,y:0};x=spot.x;y=spot.y;key=scenarioKey(x,y);}used.add(key);return{...piece,x,y};});return next;}
   const fmtClock = at => { try { return new Date(Number(at)||Date.now()).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); } catch { return ''; } };
   const rollValues = roll => Array.isArray(roll?.values) ? roll.values : Array.isArray(roll?.dice?.values) ? roll.dice.values : [];
   const rollDisplay = values => values.map((v,i)=>i===1&&Number(v)===1?'M':v).join(' · ');
@@ -55,7 +110,7 @@
   function Button({primary=false,danger=false,className='',children,...rest}){ return h('button',{...rest,className:cx('min-h-11 rounded-xl border border-white/10 bg-[#171d27] px-4 py-2 text-xs font-black tracking-wide text-white transition hover:border-white/20 hover:bg-[#1c2430] disabled:cursor-not-allowed disabled:opacity-40',primary&&'border-[#ef3340] bg-[#ef3340] hover:bg-[#ff4351]',danger&&'border-red-900/60 bg-red-950/30 text-red-200',className)},children); }
   function TinyLabel({children,className}){ return h('small',{className:cx('text-[10px] font-black uppercase tracking-[.16em] text-[#8f99a8]',className)},children); }
   function Portrait({entity,size='md',full=false}){
-    const src=entity?.image||''; const cls=size==='sm'?'h-10 w-10':size==='lg'?'h-24 w-24':'h-14 w-14';
+    const src=entity?.image||''; const cls=size==='sm'?'h-10 w-10':size==='strip'?'h-16 w-16':size==='lg'?'h-24 w-24':size==='xl'?'h-28 w-28 sm:h-36 sm:w-36':'h-14 w-14';
     return h('span',{className:cx(cls,'shrink-0 overflow-hidden rounded-xl border border-white/10 bg-[#090c11] grid place-items-center font-black text-[#a7afbc]')},src?h('img',{src:full?src:thumb(src),alt:'',loading:'lazy',decoding:'async',className:'h-full w-full object-cover'}):monogram(entity?.n));
   }
   function ResourceControl({label,current,max,onDelta,onSet,disabled}){
@@ -114,8 +169,8 @@
   }
 
   function CharacterStrip({items,selectedKey,onSelect,mode='villain'}){
-    return h('div',{className:'scrollbar-thin flex gap-2 overflow-x-auto pb-2'},items.map(item=>h('button',{key:item.key,onClick:()=>onSelect(item.key),className:cx('min-w-[132px] rounded-xl border bg-[#111720] p-2 text-left transition',selectedKey===item.key?'border-[#ef3340] bg-[#2a1117]':'border-white/10 hover:border-white/20')},[
-      h(Portrait,{key:'p',entity:item.entity,size:'sm'}),
+    return h('div',{className:'scrollbar-thin flex gap-2 overflow-x-auto pb-2'},items.map(item=>h('button',{key:item.key,onClick:()=>onSelect(item.key),className:cx('min-w-[158px] rounded-xl border bg-[#111720] p-3 text-left transition',selectedKey===item.key?'border-[#ef3340] bg-[#2a1117]':'border-white/10 hover:border-white/20')},[
+      h(Portrait,{key:'p',entity:item.entity,size:'strip'}),
       h('b',{key:'n',className:'mt-2 block truncate text-xs'},item.label||item.entity.n),
       h('small',{key:'k',className:'text-[9px] font-bold text-[#788291]'},item.kind==='hero'?'HERÓI':item.kind==='other'?'CAPANGA':mode==='hero'?'HERÓI':'VILÃO')
     ])));
@@ -195,27 +250,83 @@
     ]);
   }
 
-  function Board({scenario,heroes,villains,role,heroId,selected,onSelect,onMove,zoom,onZoom,onReset}){
-    const width=Math.max(4,Number(scenario?.width)||20),height=Math.max(4,Number(scenario?.height)||14),pieces=Array.isArray(scenario?.pieces)?scenario.pieces:[];
-    const chars=[...(heroes||[]),...(villains||[])]; const getChar=p=>chars.find(c=>c.id===(p.characterId||p.baseId))||MINIONS[p.baseId]||null;
+  function Board({scenario,heroes,villains,role,heroId,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode='run',onMoveMode,editor=false,editorTool='select',onEditCell,onRemovePiece,title=true}){
+    const current=normalizedScenario(scenario),width=current.width,height=current.height,pieces=current.pieces;
+    const chars=[...(heroes||[]),...(villains||[])];
+    const getChar=p=>chars.find(c=>c.id===(p.characterId||p.baseId))||MINIONS[p.baseId]||null;
     const canSelect=p=>role==='master'||(p.kind==='hero'&&String(p.characterId||p.baseId)===String(heroId||''));
-    const cellSize=40;
-    const cells=[];
+    const ownPiece=role==='player'?pieces.find(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(heroId||'')):null;
+    const effectiveSelected=selected||(role==='player'?ownPiece?.id:null),selectedPiece=pieces.find(p=>p.id===effectiveSelected)||null,selectedEntity=selectedPiece?getChar(selectedPiece):null;
+    const movement=selectedPiece&&canSelect(selectedPiece)?movementStatusUI(current,selectedPiece,selectedEntity,moveMode):null;
+    const reachable=movement&&editorTool==='select'?reachableScenarioCellsUI(current,selectedPiece,movement.mode,movement.remaining):new Map();
+    const cellSize=52,cells=[];
     for(let y=0;y<height;y++)for(let x=0;x<width;x++){
-      const key=`${x},${y}`,ob=scenario?.obstacles?.[key],terrain=scenario?.terrain?.[key],piece=pieces.find(p=>Number(p.x)===x&&Number(p.y)===y);
-      const entity=piece?getChar(piece):null;
-      cells.push(h('button',{key,type:'button',onClick:()=>{if(piece&&canSelect(piece))onSelect(piece.id);else if(!piece&&selected)onMove(x,y);},className:cx('board-cell',terrain&&`terrain-${terrain}`,ob&&'has-obstacle',piece&&'has-piece',selected&&piece?.id===selected&&'selected-piece'),'data-x':x,'data-y':y},[
-        ob?h('span',{key:'o',className:'obstacle-mark'},String(ob).slice(0,1).toUpperCase()):null,
-        piece?h('span',{key:'p',className:cx('board-token',canSelect(piece)&&'movable'),title:piece.name||entity?.n||''},(entity?.image||piece.image)?h('img',{src:thumb(entity?.image||piece.image),alt:'',loading:'lazy'}):h('b',null,piece.short||monogram(piece.name||entity?.n))):null
+      const key=scenarioKey(x,y),ob=scenarioObstacle(current,x,y),decor=current?.decor?.[key]||null,terrain=scenarioTerrain(current,x,y),piece=scenarioPieceAt(current,x,y),entity=piece?getChar(piece):null,isReachable=reachable.has(key),cost=reachable.get(key);
+      const click=()=>{
+        if(editor&&role==='master'&&editorTool!=='select'){onEditCell&&onEditCell(x,y,editorTool,piece);return;}
+        if(piece&&canSelect(piece)){onSelect&&onSelect(piece.id);return;}
+        if(!piece&&selectedPiece&&isReachable){onMove&&onMove(x,y,movement.mode,selectedPiece.id);}
+      };
+      cells.push(h('button',{key,type:'button',onClick:click,className:cx('board-cell',`terrain-${terrain.type}`,ob&&`obstacle-${ob}`,ob&&'has-obstacle',piece&&'has-piece',effectiveSelected&&piece?.id===effectiveSelected&&'selected-piece',isReachable&&'reachable-cell',editor&&editorTool!=='select'&&'editor-cell'),'data-x':x,'data-y':y,title:isReachable?`${MOVE_META[movement?.mode]?.label||movement?.mode}: custo ${cost}`:terrain.label},[
+        decor?h('span',{key:'d',className:'decor-mark',title:DECOR_META[decor]?.label||decor},DECOR_META[decor]?.symbol||'·'):null,
+        ob?h('span',{key:'o',className:'obstacle-mark',title:OBSTACLE_META[ob]?.label||ob},OBSTACLE_META[ob]?.symbol||String(ob).slice(0,1).toUpperCase()):null,
+        isReachable?h('span',{key:'c',className:'move-cost'},cost):null,
+        piece?h('span',{key:'p',className:cx('board-token',canSelect(piece)&&'movable'),title:piece.name||entity?.n||''},(entity?.image||piece.image)?h('img',{src:thumb(entity?.image||piece.image),alt:'',loading:'lazy',decoding:'async'}):h('b',null,piece.short||monogram(piece.name||entity?.n))):null
       ]));
     }
-    return h(Card,{className:'overflow-hidden'},[
-      h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3 p-4'},[
-        h('div',{key:'t'},[h(TinyLabel,{key:'s'},'CENÁRIO'),h('h2',{key:'h',className:'mt-1 text-xl font-black'},role==='master'?'Controle das peças':'Seu movimento')]),
-        h('div',{key:'c',className:'flex items-center gap-2'},[h(Button,{key:'m',onClick:()=>onZoom(Math.max(.45,zoom-.08)),className:'px-3'},'−'),h('span',{key:'z',className:'w-14 text-center text-xs font-black'},`${Math.round(zoom*100)}%`),h(Button,{key:'p',onClick:()=>onZoom(Math.min(1.35,zoom+.08)),className:'px-3'},'+'),h(Button,{key:'r',onClick:onReset},role==='master'?'NOVA RODADA':'REINICIAR')])
+    const movementPanel=selectedPiece&&movement?h('div',{className:'mx-4 mt-3 rounded-xl border border-white/10 bg-[#0b1017] p-3'},[
+      h('div',{key:'top',className:'flex flex-wrap items-center justify-between gap-3'},[
+        h('div',{key:'name'},[h(TinyLabel,{key:'l'},role==='player'?'SEU MOVIMENTO':'PEÇA SELECIONADA'),h('b',{key:'n',className:'mt-1 block text-sm'},selectedPiece.name||selectedEntity?.n||'Personagem')]),
+        h('div',{key:'remaining',className:'text-right'},[h(TinyLabel,{key:'l'},'RESTANTE'),h('strong',{key:'v',className:'ml-2 text-xl'},`${movement.remaining}/${movement.max}`)])
       ]),
-      h('div',{key:'hint',className:'mx-4 rounded-xl border border-dashed border-white/10 px-3 py-2 text-xs text-[#7c8695]'},role==='master'?'Selecione qualquer peça e depois clique no destino.':'Selecione sua peça e depois clique no destino.'),
+      h('div',{key:'modes',className:'mt-3 flex flex-wrap gap-2'},movement.valid.map(([mode,value])=>h('button',{key:mode,type:'button',disabled:Boolean(movement.locked&&movement.locked.mode!==mode),onClick:()=>onMoveMode&&onMoveMode(mode),className:cx('rounded-lg border px-3 py-2 text-[10px] font-black',movement.mode===mode?'border-emerald-500/60 bg-emerald-500/10 text-emerald-300':'border-white/10 bg-white/[.02] text-[#8f99a8]','disabled:opacity-30')},`${MOVE_META[mode]?.abbr||mode.toUpperCase()} ${value}`))),
+      h('div',{key:'bar',className:'mt-3 h-1.5 overflow-hidden rounded-full bg-white/5'},h('i',{className:'block h-full rounded-full bg-emerald-500',style:{width:`${movement.max?Math.max(0,Math.min(100,movement.remaining/movement.max*100)):0}%`}})),
+      h('div',{key:'actions',className:'mt-3 flex flex-wrap items-center justify-between gap-2'},[
+        h('span',{key:'hint',className:'text-[10px] text-[#778190]'},movement.remaining>0?'As casas verdes são os destinos disponíveis.':'Movimento esgotado para esta rodada.'),
+        h('div',{key:'buttons',className:'flex gap-2'},[
+          onResetPiece?h(Button,{key:'reset',onClick:()=>onResetPiece(selectedPiece.id),className:'min-h-9 py-1'},'REINICIAR MOVIMENTO'):null,
+          editor&&role==='master'&&onRemovePiece?h(Button,{key:'remove',danger:true,onClick:()=>onRemovePiece(selectedPiece.id),className:'min-h-9 py-1'},'REMOVER PEÇA'):null
+        ])
+      ])
+    ]):h('div',{className:'mx-4 mt-3 rounded-xl border border-dashed border-white/10 px-3 py-3 text-xs text-[#7c8695]'},role==='player'?(ownPiece?'Seu personagem está no cenário. As casas disponíveis aparecerão automaticamente.':'Seu personagem ainda não foi colocado no cenário.'):(editorTool==='select'?'Selecione uma peça para ver todas as casas que ela pode alcançar.':`Ferramenta ativa: ${editorTool}. Clique nas casas para editar o mapa.`));
+    return h(Card,{className:'overflow-hidden'},[
+      title?h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3 p-4'},[
+        h('div',{key:'t'},[h(TinyLabel,{key:'s'},editor?'MONTADOR TÁTICO':'CENÁRIO'),h('h2',{key:'h',className:'mt-1 text-xl font-black'},editor?'Mapa da cena':role==='master'?'Controle das peças':'Seu movimento')]),
+        h('div',{key:'c',className:'flex items-center gap-2'},[h(Button,{key:'m',onClick:()=>onZoom(Math.max(.35,zoom-.08)),className:'px-3'},'−'),h('span',{key:'z',className:'w-14 text-center text-xs font-black'},`${Math.round(zoom*100)}%`),h(Button,{key:'p',onClick:()=>onZoom(Math.min(1.4,zoom+.08)),className:'px-3'},'+'),onReset?h(Button,{key:'r',onClick:onReset},role==='master'?'NOVA RODADA':'REINICIAR'):null])
+      ]):null,
+      movementPanel,
       h('div',{key:'scroll',className:'board-scroll mt-3 overflow-auto bg-[#070a0e] p-4'},h('div',{className:'board-grid',style:{gridTemplateColumns:`repeat(${width}, ${cellSize}px)`,gridTemplateRows:`repeat(${height}, ${cellSize}px)`,transform:`scale(${zoom})`,transformOrigin:'top left',width:`${width*cellSize}px`,height:`${height*cellSize}px`}},cells))
+    ]);
+  }
+
+  function ScenarioBuilder({scenario,heroes,villains,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,tool,onTool,preset,onPreset,onApplyPreset,onGenerate,onClear,onResize,onEnvironment,pieceChoice,onPieceChoice,qty,onQty,onAddPieces,onEditCell,onRemovePiece}){
+    const current=normalizedScenario(scenario),actorOptions=[...(heroes||[]).map(e=>({key:`hero|${e.id}`,label:`Herói · ${e.n}`})),...(villains||[]).map(e=>({key:`villain|${e.id}`,label:`Vilão · ${e.n}`})),...Object.values(MINIONS).map(e=>({key:`other|${e.id}`,label:`Capanga · ${e.n.replace(/^Capanga · /,'')}`}))];
+    const toolButton=(id,label)=>h('button',{key:id,type:'button',onClick:()=>onTool(id),className:cx('min-h-10 rounded-lg border px-3 text-[10px] font-black',tool===id?'border-[#ef3340] bg-[#ef3340]/10 text-white':'border-white/10 bg-[#10161e] text-[#8e98a6]')},label);
+    return h('div',{className:'space-y-4'},[
+      h('section',{key:'head'},[h(TinyLabel,{key:'s'},'CENÁRIO'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},'Montador de cenário'),h('p',{key:'p',className:'mt-1 text-sm text-[#7f8997]'},'Monte o mapa, posicione as peças e use o mesmo grid durante a sessão.')]),
+      h(Card,{key:'setup',className:'p-4 sm:p-5'},[
+        h('div',{key:'row1',className:'grid gap-3 lg:grid-cols-[1.2fr_1fr_1fr_auto_auto]'},[
+          h('label',{key:'env',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'AMBIENTE'),h('select',{key:'s',value:current.environment,onChange:e=>onEnvironment(e.target.value),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-sm outline-none'},Object.entries(ENVIRONMENTS).map(([id,meta])=>h('option',{key:id,value:id},meta.label)))]),
+          h('label',{key:'size',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'TAMANHO'),h('select',{key:'s',value:`${current.width}x${current.height}`,onChange:e=>onResize(e.target.value),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-sm outline-none'},['10x8','12x9','16x12','18x12','18x14','20x14','22x14','22x16','24x16','24x18','30x20'].map(v=>h('option',{key:v,value:v},v.replace('x',' × '))))]),
+          h('label',{key:'preset',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'MODELO'),h('select',{key:'s',value:preset,onChange:e=>onPreset(e.target.value),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-sm outline-none'},Object.entries(SCENARIO_PRESETS).map(([id,meta])=>h('option',{key:id,value:id},meta.label)))]),
+          h(Button,{key:'apply',onClick:onApplyPreset,className:'self-end'},'APLICAR MODELO'),
+          h(Button,{key:'gen',primary:true,onClick:onGenerate,className:'self-end'},'GERAR MAPA')
+        ]),
+        h('div',{key:'tools',className:'mt-5 grid gap-4 xl:grid-cols-[1fr_1.4fr]'},[
+          h('div',{key:'paint'},[h(TinyLabel,{key:'l'},'FERRAMENTAS'),h('div',{key:'g',className:'mt-2 flex flex-wrap gap-2'},[
+            toolButton('select','SELECIONAR / MOVER'),toolButton('erase','APAGAR'),toolButton('base','PISO BASE'),
+            ...Array.from(TERRAIN_TOOLS).map(id=>toolButton(id,TERRAIN_META[id].label.toUpperCase())),
+            ...Object.entries(OBSTACLE_META).map(([id,meta])=>toolButton(id,meta.label.toUpperCase())),
+            ...Object.entries(DECOR_META).map(([id,meta])=>toolButton(`decor-${id}`,`DECOR · ${meta.label.toUpperCase()}`))
+          ])]),
+          h('div',{key:'pieces'},[h(TinyLabel,{key:'l'},'ADICIONAR PEÇAS'),h('div',{key:'r',className:'mt-2 grid gap-2 sm:grid-cols-[1fr_90px_auto]'},[
+            h('select',{key:'a',value:pieceChoice||actorOptions[0]?.key||'',onChange:e=>onPieceChoice(e.target.value),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-sm outline-none'},actorOptions.map(o=>h('option',{key:o.key,value:o.key},o.label))),
+            h('input',{key:'q',type:'number',min:1,max:20,value:qty,onChange:e=>onQty(clamp(e.target.value,1,20)),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-center text-sm outline-none'}),
+            h(Button,{key:'b',onClick:onAddPieces},'ADICIONAR')
+          ]),h('div',{key:'clear',className:'mt-2 flex justify-end'},h(Button,{danger:true,onClick:onClear},'LIMPAR MAPA'))])
+        ])
+      ]),
+      h(Board,{key:'board',scenario:current,heroes,villains,role:'master',selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,editor:true,editorTool:tool,onEditCell,onRemovePiece})
     ]);
   }
 
@@ -232,7 +343,7 @@
   class ArachneApp extends React.Component {
     constructor(props){
       super(props);
-      this.state={screen:'loading',campaigns:[],templates:[],characters:{heroes:[],villains:[]},selectedCampaign:null,accessMode:'',joinCode:'',masterPassword:'',createOpen:false,createTemplate:'',createName:'',createPassword:'',profile:null,data:{...DEFAULT_DATA},page:'central',navOpen:false,actorKey:'',category:'combat',power:'',roll:null,rollAnimating:false,initiativeRoll:null,initiativeAnimating:false,tn:14,edge:0,trouble:0,selectedPiece:null,zoom:.72,sheet:null,status:'offline',toast:'',error:''};
+      this.state={screen:'loading',campaigns:[],templates:[],characters:{heroes:[],villains:[]},selectedCampaign:null,accessMode:'',joinCode:'',masterPassword:'',createOpen:false,createTemplate:'',createName:'',createPassword:'',profile:null,data:{...DEFAULT_DATA},page:'central',navOpen:false,actorKey:'',category:'combat',power:'',roll:null,rollAnimating:false,initiativeRoll:null,initiativeAnimating:false,tn:14,edge:0,trouble:0,selectedPiece:null,zoom:.72,moveMode:'run',scenarioTool:'select',scenarioPreset:'empty',scenarioPieceChoice:'',scenarioQty:1,sheet:null,status:'offline',toast:'',error:''};
       this.toastTimer=null; this.tnTimer=null;
     }
     componentDidMount(){ this.bootstrap(); }
@@ -255,11 +366,11 @@
       }catch(error){ this.setState({screen:'login',error:error.message||'Falha ao iniciar o Arachne.'}); }
     }
     enterApp(profile,data,templates=this.state.templates,characters=this.state.characters){
-      const merged={...DEFAULT_DATA,...data,challenge:{...DEFAULT_DATA.challenge,...(data.challenge||{})},scenario:{...DEFAULT_DATA.scenario,...(data.scenario||{})}};
+      const merged={...DEFAULT_DATA,...data,challenge:{...DEFAULT_DATA.challenge,...(data.challenge||{})},scenario:normalizedScenario(data.scenario||{})};
       const tn=clamp(merged.challenge?.tn||14,1,99); const campaign=profile.campaign; rememberCampaign(campaign);
       this.setState({screen:'app',profile,data:merged,templates,characters,selectedCampaign:campaign,tn,edge:0,trouble:0,page:'central',actorKey:'',roll:null,category:'combat',power:'',error:''},()=>{this.ensureActor();this.connectRealtime();});
     }
-    connectRealtime(){ API.connectRealtime({onStatus:status=>this.setState({status}),onState:event=>{if(!event?.key)return;this.setState(prev=>({data:{...prev.data,[event.key]:event.value},tn:event.key==='challenge'?clamp(event.value?.tn||prev.tn,1,99):prev.tn}),()=>this.ensureActor());}}); }
+    connectRealtime(){ API.connectRealtime({onStatus:status=>this.setState({status}),onState:event=>{if(!event?.key)return;const value=event.key==='scenario'?normalizedScenario(event.value||{}):event.value;this.setState(prev=>({data:{...prev.data,[event.key]:value},tn:event.key==='challenge'?clamp(value?.tn||prev.tn,1,99):prev.tn}),()=>this.ensureActor());}}); }
     ensureActor(){
       if(this.state.profile?.role!=='master')return;
       const list=this.masterActors(); if(!list.length)return;
@@ -323,8 +434,53 @@
     async initRoll(id){if(this.state.initiativeAnimating)return;try{const data=await API.rollInitiativeParticipant(id);const roll=data.roll||data;this.setState(prev=>({data:{...prev.data,initiative:data.initiative||prev.data.initiative},initiativeRoll:roll,initiativeAnimating:true}));}catch(e){this.toast(e.message);}}
     async animateInitiativeRoll(){const root=document.getElementById('initiative-dice-stage'),roll=this.state.initiativeRoll;if(root&&roll)await animateDiceStage(root,roll.initialValues||roll.values);this.setState({initiativeAnimating:false});}
     async initRollAll(){const pending=(this.state.data.initiative||[]).filter(x=>x.result==null||x.result===''||!Number.isFinite(Number(x.result)));for(const item of pending){await this.initRoll(item.id);while(this.state.initiativeAnimating)await sleep(50);} }
-    async movePiece(x,y){const pieceId=this.state.selectedPiece;if(!pieceId)return;const piece=(this.state.data.scenario?.pieces||[]).find(p=>p.id===pieceId);if(!piece)return;try{const result=await API.moveScenarioPiece({pieceId,x,y,mode:'run',from:{x:piece.x,y:piece.y}});this.setState(prev=>({data:{...prev.data,scenario:result.scenario||prev.data.scenario}}));}catch(e){this.toast(e.message);}}
-    async resetMovement(){try{const values=this.state.profile.role==='master'?{all:true}:{pieceId:this.state.selectedPiece};const result=await API.resetScenarioMovement(values);this.setState(prev=>({data:{...prev.data,scenario:result.scenario||result?.data?.scenario||prev.data.scenario}}));}catch(e){this.toast(e.message);}}
+    async movePiece(x,y,mode='run',pieceId=''){
+      const scenario=normalizedScenario(this.state.data.scenario),owned=this.state.profile.role==='player'?scenario.pieces.find(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(this.state.profile.heroId||'')):null,id=pieceId||this.state.selectedPiece||owned?.id;if(!id)return;
+      const piece=scenario.pieces.find(p=>p.id===id);if(!piece)return;
+      try{const result=await API.moveScenarioPiece({pieceId:id,x,y,mode,from:{x:piece.x,y:piece.y}});this.setState(prev=>({data:{...prev.data,scenario:normalizedScenario(result.scenario||prev.data.scenario)},selectedPiece:id,moveMode:mode}));}catch(e){this.toast(e.message);}
+    }
+    async resetMovement(pieceId='',all=false){
+      try{const scenario=normalizedScenario(this.state.data.scenario),owned=this.state.profile.role==='player'?scenario.pieces.find(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(this.state.profile.heroId||'')):null;const values=this.state.profile.role==='master'?(all?{all:true}:{pieceId:pieceId||this.state.selectedPiece}):{pieceId:owned?.id||pieceId};const result=await API.resetScenarioMovement(values);this.setState(prev=>({data:{...prev.data,scenario:normalizedScenario(result.scenario||result?.data?.scenario||prev.data.scenario)}}));}catch(e){this.toast(e.message);}
+    }
+    async saveScenario(next,message=''){
+      if(this.state.profile.role!=='master')return;
+      const scenario=placePiecesSafely(next);this.setState(prev=>({data:{...prev.data,scenario}}));
+      try{await API.saveState('scenario',scenario);if(message)this.toast(message);}catch(e){this.toast(e.message||'Não foi possível salvar o cenário.');}
+    }
+    async setScenarioEnvironment(environment){const current=normalizedScenario(this.state.data.scenario);await this.saveScenario({...current,environment,baseTerrain:ENVIRONMENTS[environment]?.base||'floor'},'Ambiente atualizado.');}
+    async resizeScenario(value){const parts=String(value).split('x').map(Number);if(parts.length!==2)return;const current=normalizedScenario(this.state.data.scenario);await this.saveScenario({...current,width:clamp(parts[0],8,30),height:clamp(parts[1],7,24)},'Tamanho atualizado.');}
+    async applyScenarioPreset(){const preset=SCENARIO_PRESETS[this.state.scenarioPreset]||SCENARIO_PRESETS.empty,current=normalizedScenario(this.state.data.scenario),obstacles={},terrain={};for(const[type,x,y]of preset.obstacles||[])obstacles[scenarioKey(x,y)]=type;for(const[type,x,y]of preset.terrain||[])terrain[scenarioKey(x,y)]=type;await this.saveScenario({...current,preset:this.state.scenarioPreset,environment:preset.env,width:preset.w,height:preset.h,baseTerrain:ENVIRONMENTS[preset.env]?.base||'floor',obstacles,terrain,decor:{},turnMovement:{},movementSpent:{}},'Modelo aplicado.');}
+    async generateScenario(){
+      const current=normalizedScenario(this.state.data.scenario),environment=current.environment||'large-room',obstacles={},terrain={},w=current.width,h=current.height,setOb=(type,x,y)=>{if(x>=0&&y>=0&&x<w&&y<h)obstacles[scenarioKey(x,y)]=type;},setTer=(type,x,y)=>{if(x>=0&&y>=0&&x<w&&y<h)terrain[scenarioKey(x,y)]=type;};
+      if(['closed','small-room','lab','inn'].includes(environment)){for(let x=0;x<w;x++){setOb('wall',x,0);setOb('wall',x,h-1);}for(let y=1;y<h-1;y++){setOb('wall',0,y);setOb('wall',w-1,y);}setOb('door',Math.floor(w/2),0);}
+      const pools={lab:['crate','terminal','barrel','pillar'],garage:['car','crate','barrel','booth'],rooftop:['crate','cover','barrel','rock'],forest:['tree','tree','rock','log','stump'],lumber:['log','stump','tree','rock','crate'],inn:['table','counter','shelf','barrel'],ruins:['rubble','pillar','rock','wall','statue'],city:['car','cover','crate','rubble'],closed:['crate','cover','pillar','rubble'],'small-room':['crate','table','pillar'],'large-room':['crate','cover','barrel','pillar']}[environment]||['crate','cover','pillar'];
+      const count=Math.max(5,Math.floor(w*h/28));for(let i=0;i<count;i++){const x=1+Math.floor(Math.random()*Math.max(1,w-2)),y=1+Math.floor(Math.random()*Math.max(1,h-2));if(!obstacles[scenarioKey(x,y)])setOb(pools[Math.floor(Math.random()*pools.length)],x,y);}
+      if(environment==='forest'||environment==='lumber'){const row=Math.max(2,h-3);for(let x=Math.floor(w*.25);x<Math.floor(w*.75);x++)setTer('water',x,row);}
+      if(environment==='rooftop'){const gx=Math.floor(w*.42),gy=Math.floor(h*.35);for(let y=gy;y<Math.min(h,gy+2);y++)for(let x=gx;x<Math.min(w,gx+2);x++)setTer('gap',x,y);}
+      if(['lab','closed','large-room','ruins'].includes(environment)){const ex=Math.max(2,w-5),ey=2;setTer('ramp1',ex-1,ey);setTer('elev1',ex,ey);setTer('elev1',ex+1,ey);}
+      await this.saveScenario({...current,preset:'custom',baseTerrain:ENVIRONMENTS[environment]?.base||'floor',obstacles,terrain,decor:{},turnMovement:{},movementSpent:{}},'Mapa gerado.');
+    }
+    async clearScenarioMap(){const current=normalizedScenario(this.state.data.scenario);await this.saveScenario({...current,obstacles:{},terrain:{},decor:{},turnMovement:{},movementSpent:{}},'Mapa limpo.');}
+    async editScenarioCell(x,y,tool,piece){
+      if(this.state.profile.role!=='master')return;const next=normalizedScenario(this.state.data.scenario),key=scenarioKey(x,y);
+      if(tool==='erase'){delete next.obstacles[key];delete next.terrain[key];delete next.decor[key];if(piece){next.pieces=next.pieces.filter(p=>p.id!==piece.id);delete next.turnMovement[piece.id];delete next.movementSpent[piece.id];if(this.state.selectedPiece===piece.id)this.setState({selectedPiece:null});}}
+      else if(tool==='base'){delete next.terrain[key];}
+      else if(TERRAIN_TOOLS.has(tool)){delete next.obstacles[key];delete next.decor[key];next.terrain[key]=tool;}
+      else if(OBSTACLE_META[tool]){delete next.decor[key];next.obstacles[key]=tool;}
+      else if(String(tool).startsWith('decor-')){const decor=String(tool).slice(6);if(DECOR_META[decor])next.decor[key]=decor;}
+      await this.saveScenario(next);
+    }
+    async addScenarioPieces(){
+      const current=normalizedScenario(this.state.data.scenario),fallback=(this.state.data.heroes||[])[0]?`hero|${this.state.data.heroes[0].id}`:(this.state.data.villains||[])[0]?`villain|${this.state.data.villains[0].id}`:'other|minion-melee',choice=this.state.scenarioPieceChoice||fallback,[kind,id]=choice.split('|');let entity=null;if(kind==='hero')entity=(this.state.data.heroes||[]).find(e=>e.id===id);else if(kind==='villain')entity=(this.state.data.villains||[]).find(e=>e.id===id);else entity=MINIONS[id];if(!entity)return this.toast('Escolha um personagem.');
+      const qty=clamp(this.state.scenarioQty,1,20),next=normalizedScenario(current);let added=0;
+      for(let i=0;i<qty;i++){
+        if(kind==='hero'&&next.pieces.some(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(entity.id))){if(i===0)this.toast(`${entity.n} já está no cenário.`);break;}
+        const temp=placePiecesSafely(next),spots=safePlacementCells(temp).filter(c=>!temp.pieces.some(p=>Number(p.x)===c.x&&Number(p.y)===c.y));if(!spots.length)break;const spot=spots[Math.min(spots.length-1,Math.max(0,Math.floor(spots.length*.12)+i))],pieceKind=kind==='hero'?'hero':'enemy';
+        next.pieces.push({id:`piece-${entity.id}-${Date.now()}-${i}-${Math.random().toString(36).slice(2,6)}`,kind:pieceKind,tier:kind==='other'?'minion':kind==='villain'?'main':undefined,baseId:entity.id,characterId:entity.id,name:qty>1?`${entity.n} ${i+1}`:entity.n,short:monogram(entity.n),image:entity.image||'',x:spot.x,y:spot.y,movement:{...(entity.movement||{})},maxHealth:entity.maxHealth??null,currentHealth:entity.currentHealth??entity.maxHealth??null,maxFocus:entity.maxFocus??null,currentFocus:entity.currentFocus??entity.maxFocus??null});added++;
+      }
+      await this.saveScenario(next,`${added} peça${added===1?'':'s'} adicionada${added===1?'':'s'}.`);
+    }
+    async removeScenarioPiece(pieceId){const next=normalizedScenario(this.state.data.scenario);next.pieces=next.pieces.filter(p=>p.id!==pieceId);delete next.turnMovement[pieceId];delete next.movementSpent[pieceId];this.setState({selectedPiece:null});await this.saveScenario(next,'Peça removida.');}
     openSheet(entity,kind){this.setState({sheet:{entity,kind}});}
 
     renderLogin(){
@@ -365,17 +521,20 @@
         identityPanel=h(Card,{key:'actors',className:'p-4 sm:p-5'},[
           h(TinyLabel,{key:'l'},'QUEM ESTÁ AGINDO?'),
           h('div',{key:'x',className:'mt-3'},h(CharacterStrip,{items:this.masterActors(),selectedKey:s.actorKey,onSelect:key=>this.setState({actorKey:key,roll:null,power:''})})),
-          entity?h('div',{key:'res',className:'mt-4 grid gap-3 lg:grid-cols-[1fr_1fr_auto]'},[
-            h(ResourceControl,{key:'h',label:'HEALTH',current:entity.currentHealth??entity.maxHealth??0,max:entity.maxHealth??0,onDelta:v=>this.adjustResource(v,'health'),onSet:v=>this.adjustResource(v,'health',true)}),
-            h(ResourceControl,{key:'f',label:'FOCUS',current:entity.currentFocus??entity.maxFocus??0,max:entity.maxFocus??0,onDelta:v=>this.adjustResource(v,'focus'),onSet:v=>this.adjustResource(v,'focus',true)}),
-            h(Button,{key:'s',onClick:()=>this.openSheet(entity,kind),className:'self-stretch lg:min-w-28'},'VER FICHA')
+          entity?h('div',{key:'selected',className:'mt-4 grid gap-4 border-t border-white/5 pt-4 lg:grid-cols-[auto_1fr] lg:items-center'},[
+            h('div',{key:'id',className:'flex items-center gap-4'},[h(Portrait,{key:'p',entity,size:'xl'}),h('div',{key:'t'},[h(TinyLabel,{key:'l'},kind==='other'?'CAPANGA':kind==='hero'?'HERÓI':'VILÃO'),h('b',{key:'n',className:'mt-1 block text-xl sm:text-2xl'},entity.n),h('span',{key:'r',className:'text-sm text-[#7e8896]'},entity.r||entity.role||'')])]),
+            h('div',{key:'res',className:'grid gap-3 sm:grid-cols-2'},[
+              h(ResourceControl,{key:'h',label:'HEALTH',current:entity.currentHealth??entity.maxHealth??0,max:entity.maxHealth??0,onDelta:v=>this.adjustResource(v,'health'),onSet:v=>this.adjustResource(v,'health',true)}),
+              h(ResourceControl,{key:'f',label:'FOCUS',current:entity.currentFocus??entity.maxFocus??0,max:entity.maxFocus??0,onDelta:v=>this.adjustResource(v,'focus'),onSet:v=>this.adjustResource(v,'focus',true)}),
+              h(Button,{key:'s',onClick:()=>this.openSheet(entity,kind),className:'sm:col-span-2'},'VER FICHA')
+            ])
           ]):null
         ]);
       } else {
         identityPanel=h(Card,{key:'hero',className:'p-4 sm:p-5'},h('div',{className:'grid gap-4 lg:grid-cols-[1fr_1.1fr] lg:items-center'},[
           h('div',{key:'id',className:'flex items-center gap-4'},[
-            h(Portrait,{key:'p',entity,size:'md'}),
-            h('div',{key:'t'},[h(TinyLabel,{key:'l'},'PERSONAGEM'),h('b',{key:'n',className:'mt-1 block text-lg'},entity?.n||'Personagem'),h('span',{key:'r',className:'text-sm text-[#7e8896]'},entity?.r||'')])
+            h(Portrait,{key:'p',entity,size:'xl'}),
+            h('div',{key:'t'},[h(TinyLabel,{key:'l'},'PERSONAGEM'),h('b',{key:'n',className:'mt-1 block text-xl sm:text-2xl'},entity?.n||'Personagem'),h('span',{key:'r',className:'text-sm text-[#7e8896]'},entity?.r||'')])
           ]),
           h('div',{key:'res',className:'grid gap-3 sm:grid-cols-2'},[
             h(ResourceControl,{key:'h',label:'HEALTH',current:entity?.currentHealth??entity?.maxHealth??0,max:entity?.maxHealth??0,onDelta:v=>this.adjustResource(v,'health'),onSet:v=>this.adjustResource(v,'health',true)}),
@@ -397,7 +556,7 @@
         isMaster?h(InitiativePanel,{key:'init',initiative:d.initiative||[],choices:[...(d.heroes||[]),...(d.villains||[]),...Object.values(MINIONS)],onAdd:id=>this.initAdd(id),onRemove:id=>this.initRemove(id),onRoll:id=>this.initRoll(id),onRollAll:()=>this.initRollAll(),lastRoll:s.initiativeRoll,animating:s.initiativeAnimating}):null,
         identityPanel,
         h(ActionCenter,{key:'act',entity:actorItem?.entity||entity,category:s.category,onCategory:category=>this.setState({category,power:'',roll:null}),onRoll:(a,c)=>this.runAction(a,c),roll:s.roll,animating:s.rollAnimating,onEdge:i=>this.useEdge(i),onFinalize:()=>this.finalizeRoll(),tn:s.tn,onTN:tn=>this.updateTN(tn),power:s.power,onPower:power=>this.setState({power,roll:null}),edge:s.edge,trouble:s.trouble,onEdgeChange:edge=>this.setState({edge}),onTroubleChange:trouble=>this.setState({trouble})}),
-        h('div',{key:'board'},h(Board,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:s.profile.role,heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y)=>this.movePiece(x,y),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement()})),
+        h('div',{key:'board'},h(Board,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:s.profile.role,heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',isMaster),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode})})),
         isMaster?h(RollHistory,{key:'hist',rows:d.actionHistory||[]}):null
       ]);
     }
@@ -407,11 +566,16 @@
       return h('div',null,[h(TinyLabel,{key:'s'},kind==='hero'?'DOSSIÊS':'AMEAÇAS'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},kind==='hero'?'Heróis':'Vilões'),h('div',{key:'g',className:'mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3'},items.map(entity=>h(Card,{key:entity.id,className:'overflow-hidden'},h('button',{onClick:()=>this.openSheet(entity,kind),className:'flex w-full items-center gap-4 p-4 text-left'},[h(Portrait,{key:'p',entity,size:'md'}),h('div',{key:'t',className:'min-w-0 flex-1'},[h(TinyLabel,{key:'l'},kind==='hero'?'HERÓI':entity.tier||'VILÃO'),h('b',{key:'n',className:'mt-1 block truncate text-base'},entity.n),h('span',{key:'r',className:'block truncate text-xs text-[#7c8694]'},entity.r||entity.role||''),h('small',{key:'v',className:'mt-2 block text-[10px] text-[#8c95a2]'},`HP ${entity.currentHealth??entity.maxHealth}/${entity.maxHealth} · FO ${entity.currentFocus??entity.maxFocus}/${entity.maxFocus}`)])]))))]);
     }
     renderCampaign(){ const c=this.state.data.campaignContent||{};const sessions=c.sessions||[];return h('div',null,[h(TinyLabel,{key:'s'},'CAMPANHA'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},c.title||this.state.selectedCampaign?.name||'Campanha'),h('p',{key:'p',className:'mt-2 max-w-3xl text-sm leading-6 text-[#8b95a3]'},c.summary||c.subtitle||''),h('div',{key:'m',className:'mt-4 flex flex-wrap gap-2'},[c.rank&&h('span',{key:'r',className:'rounded-lg border border-white/10 px-3 py-2 text-xs'},`RANK ${c.rank}`),c.mode&&h('span',{key:'o',className:'rounded-lg border border-white/10 px-3 py-2 text-xs'},c.mode==='solo'?'SOLO':'GRUPO'),c.campaignPdf&&h('a',{key:'pdf',href:c.campaignPdf,target:'_blank',rel:'noopener',className:'rounded-lg border border-[#ef3340]/40 bg-[#ef3340]/10 px-3 py-2 text-xs font-black'},'ABRIR PDF')]),h('div',{key:'list',className:'mt-6 space-y-2'},sessions.map((session,i)=>h(Card,{key:session.id||i,className:'p-4'},[h(TinyLabel,{key:'i'},session.id||String(i+1).padStart(2,'0')),h('b',{key:'t',className:'mt-1 block'},session.title),h('p',{key:'p',className:'mt-2 text-sm leading-6 text-[#858f9d]'},session.text)]))) ]); }
+    renderScenarioPage(){
+      const s=this.state,d=s.data;if(s.profile.role!=='master')return h('div',{className:'space-y-4'},[h('section',{key:'h'},[h(TinyLabel,{key:'s'},'CENÁRIO'),h('h1',{key:'t',className:'mt-1 text-3xl font-black'},'Movimentação'),h('p',{key:'p',className:'mt-1 text-sm text-[#7f8997]'},'As casas verdes mostram exatamente onde seu personagem pode chegar.')]),h(Board,{key:'b',scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:'player',heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',false),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode})})]);
+      return h(ScenarioBuilder,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',true),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),tool:s.scenarioTool,onTool:scenarioTool=>this.setState({scenarioTool}),preset:s.scenarioPreset,onPreset:scenarioPreset=>this.setState({scenarioPreset}),onApplyPreset:()=>this.applyScenarioPreset(),onGenerate:()=>this.generateScenario(),onClear:()=>this.clearScenarioMap(),onResize:value=>this.resizeScenario(value),onEnvironment:value=>this.setScenarioEnvironment(value),pieceChoice:s.scenarioPieceChoice,onPieceChoice:scenarioPieceChoice=>this.setState({scenarioPieceChoice}),qty:s.scenarioQty,onQty:scenarioQty=>this.setState({scenarioQty}),onAddPieces:()=>this.addScenarioPieces(),onEditCell:(x,y,tool,piece)=>this.editScenarioCell(x,y,tool,piece),onRemovePiece:id=>this.removeScenarioPiece(id)});
+    }
+
     renderRules(){return h('div',null,[h(TinyLabel,{key:'s'},'REFERÊNCIA RÁPIDA'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},'Regras'),h('div',{key:'g',className:'mt-5 grid gap-3 md:grid-cols-2'},[
       ['D616','Role dois D6 comuns e o Marvel Die. Some os dados, tratando M como 6, e acrescente o modificador da habilidade.'],['Fantastic','Se o Marvel Die mostra M, o resultado é Fantastic. O resultado total ainda é comparado ao TN.'],['Edge','Quando houver Edge, rerrole um dos dados e mantenha o melhor resultado.'],['Trouble','Quando houver Trouble, um dado é rerrolado e o pior resultado é mantido. Edge e Trouble se anulam um a um.'],['Central','O Arachne é apoio de mesa: as rolagens informam resultado e dano da ficha, sem escolher alvo nem aplicar dano automaticamente.']
     ].map((x,i)=>h(Card,{key:i,className:'p-4'},[h('b',{key:'b'},x[0]),h('p',{key:'p',className:'mt-2 text-sm leading-6 text-[#858f9d]'},x[1])])))]);}
     renderNotes(){const value=this.state.data.notesMaster||'';return h('div',null,[h(TinyLabel,{key:'s'},'MESTRE'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},'Anotações'),h('textarea',{key:'t',value,onChange:e=>this.setState(prev=>({data:{...prev.data,notesMaster:e.target.value}})),onBlur:async e=>{try{await API.saveState('notesMaster',e.target.value);this.toast('Anotações salvas.');}catch(err){this.toast(err.message);}},placeholder:'Anotações da sessão...',className:'mt-5 min-h-[55vh] w-full rounded-2xl border border-white/10 bg-[#0e131a] p-4 text-sm leading-6 outline-none focus:border-[#ef3340]/60'})]);}
-    renderPage(){switch(this.state.page){case'heroes':return this.renderRoster('hero');case'villains':return this.renderRoster('villain');case'campaign':return this.renderCampaign();case'scenario':return h(Board,{scenario:this.state.data.scenario,heroes:this.state.data.heroes,villains:this.state.data.villains,role:this.state.profile.role,heroId:this.state.profile.heroId,selected:this.state.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y)=>this.movePiece(x,y),zoom:this.state.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement()});case'rules':return this.renderRules();case'notes':return this.renderNotes();default:return this.renderCentral();}}
+    renderPage(){switch(this.state.page){case'heroes':return this.renderRoster('hero');case'villains':return this.renderRoster('villain');case'campaign':return this.renderCampaign();case'scenario':return this.renderScenarioPage();case'rules':return this.renderRules();case'notes':return this.renderNotes();default:return this.renderCentral();}}
     renderApp(){const s=this.state,campaign=s.profile?.campaign||s.selectedCampaign;return h('div',{className:'min-h-screen bg-[#080b10] text-white'},[
       h(Sidebar,{key:'side',page:s.page,onPage:p=>this.setPage(p),profile:s.profile,campaign,onLogout:()=>this.logout(),open:s.navOpen,onClose:()=>this.setState({navOpen:false})}),
       s.navOpen?h('button',{key:'back',onClick:()=>this.setState({navOpen:false}),className:'fixed inset-0 z-30 bg-black/70 lg:hidden','aria-label':'Fechar menu'}):null,

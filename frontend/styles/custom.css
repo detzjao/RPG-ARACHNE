@@ -53,3 +53,34 @@ img[src$="villain-tombstone.webp"]{--portrait-position:center 24%;--portrait-sca
 img[src$="villain-t-ray.webp"]{--portrait-position:62% 0%;--portrait-scale:1.03}
 img[src$="hero-vision.webp"]{--portrait-position:center 18%;--portrait-scale:1.25}
 img[src$="villain-kingpin.webp"]{--portrait-position:center 8%;--portrait-scale:1.05}
+
+/* v45 · Montador de cenário e alcance de movimento */
+.board-cell{width:52px;height:52px;transition:filter .12s ease,box-shadow .12s ease,outline-color .12s ease}
+.board-token{inset:5px;font-size:10px}
+.board-token.movable{border-color:#d7a638}
+.board-cell.reachable-cell{cursor:pointer;box-shadow:inset 0 0 0 2px rgba(52,211,153,.56),inset 0 0 22px rgba(16,185,129,.16);z-index:1}
+.board-cell.reachable-cell::after{content:"";position:absolute;inset:4px;border-radius:7px;background:rgba(16,185,129,.10);pointer-events:none}
+.board-cell.reachable-cell:hover{outline:2px solid rgba(110,231,183,.95);filter:brightness(1.18);z-index:3}
+.move-cost{position:absolute;right:2px;bottom:2px;z-index:4;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#064e3b;border:1px solid rgba(110,231,183,.55);color:#a7f3d0;font-size:8px;line-height:14px;text-align:center;font-weight:950;pointer-events:none}
+.board-cell.editor-cell{cursor:crosshair}.board-cell.editor-cell:hover{outline:2px solid rgba(239,51,64,.72);z-index:3}
+.board-cell.terrain-floor{background:linear-gradient(145deg,#1b212b,#11161d)}
+.board-cell.terrain-labfloor{background:linear-gradient(145deg,#1b2530,#10171e)}
+.board-cell.terrain-parking{background:linear-gradient(145deg,#25272a,#16181b)}
+.board-cell.terrain-roof{background:linear-gradient(145deg,#242329,#15141a)}
+.board-cell.terrain-wood{background:linear-gradient(145deg,#30261e,#19130f)}
+.board-cell.terrain-stone{background:linear-gradient(145deg,#292b2d,#17191b)}
+.board-cell.terrain-grass{background:linear-gradient(145deg,#1d2a20,#101811)}
+.board-cell.terrain-road{background:linear-gradient(145deg,#25292d,#121519)}
+.board-cell.terrain-elev1{background:linear-gradient(145deg,#343b45,#202630);box-shadow:inset 0 0 0 2px rgba(148,163,184,.16)}
+.board-cell.terrain-elev2{background:linear-gradient(145deg,#46505d,#252c35);box-shadow:inset 0 0 0 3px rgba(203,213,225,.18)}
+.board-cell.terrain-ramp1{background:linear-gradient(135deg,#313a45 0 45%,#202630 46% 55%,#151b22 56%)}
+.board-cell.terrain-ramp2{background:linear-gradient(135deg,#46505d 0 45%,#2c3440 46% 55%,#181e26 56%)}
+.board-cell.terrain-water{background:repeating-linear-gradient(135deg,#102b3c 0 8px,#12364a 8px 16px)!important}
+.board-cell.terrain-gap{background:radial-gradient(circle at 50% 40%,#050608,#020304 72%)!important;box-shadow:inset 0 0 14px #000}
+.board-cell.has-obstacle{box-shadow:inset 0 0 0 1px rgba(239,68,68,.14)}
+.obstacle-mark{z-index:1;font-size:15px;color:#c08c94;text-shadow:0 1px 7px #000;font-weight:950}
+.board-cell.obstacle-door .obstacle-mark,.board-cell.obstacle-rubble .obstacle-mark,.board-cell.obstacle-dock .obstacle-mark,.board-cell.obstacle-campfire .obstacle-mark{color:#d5b96c}
+.board-cell.obstacle-tree .obstacle-mark{color:#76a871}.board-cell.obstacle-rock .obstacle-mark{color:#9ca3af}.board-cell.obstacle-car .obstacle-mark{color:#7aa6c9}
+.board-cell.selected-piece{z-index:4}.board-cell.selected-piece .board-token{outline:3px solid #ef3340;outline-offset:2px;box-shadow:0 0 0 5px rgba(239,51,64,.14),0 8px 20px #000b}
+@media(max-width:640px){.board-cell{width:46px;height:46px}.board-token{inset:4px}.move-cost{right:1px;bottom:1px}}
+.decor-mark{position:absolute;inset:0;display:grid;place-items:center;z-index:0;color:rgba(203,213,225,.24);font-size:17px;font-weight:900;pointer-events:none}.board-cell.has-piece .decor-mark{opacity:.45}.board-cell.reachable-cell .decor-mark{opacity:.3}

@@ -1,4 +1,25 @@
+# v45.1 — Correção de atualização do frontend
+
+- Corrige cache de JavaScript e CSS que podia fazer a v45 abrir visualmente como a v44.
+- `index.html` passa a usar identificação de build nos assets principais.
+- JS/CSS/HTML passam a usar `no-store/no-cache` quando servidos pelo backend local.
+- Imagens e retratos continuam com cache otimizado para não prejudicar performance.
+
 # Changelog
+
+## [UI 45] - 2026-09-05
+
+### Cenário e movimentação
+- Retrato principal do personagem ampliado na Central do Jogador e na seleção ativa do Mestre.
+- Grid destaca em verde apenas as casas alcançáveis pelo personagem selecionado e mostra o custo de cada destino.
+- Prévia de alcance considera modo de movimento, orçamento restante, terreno, água, elevação, obstáculos e ocupação, espelhando a validação autoritativa do backend.
+- Jogador continua movendo somente o próprio herói; Mestre pode controlar todas as peças.
+- Página Cenário do Mestre ganhou montador com tamanho, ambiente, modelos, geração rápida, terreno, obstáculos, decoração e inclusão/remoção de peças.
+- Redimensionamento e aplicação de modelos reposicionam peças em células seguras.
+
+### Preservado
+- Mesmo objeto `scenario`, mesmas APIs e mesmo realtime; nenhum segundo grid foi criado.
+- D616, Edge/Trouble, Health/Focus, dano informativo, fichas, iniciativa e campanha solo permanecem inalterados.
 
 ## [UI 44] - 2026-09-05
 
