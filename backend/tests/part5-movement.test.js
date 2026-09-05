@@ -17,9 +17,9 @@ test('backend reutiliza as regras existentes de alcance, ocupação e orçamento
   assert.equal(moved.cost,1);assert.equal(moved.remaining,4);assert.equal(moved.scenario.turnMovement['hero-a'].spent,1);
 });
 
-test('frontend libera apenas o próprio token no turno e usa a API dedicada',()=>{
+test('frontend libera apenas o próprio token sem exigir turno e usa a API dedicada',()=>{
   assert.match(script,/function playerCanMoveScenario\(\)/);
-  assert.match(script,/Aguarde seu turno para movimentar seu personagem\./);
+  assert.doesNotMatch(script,/Aguarde seu turno para movimentar seu personagem\./);
   assert.match(script,/piece\.id!==own\.id/);
   assert.match(script,/ArachneAPI\.moveScenarioPiece/);
   assert.match(api,/request\('\/scenario\/move',\{method:'PATCH'/);

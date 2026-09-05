@@ -15,7 +15,7 @@ test('Central de combate oferece iniciativa D616 sem pedir modificador manual',(
   assert.match(script,/data-central-init-roll=/);
   assert.match(script,/data-central-roll-all/);
   assert.match(script,/central-initiative-dice-stage/);
-  assert.match(script,/O servidor gera a D616 e usa o modificador da ficha/);
+  assert.doesNotMatch(script,/O servidor gera a D616 e usa o modificador da ficha/);
   assert.doesNotMatch(script,/data-central-init-result=/);
   assert.match(script,/initiative-add-only/);
 });

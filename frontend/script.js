@@ -32,7 +32,13 @@
 
   function portraitDisplaySrc(value,{small=false}={}) {
     let src=String(value||'');
-    if(small&&/^\/?assets\/portraits\/(?!thumbs\/)/i.test(src)) src=src.replace(/^(\/?assets\/portraits\/)/i,'$1thumbs/');
+    if(small&&/^\/?assets\/portraits\/(?!thumbs\/)/i.test(src)) {
+      const [pathPart,...queryParts]=src.split('?');
+      const thumbPath=pathPart
+        .replace(/^(\/?assets\/portraits\/)/i,'$1thumbs/')
+        .replace(/\.(?:png|jpe?g|webp)$/i,'.webp');
+      src=queryParts.length?`${thumbPath}?${queryParts.join('?')}`:thumbPath;
+    }
     return versionedPortraitSrc(src);
   }
 
@@ -182,7 +188,7 @@
     {
       id:'aim-agent', n:'Agente da I.M.A.', r:'Identidade variável', i:'🧪', rank:1, tier:'CAPANGA', pdf:'assets/pdfs/villain-agente-ima.pdf',
       role:'Cientista / suporte tecnológico', hook:'Unidade científica extra para laboratórios, escoltas e encontros tecnológicos.',
-      maxHealth:10, maxFocus:60, currentHealth:10, currentFocus:60, karma:'—', healthDR:'—', focusDR:'—', initiative:'+1',
+      maxHealth:30, maxFocus:60, currentHealth:30, currentFocus:60, karma:'—', healthDR:'—', focusDR:'—', initiative:'+1',
       speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3', movement:{run:5,climb:3,swim:3,jump:3}, occupation:'Cientista', origin:'Alta Tecnologia', teams:'I.M.A.', base:'Q.G. da I.M.A.',
       abilities:{Melee:0,Agility:1,Resilience:0,Vigilance:1,Ego:1,Logic:3},
       traits:['Pronto para Batalha','Inventor','Dependência Tecnológica','Especialista Científico'],
@@ -224,15 +230,19 @@
 
   // Biblioteca privada de ameaças. Só é renderizada quando o perfil Mestre está ativo.
   const MINION_TEMPLATES = {
-    'minion-melee': {id:'minion-melee', n:'Capanga · Curta distância', i:'◆', abilities:{Melee:2,Agility:1,Resilience:2,Vigilance:1,Ego:0,Logic:0}, movement:{run:5,climb:3,swim:3,jump:3}, initiative:'+1', damage:{Melee:[2,2],Agility:[1,1],Ego:[1,0],Logic:[1,0]}},
-    'minion-ranged': {id:'minion-ranged', n:'Capanga · Longo alcance', i:'◇', abilities:{Melee:1,Agility:2,Resilience:1,Vigilance:2,Ego:0,Logic:0}, movement:{run:5,climb:3,swim:3,jump:3}, initiative:'+2', damage:{Melee:[1,1],Agility:[2,2],Ego:[1,0],Logic:[1,0]}},
-    'minion-support': {id:'minion-support', n:'Capanga · Suporte', i:'✦', abilities:{Melee:0,Agility:1,Resilience:1,Vigilance:2,Ego:1,Logic:2}, movement:{run:5,climb:3,swim:3,jump:3}, initiative:'+2', damage:{Melee:[1,0],Agility:[1,1],Ego:[1,1],Logic:[2,2]}}
+    'minion-melee': {id:'minion-melee', n:'Capanga · Curta distância', i:'◆', maxHealth:40,currentHealth:40,maxFocus:30,currentFocus:30, abilities:{Melee:2,Agility:1,Resilience:2,Vigilance:1,Ego:0,Logic:0}, movement:{run:5,climb:3,swim:3,jump:3}, initiative:'+1', damage:{Melee:[2,2],Agility:[1,1],Ego:[1,0],Logic:[1,0]}},
+    'minion-ranged': {id:'minion-ranged', n:'Capanga · Longo alcance', i:'◇', maxHealth:30,currentHealth:30,maxFocus:30,currentFocus:30, abilities:{Melee:1,Agility:2,Resilience:1,Vigilance:2,Ego:0,Logic:0}, movement:{run:5,climb:3,swim:3,jump:3}, initiative:'+2', damage:{Melee:[1,1],Agility:[2,2],Ego:[1,0],Logic:[1,0]}},
+    'minion-support': {id:'minion-support', n:'Capanga · Suporte', i:'✦', maxHealth:30,currentHealth:30,maxFocus:40,currentFocus:40, abilities:{Melee:0,Agility:1,Resilience:1,Vigilance:2,Ego:1,Logic:2}, movement:{run:5,climb:3,swim:3,jump:3}, initiative:'+2', damage:{Melee:[1,0],Agility:[1,1],Ego:[1,1],Logic:[2,2]}}
   };
 
 
   const DEFAULT_SCENARIO = {
     preset:'empty', environment:'lab', width:20, height:14, baseTerrain:'floor', selectedTool:'select', selectedPiece:null, selectedMode:'run', zoom:1,
-    obstacles:{}, terrain:{}, decor:{}, turnMovement:{}, movementSpent:{}, pieces:[
+    obstacles:{}, terrain:{}, decor:{}, turnMovement:{}, movementSpent:{}, minionVitals:{
+      'minion-melee':{maxHealth:40,currentHealth:40,maxFocus:30,currentFocus:30},
+      'minion-ranged':{maxHealth:30,currentHealth:30,maxFocus:30,currentFocus:30},
+      'minion-support':{maxHealth:30,currentHealth:30,maxFocus:40,currentFocus:40}
+    }, pieces:[
       {id:'hero-spider',kind:'hero',baseId:'spider',name:'Homem-Aranha',short:'HA',color:'#ef4444',x:2,y:11,movement:{run:6,climb:6,swim:3,jump:6,glide:12,swingline:18}},
       {id:'hero-wolverine',kind:'hero',baseId:'wolverine',name:'Wolverine',short:'W',color:'#facc15',x:4,y:12,movement:{run:5,climb:3,swim:3,jump:3}},
       {id:'hero-cap',kind:'hero',baseId:'cap',name:'Capitão América',short:'CA',color:'#3b82f6',x:2,y:12,movement:{run:5,climb:3,swim:3,jump:3}}
@@ -257,7 +267,7 @@
   }
 
   function characterArtMarkup(id, label, extraClass = '', custom = '') {
-    const src = portraitDisplaySrc(characterArt(id, custom));
+    const src = portraitDisplaySrc(characterArt(id, custom), {small:true});
     const pos = characterArtPosition(id);
     return src
       ? `<img class="character-art-image ${extraClass}" src="${escapeHTML(src)}" alt="${escapeHTML(label)}" loading="lazy" decoding="async" style="object-position:${escapeHTML(pos)}">`
@@ -489,6 +499,9 @@
     if ($('selected-campaign-name')) $('selected-campaign-name').textContent = campaign.name;
     $('login-title').textContent = campaign.name.toUpperCase();
     $('campaign-error').textContent = '';
+    const soloMode = (state.campaignContent?.mode||campaign.campaignContent?.mode) === 'solo';
+    if ($('player-login')) $('player-login').classList.toggle('hidden',soloMode);
+    if ($('master-login')) $('master-login').textContent = soloMode ? 'ENTRAR NA CAMPANHA SOLO' : 'ENTRAR COMO MESTRE';
     applyCampaignBranding();
   }
 
@@ -503,6 +516,8 @@
     qsa('.login-actions').forEach(el=>el.classList.remove('hidden'));
     $('campaign-hub')?.classList.remove('hidden');
     $('login-title').textContent = 'SUAS CAMPANHAS';
+    if ($('player-login')) $('player-login').classList.remove('hidden');
+    if ($('master-login')) $('master-login').textContent = 'ENTRAR COMO MESTRE';
     renderCampaignLibrary();
   }
 
@@ -607,7 +622,7 @@
     wrap.innerHTML = availableTemplates.map(template => {
       const featured = (template.villains || []).find(item => item.image) || (template.heroes || []).find(item => item.image) || template.villains?.[0] || template.heroes?.[0];
       const art = featured ? characterArtMarkup(featured.id, featured.n, 'template-card-art-image', featured.image || '') : `<span class="hero-glyph template-card-art-image"><b>${escapeHTML(String(template.name||'C').slice(0,1).toUpperCase())}</b><small>CAMPANHA</small></span>`;
-      return `<button type="button" class="template-card ${selectedTemplateId===template.id?'active':''}" data-template-id="${escapeHTML(template.id)}" style="--template-accent:${escapeHTML(template.accent||'#ef3340')}"><span class="template-card-art">${art}</span><div><small>${escapeHTML(template.players)} JOGADORES · RANK ${escapeHTML(template.rank)} · ${escapeHTML((template.sessions||[]).length)} SESSÕES</small><b>${escapeHTML(template.name)}</b><span>${escapeHTML(template.subtitle||template.summary||'')}</span></div><em>${escapeHTML(template.finalVillain||'')}</em></button>`;
+      return `<button type="button" class="template-card ${selectedTemplateId===template.id?'active':''}" data-template-id="${escapeHTML(template.id)}" style="--template-accent:${escapeHTML(template.accent||'#ef3340')}"><span class="template-card-art">${art}</span><div><small>${template.mode==='solo'?'SOLO':`${escapeHTML(template.players)} JOGADORES`} · RANK ${escapeHTML(template.rank)} · ${escapeHTML((template.sessions||[]).length)} ${template.mode==='solo'?'ATOS':'SESSÕES'}</small><b>${escapeHTML(template.name)}</b><span>${escapeHTML(template.subtitle||template.summary||'')}</span></div><em>${escapeHTML(template.finalVillain||'')}</em></button>`;
     }).join('') || '<div class="campaign-empty">Nenhuma campanha pronta disponível.</div>';
   }
 
@@ -619,7 +634,7 @@
     const villains = allTemplateCharacters('villain').filter(item => builderVillainIds.includes(item.id));
     if (createCampaignMode === 'template' && template) {
       const featured = villains.find(item=>item.image) || heroes.find(item=>item.image) || villains[0] || heroes[0];
-      wrap.innerHTML = `<div class="template-preview-card" style="--template-accent:${escapeHTML(template.accent||'#ef3340')}"><div class="template-preview-art">${featured ? characterArtMarkup(featured.id, featured.n, 'template-preview-art-image', featured.image || '') : ''}<span class="template-preview-shade"></span><div class="template-preview-copy"><small>CAMPANHA BASE</small><b>${escapeHTML(template.name)}</b><span>${escapeHTML(template.summary || template.subtitle || '')}</span><div class="template-preview-meta"><span>${heroes.length} heróis</span><span>${villains.length} vilões</span><span>${(template.sessions||[]).length} sessões</span></div></div></div><div class="template-preview-roster"><div><small>HERÓIS SELECIONADOS</small><p>${heroes.map(item=>escapeHTML(item.n)).join(' · ') || 'Nenhum'}</p></div><div><small>VILÕES SELECIONADOS</small><p>${villains.map(item=>escapeHTML(item.n)).join(' · ') || 'Nenhum'}</p></div></div></div>`;
+      wrap.innerHTML = `<div class="template-preview-card" style="--template-accent:${escapeHTML(template.accent||'#ef3340')}"><div class="template-preview-art">${featured ? characterArtMarkup(featured.id, featured.n, 'template-preview-art-image', featured.image || '') : ''}<span class="template-preview-shade"></span><div class="template-preview-copy"><small>CAMPANHA BASE</small><b>${escapeHTML(template.name)}</b><span>${escapeHTML(template.summary || template.subtitle || '')}</span><div class="template-preview-meta"><span>${heroes.length} heróis</span><span>${villains.length} vilões</span><span>${(template.sessions||[]).length} ${template.mode==='solo'?'atos':'sessões'}</span></div></div></div><div class="template-preview-roster"><div><small>HERÓIS SELECIONADOS</small><p>${heroes.map(item=>escapeHTML(item.n)).join(' · ') || 'Nenhum'}</p></div><div><small>VILÕES SELECIONADOS</small><p>${villains.map(item=>escapeHTML(item.n)).join(' · ') || 'Nenhum'}</p></div></div></div>`;
       return;
     }
     const label = createCampaignMode === 'pdf' ? 'CAMPANHA POR PDF' : 'CAMPANHA EM BRANCO';
@@ -822,45 +837,65 @@
     if (key === 'heroes' && Array.isArray(value)) {
       state.heroes = normalizeHeroList(value);
       localStorage.setItem(STORAGE.heroes, JSON.stringify(state.heroes));
-      renderHeroes();
-      renderChallengeSummary();
-      renderSessionCentral();
-      renderCombatConsole();
+      if(state.page==='heroes') renderHeroes();
+      if(state.page==='dice') renderChallengeSummary();
+      if(state.page==='home') renderSessionCentral();
+      if(state.page==='combat') renderCombatConsole();
     } else if (key === 'villains' && state.role === 'master' && Array.isArray(value)) {
       state.villains = normalizeVillainList(value);
       localStorage.setItem(STORAGE.villains, JSON.stringify(state.villains));
-      renderVillains();
-      renderActorOptions();
-      renderSessionCentral();
+      if(state.page==='villains') renderVillains();
+      if(state.page==='dice') renderActorOptions();
+      if(state.page==='home') renderSessionCentral();
     } else if (key === 'campaign' && state.role === 'master' && value && typeof value === 'object') {
-      state.campaign = value; localStorage.setItem(STORAGE.campaign, JSON.stringify(value)); renderCampaign();
+      state.campaign = value;
+      localStorage.setItem(STORAGE.campaign, JSON.stringify(value));
+      if(state.page==='campaign') renderCampaign();
+      if(state.page==='home') renderSessionCentral();
     } else if (key === 'campaignContent' && value && typeof value === 'object') {
-      state.campaignContent = {...clone(DEFAULT_CAMPAIGN_CONTENT), ...value}; localStorage.setItem(STORAGE.campaignContent, JSON.stringify(state.campaignContent)); renderCampaign(); applyCampaignBranding(); renderSessionCentral();
+      state.campaignContent = {...clone(DEFAULT_CAMPAIGN_CONTENT), ...value};
+      localStorage.setItem(STORAGE.campaignContent, JSON.stringify(state.campaignContent));
+      if(state.page==='campaign') renderCampaign();
+      applyCampaignBranding();
+      if(state.page==='home') renderSessionCentral();
     } else if (key === 'dice' && Array.isArray(value)) {
       const previousAt = state.diceHistory?.[0]?.at;
-      state.diceHistory = value; localStorage.setItem(STORAGE.dice, JSON.stringify(value)); renderDiceHistory(); renderHomeLiveRolls(); renderPlayerLiveDice(); renderSessionCentral();
+      state.diceHistory = value;
+      localStorage.setItem(STORAGE.dice, JSON.stringify(value));
+      if(state.page==='dice') renderDiceHistory();
+      if(state.page==='home') { renderHomeLiveRolls(); renderPlayerLiveDice(); renderSessionCentral(); }
       const latest = value[0];
       if (state.role === 'player' && latest && latest.at !== previousAt) {
-        animatePlayerLiveDice(latest);
+        if(state.page==='home') animatePlayerLiveDice(latest);
         toast(`Rolagem · ${latest.label}: ${latest.total}`);
       }
     } else if (key === 'challenge' && value && typeof value === 'object') {
-      state.challenge = {...DEFAULT_CHALLENGE, ...value}; localStorage.setItem(STORAGE.challenge, JSON.stringify(state.challenge)); syncChallengeInputs(); renderChallengeSummary(); renderSessionCentral();
+      state.challenge = {...DEFAULT_CHALLENGE, ...value};
+      localStorage.setItem(STORAGE.challenge, JSON.stringify(state.challenge));
+      if(state.page==='dice') { syncChallengeInputs(); renderChallengeSummary(); }
+      if(state.page==='home') renderSessionCentral();
     } else if (key === 'scenario' && value && typeof value === 'object') {
       const localZoom = state.scenario?.zoom || 1;
       state.scenario = {...clone(DEFAULT_SCENARIO), ...value};
       if (state.role === 'player') state.scenario.zoom = localZoom;
-      localStorage.setItem(STORAGE.scenario, JSON.stringify(state.scenario)); if(state.page==='scenario')renderScenario(); renderSessionCentral();
+      localStorage.setItem(STORAGE.scenario, JSON.stringify(state.scenario));
+      if(state.page==='scenario') renderScenario();
+      if(state.page==='home') renderCentralScenario();
     } else if (key === 'initiative' && Array.isArray(value)) {
-      state.initiativeParticipants = value; localStorage.setItem(STORAGE.initiative, JSON.stringify(value)); renderInitiativeParticipants(); renderSessionCentral();
+      state.initiativeParticipants = value;
+      localStorage.setItem(STORAGE.initiative, JSON.stringify(value));
+      if(state.page==='dice') renderInitiativeParticipants();
+      if(state.page==='home') renderSessionCentral();
     } else if (key === 'combat' && value && typeof value === 'object') {
       state.combat = {...{active:false,round:0,turnIndex:-1,order:[]}, ...value};
       localStorage.setItem(STORAGE.combat, JSON.stringify(state.combat));
-      if(state.page==='scenario')renderScenario();
-      renderSessionCentral();
-      renderCombatConsole();
+      if(state.page==='scenario') renderScenario();
+      if(state.page==='home') renderSessionCentral();
+      if(state.page==='combat') renderCombatConsole();
     } else if (key === 'actionHistory' && Array.isArray(value)) {
-      state.actionHistory = value; localStorage.setItem(STORAGE.actionHistory, JSON.stringify(value)); renderSessionCentral(); renderMasterRecentRolls();
+      state.actionHistory = value;
+      localStorage.setItem(STORAGE.actionHistory, JSON.stringify(value));
+      if(state.page==='home') { renderSessionCentral(); renderMasterRecentRolls(); }
     } else if (key === 'playerNotes' && value && typeof value === 'object') {
       const heroId = value.heroId || event.heroId;
       if (heroId) {
@@ -936,8 +971,9 @@
 
   function updateAccessLabels() {
     const hero = selectedHero();
-    $('role-label').textContent = state.role === 'master' ? 'MESTRE' : hero ? `JOGADOR · ${hero.n.toUpperCase()}` : 'JOGADOR';
-    $('home-role').textContent = state.role === 'master' ? 'MESTRE' : hero ? hero.n.toUpperCase() : 'JOGADOR';
+    const soloMode=state.campaignContent?.mode==='solo';
+    $('role-label').textContent = state.role === 'master' ? (soloMode?'SOLO':'MESTRE') : hero ? `JOGADOR · ${hero.n.toUpperCase()}` : 'JOGADOR';
+    $('home-role').textContent = state.role === 'master' ? (soloMode?'SOLO':'MESTRE') : hero ? hero.n.toUpperCase() : 'JOGADOR';
   }
 
   async function enter(role, heroId = null, password = '') {
@@ -1010,10 +1046,16 @@
     qsa('#nav button').forEach(el => el.classList.toggle('active', el.dataset.page === id));
     $('title').textContent = {home:state.role==='master'?'Central do Mestre':'Central do Jogador',heroes:'Heróis',villains:'Vilões',campaign:state.campaignContent?.title||activeCampaign?.name||'Campanha',dice:'Dados do Mestre',scenario:'Cenário de Combate',combat:'Combate e Turnos',rules:'Regras do Sistema',notes:'Anotações do Mestre'}[id] || (activeCampaign?.name||'Campanha');
     closeNav();
+    // Renderização sob demanda: páginas invisíveis deixam de reconstruir DOM pesado em cada navegação.
     if(id==='home')renderSessionCentral();
+    if(id==='home'){renderMasterRecentRolls();renderHomeLiveRolls();renderPlayerLiveDice();}
+    if(id==='heroes'){renderHeroes();renderPlayerNotes();}
+    if(id==='villains'&&state.role==='master')renderVillains();
+    if(id==='campaign'&&state.role==='master')renderCampaign();
+    if(id==='dice'&&state.role==='master'){renderActorOptions();renderDiceHistory();syncChallengeInputs();renderInitiativeThreatPicker();renderInitiativeParticipants();}
     if(id==='combat')renderCombatConsole();
     if(id==='scenario'){renderScenario();requestAnimationFrame(()=>fitScenarioBoard());}
-    if(id==='heroes')renderPlayerNotes();
+    if(id==='notes')updateNotesCount();
   }
 
   function openNav() { $('app').classList.add('nav-open'); $('menu-toggle').setAttribute('aria-expanded', 'true'); }
@@ -1253,7 +1295,6 @@
     localStorage.setItem(STORAGE.heroes, JSON.stringify(state.heroes));
     if (backendReady && window.ArachneAPI) await window.ArachneAPI.saveHero(hero);
     renderHeroes();
-    renderChallengeSummary();
     closeModal();
     markSaved('Herói salvo');
     toast('Ficha do herói atualizada');
@@ -1275,7 +1316,7 @@
       }
       hero.stats = [['Health',heroMaxHealth(hero)],['Focus',heroMaxFocus(hero)],['Karma',heroKarma(hero)]];
       saveJSON(STORAGE.heroes, state.heroes);
-      renderHeroes(); renderSessionCentral(); renderCombatConsole();
+      renderHeroes();
       viewHero(index);
       markSaved(`${resource === 'focus' ? 'Focus' : 'Health'} atualizado`);
     } catch (error) { toast(error.message || 'Falha ao atualizar recurso.'); }
@@ -1344,7 +1385,7 @@
     villain.powers = $('v-e-powers').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,60); villain.traits = $('v-e-traits').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,40); villain.tags = $('v-e-tags').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,40);
     const imageFile=$('v-e-image-file')?.files?.[0],pdfFile=$('v-e-pdf-file')?.files?.[0];
     if(backendReady&&window.ArachneAPI){try{if(imageFile){markSaved('Enviando imagem…');const asset=await window.ArachneAPI.uploadAsset(imageFile);if(asset?.url)villain.image=asset.url;}if(pdfFile){markSaved('Enviando PDF…');const asset=await window.ArachneAPI.uploadAsset(pdfFile);if(asset?.url)villain.pdf=asset.url;}}catch(error){toast(error.message||'Falha ao enviar arquivo');}}
-    localStorage.setItem(STORAGE.villains,JSON.stringify(state.villains));if(backendReady&&window.ArachneAPI)await window.ArachneAPI.saveVillain(villain); renderVillains(); renderChallengeSummary(); renderInitiativeThreatPicker(); renderScenarioThreatPicker(); closeModal(); markSaved('Vilão salvo'); toast('Ficha do vilão atualizada');
+    localStorage.setItem(STORAGE.villains,JSON.stringify(state.villains));if(backendReady&&window.ArachneAPI)await window.ArachneAPI.saveVillain(villain); renderVillains(); closeModal(); markSaved('Vilão salvo'); toast('Ficha do vilão atualizada');
   }
 
   async function adjustVillain(index, resource, delta) {
@@ -1359,7 +1400,7 @@
         const key = resource === 'focus' ? 'currentFocus' : 'currentHealth'; const maxKey = resource === 'focus' ? 'maxFocus' : 'maxHealth';
         villain[key] = Math.min(villain[maxKey], Math.max(0, Number(villain[key] || 0) + Number(delta || 0)));
       }
-      saveJSON(STORAGE.villains,state.villains); renderVillains(); renderSessionCentral(); renderCombatConsole(); viewVillain(index); markSaved(`${resource === 'focus' ? 'Focus' : 'Health'} atualizado`);
+      saveJSON(STORAGE.villains,state.villains); renderVillains(); viewVillain(index); markSaved(`${resource === 'focus' ? 'Focus' : 'Health'} atualizado`);
     } catch (error) { toast(error.message || 'Falha ao atualizar recurso.'); }
   }
 
@@ -1399,7 +1440,7 @@
   async function applyCharacterImage(remoteUrl='') {
     if(!imageSearchContext||state.role!=='master'||!backendReady)return;
     const {kind,index,id}=imageSearchContext,entity=imageSearchEntity(kind,index);if(!entity)return;
-    try{markSaved(remoteUrl?'Copiando imagem para o Arachne…':'Removendo imagem…');const data=await window.ArachneAPI.setCharacterImage(kind,id,remoteUrl?{remoteUrl}:{assetUrl:''});entity.image=data.image||'';localStorage.setItem(kind==='hero'?STORAGE.heroes:STORAGE.villains,JSON.stringify(kind==='hero'?state.heroes:state.villains));closeModal();if(kind==='hero')renderHeroes();else renderVillains();renderSessionCentral();renderCombatConsole();markSaved('Imagem atualizada');toast(remoteUrl?'Imagem salva na campanha':'Imagem removida');}
+    try{markSaved(remoteUrl?'Copiando imagem para o Arachne…':'Removendo imagem…');const data=await window.ArachneAPI.setCharacterImage(kind,id,remoteUrl?{remoteUrl}:{assetUrl:''});entity.image=data.image||'';localStorage.setItem(kind==='hero'?STORAGE.heroes:STORAGE.villains,JSON.stringify(kind==='hero'?state.heroes:state.villains));closeModal();if(kind==='hero')renderHeroes();else renderVillains();markSaved('Imagem atualizada');toast(remoteUrl?'Imagem salva na campanha':'Imagem removida');}
     catch(error){toast(error.message||'Não foi possível salvar a imagem');markSaved('Falha ao salvar imagem');}
   }
 
@@ -1738,7 +1779,7 @@
   async function rollD616() {
     if (state.rolling) return;
     if (!backendReady || !window.ArachneAPI) {
-      toast('A rolagem D616 requer conexão com o servidor.');
+      toast('Sem conexão para realizar a rolagem.');
       return;
     }
     saveChallengeFromControls();
@@ -1746,7 +1787,7 @@
     if (!actor) { toast('Selecione um personagem para a rolagem.'); return; }
     const source = state.challenge.source === 'threat' ? 'threat' : 'hero';
     const kind = source === 'threat' ? 'villain' : 'hero';
-    setMasterDiceBusy(true, 'Calculando resultado no servidor...');
+    setMasterDiceBusy(true, 'Rolando...');
     $('reroll-log').innerHTML = '';
     try {
       const roll = await window.ArachneAPI.startActionRoll({
@@ -1783,7 +1824,7 @@
   async function useEdge(index) {
     const roll = state.currentRoll;
     if (!roll || roll.finalized || roll.edgeRemaining <= 0 || state.rolling || isUltimate(roll.values)) return;
-    if (!backendReady || !window.ArachneAPI) { toast('Edge requer conexão com o servidor.'); return; }
+    if (!backendReady || !window.ArachneAPI) { toast('Sem conexão para usar Edge.'); return; }
     setMasterDiceBusy(true, `Aplicando Edge em ${dieName(index)}...`);
     try {
       const updated = await window.ArachneAPI.useActionEdge(roll.id,index);
@@ -1803,7 +1844,7 @@
   async function finalizeCurrentRoll() {
     const roll = state.currentRoll;
     if (!roll || roll.finalized || state.rolling) return;
-    if (!backendReady || !window.ArachneAPI) { toast('A finalização requer conexão com o servidor.'); return; }
+    if (!backendReady || !window.ArachneAPI) { toast('Sem conexão para finalizar a rolagem.'); return; }
     setMasterDiceBusy(true, 'Registrando resultado...');
     try {
       const finalized = await window.ArachneAPI.finalizeActionRoll(roll.id);
@@ -1934,7 +1975,7 @@
     const status=$('master-live-roll-status'),result=$('master-live-roll-result');
     if(status)status.textContent=current?(masterLiveRollAnimating?'ROLANDO':current.phase==='edge'?'EDGE':current.finalized||current.phase==='final'?'FINALIZADA':'RECEBIDA'):'AGUARDANDO';
     if(result){
-      if(!current){result.innerHTML='<small>ÚLTIMA ROLAGEM</small><strong>—</strong><b>Aguardando jogador</b><span>As rolagens validadas pelo servidor aparecerão aqui.</span>';}
+      if(!current){result.innerHTML='<small>ÚLTIMA ROLAGEM</small><strong>—</strong><b>Aguardando jogador</b><span>As rolagens dos jogadores aparecem aqui.</span>';}
       else{
         const modifier=Number(current.modifier||0),extra=Number(current.extra||0),tn=current.tn==null?'—':current.tn,total=masterLiveRollRevealed?current.total:'…',outcome=masterLiveRollRevealed?(current.outcome||'Resultado recebido'):'Dados em movimento…';
         result.innerHTML=`<small>${escapeHTML(current.actorName||'Jogador')} · ${escapeHTML(current.ability||'D616')}</small><strong>${escapeHTML(total??'—')}</strong><b>${escapeHTML(outcome)}</b><span>${escapeHTML(current.action||'Action Check')}</span><em>Modificador ${escapeHTML(signed(modifier))}${extra?` · Extra ${escapeHTML(signed(extra))}`:''} · TN ${escapeHTML(tn)} · ${escapeHTML(rollClock(current.at))}</em>`;
@@ -2075,16 +2116,16 @@
   async function addInitiativeParticipant(entity) {
     if (!entity) return false;
     if(!isRepeatableInitiativeEntity(entity)&&initiativeHasParticipant(entity.id)){toast('Já está na iniciativa.');return false;}
-    if(!backendReady||!window.ArachneAPI?.addInitiativeParticipant){toast('A iniciativa requer conexão com o servidor.');return false;}
+    if(!backendReady||!window.ArachneAPI?.addInitiativeParticipant){toast('Sem conexão para rolar iniciativa.');return false;}
     try{
       const data=await window.ArachneAPI.addInitiativeParticipant(entity.id);
-      setInitiativeState(data?.initiative||[]);if(data?.scenario){state.scenario={...clone(DEFAULT_SCENARIO),...data.scenario};normalizeScenario();localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));renderScenario();}renderInitiativeParticipants();renderSessionCentral();toast(`${entity.n} adicionado à iniciativa e ao grid`);return true;
+      setInitiativeState(data?.initiative||[]);if(data?.scenario){state.scenario={...clone(DEFAULT_SCENARIO),...data.scenario};normalizeScenario();localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));if(state.page==='scenario')renderScenario();}if(state.page==='dice')renderInitiativeParticipants();if(state.page==='home')renderSessionCentral();toast(`${entity.n} adicionado à iniciativa e ao grid`);return true;
     }catch(error){toast(error?.message||'Não foi possível adicionar à iniciativa.');return false;}
   }
 
   async function removeInitiativeParticipant(participantId) {
     if(!participantId||!backendReady||!window.ArachneAPI?.removeInitiativeParticipant)return;
-    try{const data=await window.ArachneAPI.removeInitiativeParticipant(participantId);setInitiativeState(data?.initiative||[]);if(data?.scenarioChanged&&data?.scenario){state.scenario={...clone(DEFAULT_SCENARIO),...data.scenario};normalizeScenario();localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));renderScenario();}renderInitiativeParticipants();renderSessionCentral();}
+    try{const data=await window.ArachneAPI.removeInitiativeParticipant(participantId);setInitiativeState(data?.initiative||[]);if(data?.scenarioChanged&&data?.scenario){state.scenario={...clone(DEFAULT_SCENARIO),...data.scenario};normalizeScenario();localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));if(state.page==='scenario')renderScenario();}if(state.page==='dice')renderInitiativeParticipants();if(state.page==='home')renderSessionCentral();}
     catch(error){toast(error?.message||'Não foi possível remover da iniciativa.');}
   }
 
@@ -2120,8 +2161,8 @@
     if(initiativeRolling)return false;
     const current=(state.initiativeParticipants||[]).find(item=>String(item.id)===String(participantId));if(!current)return false;
     if(current.result!==null&&current.result!==''&&Number.isFinite(Number(current.result))){toast('Iniciativa já rolada.');return false;}
-    if(!backendReady||!window.ArachneAPI?.rollInitiativeParticipant){toast('A iniciativa requer conexão com o servidor.');return false;}
-    initiativeRolling=true;renderInitiativeParticipants();renderSessionCentral();
+    if(!backendReady||!window.ArachneAPI?.rollInitiativeParticipant){toast('Sem conexão para rolar iniciativa.');return false;}
+    initiativeRolling=true;if(state.page==='dice')renderInitiativeParticipants();if(state.page==='home')renderSessionCentral();
     const root=$(rootId),status=$(statusId);
     try{
       const data=await window.ArachneAPI.rollInitiativeParticipant(participantId),roll=data?.roll;
@@ -2130,16 +2171,16 @@
       const participant=data?.participant;if(status)status.textContent=participant?`${participant.name}: ${initiativeDiceText(participant)} ${signed(Number(participant.modifier||0))} = ${participant.result}`:'Iniciativa concluída';
       return true;
     }catch(error){toast(error?.message||'Não foi possível rolar a iniciativa.');return false;}
-    finally{initiativeRolling=false;renderInitiativeParticipants();renderSessionCentral();requestAnimationFrame(()=>{settleInitiativeStage($(rootId));});}
+    finally{initiativeRolling=false;if(state.page==='dice')renderInitiativeParticipants();if(state.page==='home')renderSessionCentral();requestAnimationFrame(()=>{settleInitiativeStage($(rootId));});}
   }
 
   async function rollInitiative({rootId='initiative-dice-stage',statusId='initiative-current'}={}) {
     if(initiativeBatchRolling)return;
     const pending=(state.initiativeParticipants||[]).filter(item=>item?.result===null||item?.result===''||!Number.isFinite(Number(item.result))).map(item=>item.id);
     if(!pending.length){toast(state.initiativeParticipants.length?'Todas as iniciativas já foram roladas.':'Adicione pelo menos um participante');return;}
-    initiativeBatchRolling=true;renderInitiativeParticipants();renderSessionCentral();
+    initiativeBatchRolling=true;if(state.page==='dice')renderInitiativeParticipants();if(state.page==='home')renderSessionCentral();
     try{for(const id of pending){await rollInitiativeParticipantById(id,{rootId,statusId});if(!reducedMotion())await sleep(90);}}
-    finally{initiativeBatchRolling=false;renderInitiativeParticipants();renderSessionCentral();requestAnimationFrame(()=>settleInitiativeStage($(rootId)));}
+    finally{initiativeBatchRolling=false;if(state.page==='dice')renderInitiativeParticipants();if(state.page==='home')renderSessionCentral();requestAnimationFrame(()=>settleInitiativeStage($(rootId)));}
   }
 
   // -------------------- v9 · Montador tático --------------------
@@ -2218,6 +2259,8 @@
     if(!state.scenario.terrain||typeof state.scenario.terrain!=='object')state.scenario.terrain={};
     if(!state.scenario.decor||typeof state.scenario.decor!=='object')state.scenario.decor={};
     if(!state.scenario.turnMovement||typeof state.scenario.turnMovement!=='object')state.scenario.turnMovement={};
+    if(!state.scenario.minionVitals||typeof state.scenario.minionVitals!=='object')state.scenario.minionVitals={};
+    Object.values(MINION_TEMPLATES).forEach(template=>{const saved=state.scenario.minionVitals[template.id]||{};state.scenario.minionVitals[template.id]={maxHealth:Number(saved.maxHealth??template.maxHealth??30),currentHealth:Number(saved.currentHealth??saved.maxHealth??template.currentHealth??template.maxHealth??30),maxFocus:Number(saved.maxFocus??template.maxFocus??30),currentFocus:Number(saved.currentFocus??saved.maxFocus??template.currentFocus??template.maxFocus??30)};});
     if(!state.scenario.environment||!ENVIRONMENTS[state.scenario.environment])state.scenario.environment='lab';
     if(!state.scenario.baseTerrain)state.scenario.baseTerrain=ENVIRONMENTS[state.scenario.environment].base;
     state.scenario.width=clamp(state.scenario.width||24,8,30);state.scenario.height=clamp(state.scenario.height||18,7,24);
@@ -2243,7 +2286,7 @@
   function renderScenarioThreatPicker(){if(!$('scenario-threat-tier'))return;fillThreatSelect($('scenario-threat-choice'),$('scenario-threat-tier').value||'minion',$('scenario-threat-choice').value);}
   function scenarioPieceAt(x,y){return state.scenario.pieces.find(p=>p.x===x&&p.y===y);}
   function playerScenarioPiece(){const hero=selectedHero();return hero?state.scenario.pieces.find(p=>p?.kind==='hero'&&p?.baseId===hero.id)||null:null;}
-  function playerCanMoveScenario(){const hero=selectedHero(),current=combatCurrent();return state.role==='player'&&!!hero&&!!state.combat?.active&&current?.baseId===hero.id;}
+  function playerCanMoveScenario(){const hero=selectedHero();return state.role==='player'&&!!hero&&!!playerScenarioPiece();}
   function selectedScenarioPiece(){const id=state.role==='player'?playerScenarioSelectedPieceId:state.scenario.selectedPiece;return state.scenario.pieces.find(p=>p.id===id)||null;}
   function obstacleAt(x,y){return state.scenario.obstacles[scenarioCellKey(x,y)]||null;}
   function decorAt(x,y){return state.scenario.decor[scenarioCellKey(x,y)]||null;}
@@ -2300,18 +2343,17 @@
     const panel=$('scenario-movement-panel');if(!panel)return;
     if(state.role==='player'){
       const own=playerScenarioPiece();if(!own){playerScenarioSelectedPieceId=null;panel.innerHTML='<div class="movement-empty"><b>MOVIMENTO</b><span>Seu personagem não está posicionado no cenário.</span></div>';return;}
-      if(!playerCanMoveScenario()){playerScenarioSelectedPieceId=null;panel.innerHTML='<div class="movement-empty"><b>AGUARDANDO</b><span>Aguarde seu turno para movimentar seu personagem.</span></div>';return;}
-      const piece=selectedScenarioPiece();if(!piece){panel.innerHTML=`<div class="movement-empty"><b>SEU TURNO</b><span>Selecione ${escapeHTML(own.name)} no grid para movimentar.</span></div>`;return;}
+      const piece=selectedScenarioPiece();if(!piece){panel.innerHTML=`<div class="movement-empty"><b>MOVIMENTO</b><span>Selecione ${escapeHTML(own.name)} no grid para movimentar.</span></div>`;return;}
       const st=movementStatus(piece,playerScenarioMode),opts=st.valid.map(([k,v])=>`<option value="${k}" ${k===st.mode?'selected':''} ${st.locked&&k!==st.mode?'disabled':''}>${MOVE_META[k]?.label||k} · ${v}</option>`).join(''),stats=st.valid.map(([k,v])=>`<span class="speed-chip ${k===st.mode?'active':''} ${st.locked&&k!==st.mode?'locked':''}"><small>${MOVE_META[k]?.abbr||k.toUpperCase()}</small><b>${v}</b></span>`).join('');
-      panel.innerHTML=`<div class="speed-card"><div class="speed-card-title"><span>SEU TURNO · SPEED</span><b>${escapeHTML(piece.name)}</b></div><div class="speed-chips">${stats}</div><div class="movement-controls"><label>Modo<select id="scenario-move-mode" ${scenarioMovePending?'disabled':''}>${opts}</select></label><div class="movement-budget"><small>RESTANTE</small><strong>${st.remaining}</strong><span>/ ${st.max}</span></div></div><div class="movement-meter"><i style="width:${st.max?Math.max(0,Math.min(100,st.remaining/st.max*100)):0}%"></i></div><div class="movement-actions"><span>${scenarioMovePending?'Movimentando…':'Clique em uma casa destacada para mover.'}</span>${st.locked?`<b class="mode-lock">${escapeHTML(MOVE_META[st.mode]?.label||st.mode)}</b>`:''}</div></div>`;
-      $('scenario-move-mode')?.addEventListener('change',e=>{if(st.locked&&e.target.value!==st.locked.mode){toast('O modo de movimento já foi usado neste turno');renderScenario();return;}playerScenarioMode=e.target.value;renderScenario();});return;
+      panel.innerHTML=`<div class="speed-card"><div class="speed-card-title"><span>SEU PERSONAGEM · SPEED</span><b>${escapeHTML(piece.name)}</b></div><div class="speed-chips">${stats}</div><div class="movement-controls"><label>Modo<select id="scenario-move-mode" ${scenarioMovePending?'disabled':''}>${opts}</select></label><div class="movement-budget"><small>RESTANTE</small><strong>${st.remaining}</strong><span>/ ${st.max}</span></div></div><div class="movement-meter"><i style="width:${st.max?Math.max(0,Math.min(100,st.remaining/st.max*100)):0}%"></i></div><div class="movement-actions"><span>${scenarioMovePending?'Movimentando…':'Clique em uma casa destacada para mover.'}</span>${st.locked?`<b class="mode-lock">${escapeHTML(MOVE_META[st.mode]?.label||st.mode)}</b>`:''}</div></div>`;
+      $('scenario-move-mode')?.addEventListener('change',e=>{if(st.locked&&e.target.value!==st.locked.mode){toast('Reinicie o movimento antes de trocar o modo.');renderScenario();return;}playerScenarioMode=e.target.value;renderScenario();});return;
     }
     const piece=selectedScenarioPiece();if(!piece){panel.innerHTML='<div class="movement-empty"><b>MOVIMENTO</b><span>Selecione uma peça.</span></div>';return;}
     const st=movementStatus(piece),opts=st.valid.map(([k,v])=>`<option value="${k}" ${k===st.mode?'selected':''} ${st.locked&&k!==st.mode?'disabled':''}>${MOVE_META[k]?.label||k} · ${v}</option>`).join('');
     const stats=st.valid.map(([k,v])=>`<span class="speed-chip ${k===st.mode?'active':''} ${st.locked&&k!==st.mode?'locked':''}"><small>${MOVE_META[k]?.abbr||k.toUpperCase()}</small><b>${v}</b></span>`).join('');
-    panel.innerHTML=`<div class="speed-card"><div class="speed-card-title"><span>SPEED</span><b>${escapeHTML(piece.name)}</b></div><div class="speed-chips">${stats}</div><div class="movement-controls"><label>Modo<select id="scenario-move-mode">${opts}</select></label><div class="movement-budget"><small>RESTANTE</small><strong>${st.remaining}</strong><span>/ ${st.max}</span></div></div><div class="movement-meter"><i style="width:${st.max?Math.max(0,Math.min(100,st.remaining/st.max*100)):0}%"></i></div><div class="movement-actions"><button type="button" id="scenario-reset-piece-move">NOVO TURNO</button>${st.locked?`<b class="mode-lock">${escapeHTML(MOVE_META[st.mode]?.label||st.mode)}</b>`:''}</div></div>`;
-    $('scenario-move-mode')?.addEventListener('change',e=>{if(st.locked&&e.target.value!==st.locked.mode){toast('O modo de movimento já foi usado neste turno');renderScenario();return;}state.scenario.selectedMode=e.target.value;saveScenario();renderScenario();});
-    $('scenario-reset-piece-move')?.addEventListener('click',()=>{delete state.scenario.turnMovement[piece.id];saveScenario();renderScenario();toast(`${piece.name}: novo turno`);});
+    panel.innerHTML=`<div class="speed-card"><div class="speed-card-title"><span>SPEED</span><b>${escapeHTML(piece.name)}</b></div><div class="speed-chips">${stats}</div><div class="movement-controls"><label>Modo<select id="scenario-move-mode">${opts}</select></label><div class="movement-budget"><small>RESTANTE</small><strong>${st.remaining}</strong><span>/ ${st.max}</span></div></div><div class="movement-meter"><i style="width:${st.max?Math.max(0,Math.min(100,st.remaining/st.max*100)):0}%"></i></div><div class="movement-actions"><button type="button" id="scenario-reset-piece-move">NOVO MOVIMENTO</button>${st.locked?`<b class="mode-lock">${escapeHTML(MOVE_META[st.mode]?.label||st.mode)}</b>`:''}</div></div>`;
+    $('scenario-move-mode')?.addEventListener('change',e=>{if(st.locked&&e.target.value!==st.locked.mode){toast('Reinicie o movimento antes de trocar o modo.');renderScenario();return;}state.scenario.selectedMode=e.target.value;saveScenario();renderScenario();});
+    $('scenario-reset-piece-move')?.addEventListener('click',()=>{delete state.scenario.turnMovement[piece.id];saveScenario();renderScenario();toast(`${piece.name}: movimento reiniciado`);});
   }
   function renderScenario(){
     const board=$('scenario-board');if(!board)return;normalizeScenario();if(state.role==='master')renderScenarioToolAvailability();const{w,h}=boardSize(),playerMovable=playerCanMoveScenario();
@@ -2324,8 +2366,7 @@
     }
     $('scenario-count').textContent=`${state.scenario.pieces.length} peças · ${w}×${h}`;if($('scenario-preset'))$('scenario-preset').value=state.scenario.preset||'empty';if($('scenario-environment'))$('scenario-environment').value=state.scenario.environment||'lab';
     if(state.role==='master')$('scenario-selection').textContent=selected?`${selected.name} · ${MOVE_META[st.mode]?.label||st.mode} ${st.remaining}/${st.max}`:state.scenario.selectedTool!=='select'?`${TERRAIN_META[state.scenario.selectedTool]?.label||OBSTACLE_META[state.scenario.selectedTool]?.label||'Apagar'}`:'—';
-    else if(!playerMovable)$('scenario-selection').textContent='Aguarde seu turno para movimentar seu personagem.';
-    else $('scenario-selection').textContent=selected?`${selected.name} · ${MOVE_META[st.mode]?.label||st.mode} ${st.remaining}/${st.max}`:`Seu turno · selecione ${playerScenarioPiece()?.name||'seu personagem'}`;
+    else $('scenario-selection').textContent=selected?`${selected.name} · ${MOVE_META[st.mode]?.label||st.mode} ${st.remaining}/${st.max}`:`Selecione ${playerScenarioPiece()?.name||'seu personagem'}`;
     qsa('[data-obstacle]').forEach(b=>b.classList.toggle('active',b.dataset.obstacle===state.scenario.selectedTool));if($('scenario-zoom-value'))$('scenario-zoom-value').textContent=`${Math.round((state.scenario.zoom||1)*100)}%`;renderScenarioMovementPanel();
   }
   function setMapCore(env,w,h){state.scenario.environment=env;state.scenario.baseTerrain=ENVIRONMENTS[env]?.base||'floor';state.scenario.width=w;state.scenario.height=h;state.scenario.obstacles={};state.scenario.terrain={};state.scenario.decor={};state.scenario.turnMovement={};state.scenario.movementSpent={};state.scenario.selectedPiece=null;state.scenario.selectedTool='select';state.scenario.selectedMode='run';}
@@ -2385,27 +2426,31 @@
     const tier=$('scenario-threat-tier').value,choice=$('scenario-threat-choice').value,entity=resolveThreat(tier,choice),qty=clamp($('scenario-enemy-qty').value,1,30),short=PIECE_LABELS[entity.id]||(tier==='special'?'CE':'V');
     for(let i=0;i<qty;i++){const cell=firstFreeScenarioCell(Math.max(0,8+i*2));if(!cell)break;const id=`enemy-${Date.now()}-${i}-${Math.random().toString(36).slice(2,5)}`;state.scenario.pieces.push({id,kind:'enemy',tier,baseId:entity.id,name:qty>1?`${entity.n} ${i+1}`:entity.n,short,color:scenarioColorFor(entity,i),x:cell.x,y:cell.y,movement:movementForEntity(entity)});}saveScenario();renderScenario();toast(`${qty} inimigo${qty===1?'':'s'} adicionado${qty===1?'':'s'}`);
   }
-  async function handleScenarioCell(cell){
+  async function handleScenarioCell(cell,{central=false}={}){
     const x=Number(cell.dataset.x),y=Number(cell.dataset.y),piece=scenarioPieceAt(x,y);
     if(state.role==='player'){
-      const own=playerScenarioPiece();if(!playerCanMoveScenario()){toast('Aguarde seu turno para movimentar seu personagem.');return;}if(!own){toast('Seu personagem não está posicionado no cenário.');return;}
-      if(piece){if(piece.id!==own.id){toast('Você só pode movimentar o próprio personagem.');return;}playerScenarioSelectedPieceId=playerScenarioSelectedPieceId===own.id?null:own.id;renderScenario();return;}
+      const own=playerScenarioPiece();if(!own){toast('Seu personagem não está posicionado no cenário.');return;}
+      if(piece){if(piece.id!==own.id){toast('Você só pode movimentar o próprio personagem.');return;}playerScenarioSelectedPieceId=own.id;renderScenarioViews();return;}
       const selected=selectedScenarioPiece();if(!selected||selected.id!==own.id){toast('Selecione seu personagem antes de movimentar.');return;}const st=movementStatus(selected,playerScenarioMode),reachable=reachableCells(selected,st.mode,st.remaining),key=scenarioCellKey(x,y);if(!reachable.has(key)){toast('Casa indisponível para esse movimento');return;}
-      if(scenarioMovePending)return;if(!backendReady||!window.ArachneAPI?.moveScenarioPiece){toast('A API precisa estar conectada para movimentar.');return;}
-      scenarioMovePending=true;renderScenario();try{const moved=await window.ArachneAPI.moveScenarioPiece({pieceId:selected.id,x,y,mode:st.mode,from:{x:selected.x,y:selected.y}});state.scenario={...clone(DEFAULT_SCENARIO),...(moved.scenario||state.scenario)};localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));playerScenarioSelectedPieceId=moved.piece?.id||selected.id;toast(`${selected.name} moveu ${moved.cost} casa${moved.cost===1?'':'s'}.`);}catch(error){toast(error.message||'Não foi possível movimentar.');}finally{scenarioMovePending=false;renderScenario();}return;
+      if(scenarioMovePending)return;if(!backendReady||!window.ArachneAPI?.moveScenarioPiece){toast('Sem conexão para movimentar.');return;}
+      scenarioMovePending=true;renderScenarioViews();try{const moved=await window.ArachneAPI.moveScenarioPiece({pieceId:selected.id,x,y,mode:st.mode,from:{x:selected.x,y:selected.y}});state.scenario={...clone(DEFAULT_SCENARIO),...(moved.scenario||state.scenario)};localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));playerScenarioSelectedPieceId=moved.piece?.id||selected.id;toast(`${selected.name} moveu ${moved.cost} casa${moved.cost===1?'':'s'}.`);}catch(error){toast(error.message||'Não foi possível movimentar.');}finally{scenarioMovePending=false;renderScenarioViews();}return;
     }
-    const tool=state.scenario.selectedTool||'select';
+    const tool=central?'select':(state.scenario.selectedTool||'select');
     if(tool!=='select'){
       if(tool==='erase'){clearCellArt(x,y);if(piece?.kind==='enemy'){state.scenario.pieces=state.scenario.pieces.filter(p=>p.id!==piece.id);delete state.scenario.turnMovement[piece.id];}}
       else if(!piece){if(TERRAIN_TOOLS.has(tool)){delete state.scenario.obstacles[scenarioCellKey(x,y)];delete state.scenario.decor[scenarioCellKey(x,y)];state.scenario.terrain[scenarioCellKey(x,y)]=tool;}else if(OBSTACLE_META[tool]){delete state.scenario.decor[scenarioCellKey(x,y)];state.scenario.obstacles[scenarioCellKey(x,y)]=tool;}}
-      saveScenario();renderScenario();return;
+      saveScenario();renderScenarioViews();return;
     }
-    if(piece){state.scenario.selectedPiece=state.scenario.selectedPiece===piece.id?null:piece.id;saveScenario();renderScenario();return;}
+    if(piece){state.scenario.selectedPiece=state.scenario.selectedPiece===piece.id?null:piece.id;saveScenario();renderScenarioViews();return;}
     const selected=selectedScenarioPiece();if(!selected)return;const st=movementStatus(selected),reachable=reachableCells(selected,st.mode,st.remaining),key=scenarioCellKey(x,y);if(!reachable.has(key)){toast('Casa indisponível para esse movimento');return;}
-    if(backendReady&&window.ArachneAPI?.moveScenarioPiece){if(scenarioMovePending)return;scenarioMovePending=true;try{const moved=await window.ArachneAPI.moveScenarioPiece({pieceId:selected.id,x,y,mode:st.mode,from:{x:selected.x,y:selected.y}});state.scenario={...clone(DEFAULT_SCENARIO),...(moved.scenario||state.scenario)};localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));state.scenario.selectedPiece=moved.piece?.id||selected.id;}catch(error){toast(error.message||'Não foi possível movimentar.');}finally{scenarioMovePending=false;renderScenario();}return;}
-    const cost=reachable.get(key);selected.x=x;selected.y=y;if(!state.scenario.turnMovement[selected.id])state.scenario.turnMovement[selected.id]={mode:st.mode,spent:0};state.scenario.turnMovement[selected.id].mode=st.mode;state.scenario.turnMovement[selected.id].spent=Number(state.scenario.turnMovement[selected.id].spent||0)+cost;saveScenario();renderScenario();
+    if(backendReady&&window.ArachneAPI?.moveScenarioPiece){if(scenarioMovePending)return;scenarioMovePending=true;try{const moved=await window.ArachneAPI.moveScenarioPiece({pieceId:selected.id,x,y,mode:st.mode,from:{x:selected.x,y:selected.y}});state.scenario={...clone(DEFAULT_SCENARIO),...(moved.scenario||state.scenario)};localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));state.scenario.selectedPiece=moved.piece?.id||selected.id;}catch(error){toast(error.message||'Não foi possível movimentar.');}finally{scenarioMovePending=false;renderScenarioViews();}return;}
+    const cost=reachable.get(key);selected.x=x;selected.y=y;if(!state.scenario.turnMovement[selected.id])state.scenario.turnMovement[selected.id]={mode:st.mode,spent:0};state.scenario.turnMovement[selected.id].mode=st.mode;state.scenario.turnMovement[selected.id].spent=Number(state.scenario.turnMovement[selected.id].spent||0)+cost;saveScenario();renderScenarioViews();
   }
-  function setScenarioZoom(delta){state.scenario.zoom=Math.max(.18,Math.min(1.7,Number(state.scenario.zoom||1)+delta));saveScenario();renderScenario();}
+  async function resetScenarioPieceMovement(pieceId='',all=false){
+    if(!backendReady||!window.ArachneAPI?.resetScenarioMovement){if(state.role==='master'){if(all){state.scenario.turnMovement={};state.scenario.movementSpent={};}else{delete state.scenario.turnMovement[pieceId];delete state.scenario.movementSpent[pieceId];}saveScenario();renderScenarioViews();}return;}
+    try{const data=await window.ArachneAPI.resetScenarioMovement({pieceId,all});if(data?.scenario){state.scenario={...clone(DEFAULT_SCENARIO),...data.scenario};normalizeScenario();localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));}renderScenarioViews();toast(all?'Movimentos reiniciados':'Movimento reiniciado');}catch(error){toast(error.message||'Não foi possível reiniciar o movimento.');}
+  }
+  function setScenarioZoom(delta){state.scenario.zoom=Math.max(.18,Math.min(1.7,Number(state.scenario.zoom||1)+delta));saveScenario();renderScenarioViews();}
   function fitScenarioBoard(){
     const scroll=document.querySelector('.board-scroll');if(!scroll)return;const{w,h}=boardSize(),base=58,pad=28,availableW=Math.max(260,scroll.clientWidth-pad),availableH=Math.max(320,Math.min(window.innerHeight*0.78,860)-pad),fit=Math.min(1.32,availableW/(w*base),availableH/(h*base));state.scenario.zoom=Math.max(.18,Math.min(1.32,fit));saveScenario();renderScenario();scroll.scrollLeft=0;scroll.scrollTop=0;
   }
@@ -2577,10 +2622,8 @@
   let centralMasterAttackRoll = null;
   let centralMasterAttackAnimating = false;
   let centralMasterAttackActor = '';
-  let centralMasterAttackTarget = '';
-  let centralMasterAttackAbility = 'Melee';
-  let centralMasterAttackDefense = 14;
-  let centralMasterAttackResource = 'health';
+  let centralMasterActionCategory = 'combat';
+  let centralMasterPowerName = '';
   let playerResourceUpdating = '';
 
   function combatCurrent() {
@@ -2599,14 +2642,36 @@
   function combatOrderMarkup({controls=false,orderControls=false}={}) {
     const combat=state.combat||{},order=Array.isArray(combat.order)?combat.order:[];
     if(!combat.active||!order.length)return `<div class="central-empty"><b>Nenhum combate ativo</b><span>${state.role==='master'?'Monte a iniciativa abaixo e inicie o combate.':'A ordem aparecerá aqui quando o Mestre iniciar o combate.'}</span></div>`;
-    return `<div class="central-combat-order">${order.map((item,index)=>{const active=index===Number(combat.turnIndex),entity=state.heroes.find(h=>h.id===item.baseId)||(state.role==='master'?state.villains.find(v=>v.id===item.baseId):null),hp=entity?.currentHealth??item.currentHealth,hm=entity?.maxHealth??item.maxHealth,fp=entity?.currentFocus??item.currentFocus,fm=entity?.maxFocus??item.maxFocus,src=entity?.image||item.image||characterArt(item.baseId,''),kind=state.heroes.some(h=>h.id===item.baseId)?'hero':state.villains.some(v=>v.id===item.baseId)?'villain':item.kind||'other';return `<div class="central-combat-row ${active?'active':''} ${orderControls?'is-editable':''}"><span class="central-combat-rank">${index+1}</span><span class="central-avatar">${src?`<img src="${escapeHTML(portraitDisplaySrc(src,{small:true}))}" alt="" loading="lazy" decoding="async">`:escapeHTML(monogram(item.name))}</span><div class="central-combat-name"><b>${escapeHTML(item.name)}</b><small>${active?'AGINDO AGORA':`Iniciativa ${escapeHTML(item.result??'—')}`}</small></div><strong>${escapeHTML(item.result??'—')}</strong>${Number.isFinite(Number(hp))?`<div class="central-resource"><span>HP ${escapeHTML(hp)}/${escapeHTML(hm)}</span><span>FO ${escapeHTML(fp)}/${escapeHTML(fm)}</span></div>`:''}${controls&&entity?`<div class="central-resource-controls"><button type="button" data-combat-resource="health" data-combat-kind="${kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="-5">−5 HP</button><button type="button" data-combat-resource="health" data-combat-kind="${kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="5">+5 HP</button><button type="button" data-combat-resource="focus" data-combat-kind="${kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="-5">−5 FO</button><button type="button" data-combat-resource="focus" data-combat-kind="${kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="5">+5 FO</button></div>`:''}${orderControls?`<div class="central-order-controls"><label>INICIATIVA<input type="number" min="-99" max="199" value="${escapeHTML(item.result??0)}" data-central-order-initiative="${escapeHTML(item.id)}"></label><button type="button" class="danger" data-central-order-remove="${escapeHTML(item.id)}">REMOVER</button></div>`:''}</div>`;}).join('')}</div>`;
+    return `<div class="central-combat-order">${order.map((item,index)=>{
+      const active=index===Number(combat.turnIndex),entity=state.heroes.find(h=>h.id===item.baseId)||(state.role==='master'?state.villains.find(v=>v.id===item.baseId):null),hp=entity?.currentHealth??item.currentHealth,hm=entity?.maxHealth??item.maxHealth,fp=entity?.currentFocus??item.currentFocus,fm=entity?.maxFocus??item.maxFocus,src=entity?.image||item.image||characterArt(item.baseId,''),kind=state.heroes.some(h=>h.id===item.baseId)?'hero':state.villains.some(v=>v.id===item.baseId)?'villain':item.kind||'other';
+      const resources=Number.isFinite(Number(hp))?`<div class="central-resource"><span><small>HP</small>${escapeHTML(hp)}/${escapeHTML(hm)}</span><span><small>FO</small>${escapeHTML(fp)}/${escapeHTML(fm)}</span></div>`:'';
+      const quickControls=controls&&entity?`<div class="central-resource-controls" aria-label="Ajustes rápidos de recursos"><button type="button" data-combat-resource="health" data-combat-kind="${kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="-5">HP−</button><button type="button" data-combat-resource="health" data-combat-kind="${kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="5">HP+</button><button type="button" data-combat-resource="focus" data-combat-kind="${kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="-5">FO−</button><button type="button" data-combat-resource="focus" data-combat-kind="${kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="5">FO+</button></div>`:'';
+      const more=orderControls?`<details class="central-row-menu"><summary aria-label="Mais opções para ${escapeHTML(item.name)}">•••</summary><div class="central-order-controls"><label>INICIATIVA<input type="number" min="-99" max="199" value="${escapeHTML(item.result??0)}" data-central-order-initiative="${escapeHTML(item.id)}"></label><button type="button" class="danger" data-central-order-remove="${escapeHTML(item.id)}">REMOVER</button></div></details>`:'';
+      return `<div class="central-combat-row ${active?'active':''} ${orderControls?'is-editable':''}"><span class="central-combat-rank">${index+1}</span><span class="central-avatar">${src?`<img src="${escapeHTML(portraitDisplaySrc(src,{small:true}))}" alt="" loading="lazy" decoding="async">`:escapeHTML(monogram(item.name))}</span><div class="central-combat-name"><b>${escapeHTML(item.name)}</b><small>${active?'AGINDO AGORA':`Iniciativa ${escapeHTML(item.result??'—')}`}</small></div><strong class="central-combat-score">${escapeHTML(item.result??'—')}</strong>${resources}${quickControls}${more}</div>`;
+    }).join('')}</div>`;
+  }
+
+  function centralDamageResultMarkup(roll,{animating=false}={}) {
+    if(!roll||roll.snapshot?.rollType!=='attack')return'';
+    const damage=roll.damage||null;
+    const configured=damage?.configured!==false&&Number.isFinite(Number(damage?.multiplier));
+    const success=Boolean(damage?.success);
+    const total=animating?'…':configured?(success&&Number.isFinite(Number(damage?.total))?Number(damage.total):0):'—';
+    const note=animating?'Calculando pela ficha…':!configured?'Dano não configurado nesta ficha.':success?(Number(damage?.fantasticMultiplier||1)>1?'Fantastic: dano dobrado.':'Dano calculado pela ficha.'):'Sem dano: resultado abaixo do TN.';
+    const stateClass=animating?'rolling':!configured?'neutral':success?'success':'failure';
+    return `<div class="support-damage-result ${stateClass}"><small>DANO</small><strong>${escapeHTML(total)}</strong><span>${escapeHTML(note)}</span></div>`;
   }
 
   function centralActionResultMarkup() {
-    const roll=centralActionRoll;if(!roll)return `<div class="central-roll-empty">O resultado do Action Check aparecerá aqui.</div>`;
-    const dice=(roll.values||[]).map((value,index)=>`<button type="button" class="central-die ${index===1?'marvel':''}" ${!centralActionAnimating&&roll.edgeRemaining>0&&!roll.finalized?'data-central-edge="'+index+'"':''}>${centralActionAnimating?'…':index===1&&Number(value)===1?'M':escapeHTML(value)}</button>`).join('');
-    const outcome=roll.outcome||{},math=roll.math||{},displayTotal=centralActionAnimating?'…':math.total??'—',displayOutcome=centralActionAnimating?'ROLANDO…':outcome.label||'AGUARDANDO';
-    return `<div id="central-action-dice-stage" class="dice-stage-3d central-action-dice-stage" aria-label="Animação D616"></div><div class="central-roll-result ${centralActionAnimating?'':escapeHTML(outcome.key||'')}"><div class="central-roll-dice">${dice}</div><div><small>RESULTADO</small><strong>${escapeHTML(displayTotal)}</strong><b>${escapeHTML(displayOutcome)}</b><span>${escapeHTML(roll.snapshot?.ability||'')} ${Number(roll.snapshot?.abilityMod||0)>=0?'+':''}${escapeHTML(roll.snapshot?.abilityMod||0)} · TN ${escapeHTML(roll.snapshot?.tn??'—')}</span></div>${!centralActionAnimating&&roll.edgeRemaining>0&&!roll.finalized?`<p>Edge restante: ${roll.edgeRemaining}. Clique em um dado para rerrolar e manter o melhor, ou <button type="button" data-central-finalize="${escapeHTML(roll.id)}">finalize agora</button>.</p>`:''}</div>`;
+    const roll=centralActionRoll;
+    if(!roll)return `<div class="central-roll-empty">Escolha uma ação para rolar a D616.</div>`;
+    const outcome=roll.outcome||{},math=roll.math||{};
+    const displayTotal=centralActionAnimating?'…':math.total??'—';
+    const displayOutcome=centralActionAnimating?'ROLANDO…':outcome.label||'RESULTADO';
+    const ability=roll.snapshot?.ability||'';
+    const mod=Number(roll.snapshot?.abilityMod||0);
+    const tn=roll.snapshot?.tn??state.challenge?.tn??14;
+    return `<div id="central-action-dice-stage" class="dice-stage-3d central-action-dice-stage" aria-label="Rolagem D616"></div><div class="central-roll-result support-roll-result ${centralActionAnimating?'':escapeHTML(outcome.key||'')}"><div><small>RESULTADO</small><strong>${escapeHTML(displayTotal)}</strong><b>${escapeHTML(displayOutcome)}</b><span>${escapeHTML(ability)} ${mod>=0?'+':''}${escapeHTML(mod)} · TN ${escapeHTML(tn)}</span></div>${!centralActionAnimating&&roll.edgeRemaining>0&&!roll.finalized?`<p>Edge disponível. Clique em qualquer dado para rerrolar ou <button type="button" data-central-finalize="${escapeHTML(roll.id)}">use o resultado</button>.</p>`:''}</div>${centralDamageResultMarkup(roll,{animating:centralActionAnimating})}`;
   }
 
   function settleReusableD616(stageId,roll) {
@@ -2633,52 +2698,187 @@
   function settleCentralActionDice(roll) { settleReusableD616('central-action-dice-stage',roll); }
   async function animateCentralActionResult(roll,previous=null) { if(state.role!=='player')return;await animateReusableD616Result(roll,'central-action-dice-stage',previous); }
 
-  function masterAttackEntities() {
-    return [...state.heroes.map(entity=>({kind:'hero',entity})),...state.villains.map(entity=>({kind:'villain',entity}))];
-  }
-  function masterAttackFromKey(key='') {const [kind,id]=String(key).split('|'),items=masterAttackEntities();return items.find(item=>item.kind===kind&&item.entity.id===id)||null;}
-  function ensureMasterAttackSelections() {
-    const items=masterAttackEntities(),current=combatCurrent(),currentKey=current?items.find(item=>item.entity.id===current.baseId):null;
-    if(!centralMasterAttackActor||!masterAttackFromKey(centralMasterAttackActor))centralMasterAttackActor=currentKey?`${currentKey.kind}|${currentKey.entity.id}`:(items[0]?`${items[0].kind}|${items[0].entity.id}`:'');
-    const targets=items.filter(item=>`${item.kind}|${item.entity.id}`!==centralMasterAttackActor);
-    if(!centralMasterAttackTarget||!targets.some(item=>`${item.kind}|${item.entity.id}`===centralMasterAttackTarget))centralMasterAttackTarget=targets[0]?`${targets[0].kind}|${targets[0].entity.id}`:'';
-    if(!['Melee','Agility'].includes(centralMasterAttackAbility))centralMasterAttackAbility='Melee';
-    if(!Number.isFinite(Number(centralMasterAttackDefense)))centralMasterAttackDefense=Number(state.challenge?.tn||14);
-  }
-  function centralMasterAttackMarkup() {
-    ensureMasterAttackSelections();const items=masterAttackEntities(),actor=masterAttackFromKey(centralMasterAttackActor),target=masterAttackFromKey(centralMasterAttackTarget),roll=centralMasterAttackRoll;
-    const actorOptions=items.map(item=>`<option value="${item.kind}|${escapeHTML(item.entity.id)}" ${`${item.kind}|${item.entity.id}`===centralMasterAttackActor?'selected':''}>${item.kind==='hero'?'Herói':'Vilão'} · ${escapeHTML(item.entity.n)}</option>`).join('');
-    const targetOptions=items.filter(item=>`${item.kind}|${item.entity.id}`!==centralMasterAttackActor).map(item=>`<option value="${item.kind}|${escapeHTML(item.entity.id)}" ${`${item.kind}|${item.entity.id}`===centralMasterAttackTarget?'selected':''}>${item.kind==='hero'?'Herói':'Vilão'} · ${escapeHTML(item.entity.n)}</option>`).join('');
-    let result='<div class="central-roll-empty">Selecione atacante, ação, alvo e Defesa/TN para resolver o ataque.</div>';
-    if(roll){const outcome=roll.outcome||{},damage=roll.damage||{},values=roll.values||[],history=roll.historyEntry||{},applied=history.damageApplied===true,dice=values.map((value,index)=>`<button type="button" class="central-die ${index===1?'marvel':''}" ${!centralMasterAttackAnimating&&roll.edgeRemaining>0&&!roll.finalized?`data-master-attack-edge="${index}"`:''}>${centralMasterAttackAnimating?'…':index===1&&Number(value)===1?'M':escapeHTML(value)}</button>`).join(''),damageLabel=outcome.success?(damage?.applied?escapeHTML(damage.total):'—'):'—';
-      result=`<div id="central-master-attack-dice-stage" class="dice-stage-3d central-action-dice-stage" aria-label="Animação D616 do ataque"></div><div class="central-attack-result ${centralMasterAttackAnimating?'':escapeHTML(outcome.key||'')}"><div class="central-attack-path"><b>${escapeHTML(roll.snapshot?.actorName||actor?.entity?.n||'Atacante')}</b><span>↓</span><strong>${escapeHTML(roll.snapshot?.action||'Ataque')}</strong><span>↓</span><b>${escapeHTML(roll.snapshot?.targetName||target?.entity?.n||'Alvo')}</b></div><div class="central-roll-dice">${dice}</div><div class="central-attack-numbers"><span><small>TOTAL</small><b>${centralMasterAttackAnimating?'…':escapeHTML(roll.math?.total??'—')}</b></span><span><small>DEFESA</small><b>${escapeHTML(roll.snapshot?.tn??'—')}</b></span><span><small>RESULTADO</small><b>${centralMasterAttackAnimating?'ROLANDO…':escapeHTML(outcome.label||'—')}</b></span><span><small>MARVEL DIE</small><b>${centralMasterAttackAnimating?'…':escapeHTML(Number(values[1])===1?'M':values[1]??'—')}</b></span><span><small>MULTIPLICADOR</small><b>${damage?.multiplier==null?'—':`×${escapeHTML(damage.multiplier)}`}</b></span><span><small>DANO</small><b>${centralMasterAttackAnimating?'…':damageLabel}</b></span></div>${!centralMasterAttackAnimating&&roll.edgeRemaining>0&&!roll.finalized?`<p class="central-note">Edge restante: ${roll.edgeRemaining}. Clique em um dos três dados ou <button type="button" data-master-attack-finalize>finalize a rolagem</button>.</p>`:''}${!centralMasterAttackAnimating&&roll.finalized&&outcome.success&&damage?.applied?`<button type="button" class="central-apply-damage" data-master-attack-apply ${applied?'disabled':''}>${applied?`DANO APLICADO · ${escapeHTML(history.damageAppliedResource==='focus'?'FOCUS':'HEALTH')} ${escapeHTML(history.damageAppliedBefore??'—')} → ${escapeHTML(history.damageAppliedAfter??'—')}`:`APLICAR DANO ${escapeHTML(damage.total)}`}</button>`:''}${!centralMasterAttackAnimating&&outcome.success&&!damage?.applied?'<p class="central-note">O perfil atual não possui multiplicador de dano configurado para esta habilidade.</p>':''}</div>`;
+  const COMBAT_ATTACKS = Object.freeze({
+    Melee:{label:'Corpo a corpo',short:'MELEE',resource:'health'},
+    Agility:{label:'À distância',short:'AGILITY',resource:'health'},
+    Ego:{label:'Ataque de Ego',short:'EGO',resource:'focus'},
+    Logic:{label:'Ataque de Logic',short:'LOGIC',resource:'focus'}
+  });
+
+  function masterAttackActors() {
+    const actors=[];
+    if(state.campaignContent?.mode==='solo'){
+      for(const entity of state.heroes) actors.push({key:`hero|${entity.id}`,kind:'hero',entity,item:{id:entity.id,baseId:entity.id,name:entity.n,image:entity.image||''}});
     }
-    return `<div class="central-panel-head"><div><small>RESOLUÇÃO DE ATAQUE</small><h3>Ataque + dano em uma única D616</h3></div><span>SEM SEGUNDA ROLAGEM</span></div><div class="central-attack-form"><label>PERSONAGEM<select id="central-attack-actor">${actorOptions}</select></label><label>AÇÃO<select id="central-attack-ability"><option value="Melee" ${centralMasterAttackAbility==='Melee'?'selected':''}>Ataque corpo a corpo · Melee ${signed(abilityValue(actor?.entity,'Melee'))}</option><option value="Agility" ${centralMasterAttackAbility==='Agility'?'selected':''}>Ataque à distância · Agility ${signed(abilityValue(actor?.entity,'Agility'))}</option></select></label><label>ALVO<select id="central-attack-target">${targetOptions}</select></label><label>DEFESA / TN<input id="central-attack-defense" type="number" min="1" max="99" value="${escapeHTML(centralMasterAttackDefense)}"></label><label>DANO EM<select id="central-attack-resource"><option value="health" ${centralMasterAttackResource==='health'?'selected':''}>Health</option><option value="focus" ${centralMasterAttackResource==='focus'?'selected':''}>Focus</option></select></label><button type="button" data-master-attack-roll ${!actor||!target||centralMasterAttackAnimating?'disabled':''}>ROLAR ATAQUE</button></div>${result}`;
+    actors.push(...state.villains.map(entity=>({key:`villain|${entity.id}`,kind:'villain',entity,item:{id:entity.id,baseId:entity.id,name:entity.n,image:entity.image||''}})));
+    for(const npc of Object.values(MINION_TEMPLATES)){
+      const vitals=state.scenario?.minionVitals?.[npc.id]||{};
+      const entity={...npc,...vitals};
+      actors.push({key:`minion|${npc.id}`,kind:'other',entity,item:{id:npc.id,baseId:npc.id,name:npc.n,image:npc.image||''}});
+    }
+    return actors;
+  }
+
+  function masterAttackFromKey(key='') {
+    return masterAttackActors().find(item=>item.key===key)||null;
+  }
+
+  function ensureMasterAttackSelections() {
+    const actors=masterAttackActors();
+    if(!actors.some(item=>item.key===centralMasterAttackActor)){
+      centralMasterAttackActor=actors[0]?.key||'';
+      centralMasterAttackRoll=null;
+    }
+  }
+
+  function attackPortrait(entity) {
+    const src = entity?.image || characterArt(entity?.id,'');
+    return src
+      ? `<img src="${escapeHTML(portraitDisplaySrc(src,{small:true}))}" alt="" loading="lazy" decoding="async">`
+      : escapeHTML(monogram(entity?.n || '?'));
+  }
+
+  function masterActorCardsMarkup(items, actorKey) {
+    if(!items.length)return '<div class="central-empty compact"><b>Nenhum vilão cadastrado.</b><span>Adicione um vilão à campanha para fazer rolagens pelo Mestre.</span></div>';
+    return `<div class="master-actor-strip support-actor-strip">${items.map(item=>{
+      const selected=item.key===actorKey,entity=item.entity;
+      return `<button type="button" class="master-actor-card ${selected?'active':''} threat" data-master-attack-actor-card="${escapeHTML(item.key)}"><span>${attackPortrait(entity)}</span><b>${escapeHTML(item.item?.name||entity.n)}</b><small>${item.kind==='hero'?'HERÓI':item.kind==='other'?'CAPANGA':'VILÃO'}</small></button>`;
+    }).join('')}</div>`;
+  }
+
+  function masterActionResultMarkup(actor, target, roll) {
+    if(!roll)return '<div class="central-roll-empty">Escolha uma ação para rolar a D616.</div>';
+    const outcome=roll.outcome||{};
+    const actorName=roll.snapshot?.actorName||actor?.item?.name||actor?.entity?.n||'Personagem';
+    const tn=roll.snapshot?.tn??state.challenge?.tn??14;
+    const stateClass=centralMasterAttackAnimating?'rolling':escapeHTML(outcome.key||'');
+    return `<div class="master-attack-result-simple support-master-roll ${stateClass}"><div class="master-attack-result-head"><div><small>${escapeHTML(actorName)}</small><b>${centralMasterAttackAnimating?'ROLANDO…':escapeHTML(outcome.label||'RESULTADO')}</b></div><span>${centralMasterAttackAnimating?'…':`${escapeHTML(roll.math?.total??'—')} · TN ${escapeHTML(tn)}`}</span></div><div id="central-master-attack-dice-stage" class="dice-stage-3d master-action-dice-stage" aria-label="Rolagem D616"></div>${!centralMasterAttackAnimating&&roll.edgeRemaining>0&&!roll.finalized?`<div class="master-edge-hint"><span>Edge disponível: clique em um dado para rerrolar.</span><button type="button" data-master-attack-finalize>USAR RESULTADO</button></div>`:''}</div>${centralDamageResultMarkup(roll,{animating:centralMasterAttackAnimating})}`;
+  }
+
+  function masterCombatActionMarkup(actor) {
+    const actions=Object.entries(COMBAT_ATTACKS).map(([name,meta])=>`<button type="button" class="master-action-card" data-master-roll-ability="${name}" ${!actor||centralMasterAttackAnimating?'disabled':''}><small>${escapeHTML(meta.short)}</small><b>${escapeHTML(meta.label)}</b><strong>${signed(abilityValue(actor?.entity,name))}</strong><span>ROLAR D616</span></button>`).join('');
+    return `<div class="support-action-block"><small>ESCOLHA A AÇÃO</small><div class="master-action-grid support-action-grid">${actions}</div></div>`;
+  }
+
+  function masterActionOptions(actor) {
+    if (!actor) return '<div class="central-empty compact"><span>Selecione um vilão que esteja no combate.</span></div>';
+    const entity = actor.entity;
+    if (centralMasterActionCategory === 'combat') return masterCombatActionMarkup(actor);
+    if (centralMasterActionCategory === 'movement') {
+      return `<div class="central-movement-list">${Object.entries(entity.movement||{}).map(([mode,value])=>`<span><b>${escapeHTML(MOVE_META[mode]?.label||mode)}</b><strong>${escapeHTML(value)}</strong></span>`).join('')||'<span>Movimento não disponível.</span>'}</div>`;
+    }
+    if (centralMasterActionCategory === 'powers') {
+      return `<div class="central-power-list">${(entity.powers||[]).map(power=>`<button type="button" class="${centralMasterPowerName===power?'active':''}" data-master-power="${escapeHTML(power)}">${escapeHTML(power)}</button>`).join('')||'<span>Nenhum poder cadastrado.</span>'}</div>${centralMasterPowerName?`<div class="central-ability-grid">${ABILITIES.map(ability=>`<button type="button" data-master-roll-ability="${ability}"><small>${escapeHTML(ability)}</small><b>${signed(abilityValue(entity,ability))}</b><span>ROLAR</span></button>`).join('')}</div>`:''}`;
+    }
+    return `<div class="central-ability-grid">${ABILITIES.map(ability=>`<button type="button" data-master-roll-ability="${ability}"><small>${escapeHTML(ability)}</small><b>${signed(abilityValue(entity,ability))}</b><span>ROLAR</span></button>`).join('')}</div>`;
+  }
+
+  function centralTNControlMarkup() {
+    return `<label class="central-tn-control"><span>TN</span><input type="number" min="1" max="99" inputmode="numeric" value="${escapeHTML(clamp(state.challenge?.tn??14,1,99))}" data-central-tn-input aria-label="Número alvo da rolagem"></label>`;
+  }
+
+  function supportResourceControlMarkup({kind,entity,player=false}={}) {
+    if(!entity)return'';
+    const maxHealth=Number(entity.maxHealth),maxFocus=Number(entity.maxFocus),hasHealth=Number.isFinite(maxHealth),hasFocus=Number.isFinite(maxFocus);
+    if(!hasHealth&&!hasFocus)return'';
+    const health=hasHealth?Math.max(0,Math.min(maxHealth,Number(entity.currentHealth??maxHealth))):0;
+    const focus=hasFocus?Math.max(0,Math.min(maxFocus,Number(entity.currentFocus??maxFocus))):0;
+    const buttonAttrs=(resource,delta)=>player?`data-player-resource="${resource}" data-delta="${delta}"`:kind==='minion'?`data-minion-resource="${resource}" data-minion-id="${escapeHTML(entity.id)}" data-delta="${delta}"`:`data-combat-resource="${resource}" data-combat-kind="${escapeHTML(kind)}" data-combat-id="${escapeHTML(entity.id)}" data-delta="${delta}"`;
+    const inputAttrs=resource=>player?`data-player-resource-input="${resource}"`:kind==='minion'?`data-minion-resource-input="${resource}" data-minion-id="${escapeHTML(entity.id)}"`:`data-master-resource-input="${resource}" data-combat-kind="${escapeHTML(kind)}" data-combat-id="${escapeHTML(entity.id)}"`;
+    return `<div class="support-resource-strip">${hasHealth?`<div class="support-resource-item health"><small>HEALTH</small><div><button type="button" ${buttonAttrs('health',-5)} aria-label="Diminuir Health">−5</button><input type="number" min="0" max="${escapeHTML(maxHealth)}" value="${escapeHTML(health)}" ${inputAttrs('health')} aria-label="Health atual"><span>/ ${escapeHTML(maxHealth)}</span><button type="button" ${buttonAttrs('health',5)} aria-label="Aumentar Health">+5</button></div></div>`:''}${hasFocus?`<div class="support-resource-item focus"><small>FOCUS</small><div><button type="button" ${buttonAttrs('focus',-5)} aria-label="Diminuir Focus">−5</button><input type="number" min="0" max="${escapeHTML(maxFocus)}" value="${escapeHTML(focus)}" ${inputAttrs('focus')} aria-label="Focus atual"><span>/ ${escapeHTML(maxFocus)}</span><button type="button" ${buttonAttrs('focus',5)} aria-label="Aumentar Focus">+5</button></div></div>`:''}</div>`;
+  }
+
+  function masterActorToolsMarkup(actor) {
+    if(!actor)return'';
+    if(actor.kind==='hero'){
+      const index=state.heroes.findIndex(item=>item.id===actor.entity.id);
+      return `<div class="support-actor-tools">${supportResourceControlMarkup({kind:'hero',entity:actor.entity})}${index>=0?`<button type="button" class="support-sheet-button" data-action="view-hero" data-index="${index}">VER FICHA</button>`:''}</div>`;
+    }
+    if(actor.kind==='villain'){
+      const index=state.villains.findIndex(item=>item.id===actor.entity.id);
+      return `<div class="support-actor-tools">${supportResourceControlMarkup({kind:'villain',entity:actor.entity})}${index>=0?`<button type="button" class="support-sheet-button" data-action="view-villain" data-index="${index}">VER FICHA</button>`:''}</div>`;
+    }
+    return `<div class="support-actor-tools minion">${supportResourceControlMarkup({kind:'minion',entity:actor.entity})}<button type="button" class="support-sheet-button" data-master-minion-sheet="${escapeHTML(actor.entity.id)}">VER FICHA RÁPIDA</button></div>`;
+  }
+
+  function centralMasterRollHistoryMarkup() {
+    const rows=Array.isArray(state.diceHistory)?state.diceHistory:[];
+    const body=rows.length?rows.map(entry=>{
+      const values=Array.isArray(entry?.dice?.values)?entry.dice.values:[];
+      const dice=values.length?values.map((value,index)=>index===1&&Number(value)===1?'M':value).join(' · '):'—';
+      const actor=entry.actorName||String(entry.label||'Rolagem').split(' · ')[0]||'Personagem';
+      const action=entry.ability||entry.action||entry.type||'D616';
+      const tn=entry.tn==null?'':` · TN ${escapeHTML(entry.tn)}`;
+      return `<div class="support-history-row"><div><b>${escapeHTML(actor)}</b><small>${escapeHTML(action)} · D616 ${escapeHTML(dice)}${tn}</small></div><strong>${escapeHTML(entry.total??'—')}</strong><span>${escapeHTML(entry.outcome||'')}</span><time>${escapeHTML(rollClock(entry.at))}</time></div>`;
+    }).join(''):'<div class="central-empty compact"><span>Nenhuma rolagem registrada ainda.</span></div>';
+    return `<article class="central-panel support-history-card"><div class="central-panel-head"><div><small>HISTÓRICO DA SESSÃO</small><h3>Todas as rolagens</h3></div><span class="support-history-count">${rows.length}</span></div><div class="support-history-list">${body}</div></article>`;
+  }
+
+  function openMasterMinionSheet(id) {
+    const entity=MINION_TEMPLATES[id];if(!entity)return;
+    const abilities=ABILITIES.map(name=>`<div><small>${escapeHTML(name)}</small><b>${escapeHTML(signed(abilityValue(entity,name)))}</b></div>`).join('');
+    const movement=Object.entries(entity.movement||{}).map(([mode,value])=>`<li>${escapeHTML(MOVE_META[mode]?.label||mode)}: <b>${escapeHTML(value)}</b></li>`).join('');
+    const vitals={...entity,...(state.scenario?.minionVitals?.[id]||{})};
+    openModal(`<h2 id="modal-title">${escapeHTML(entity.n)}</h2><p class="muted">Ficha rápida do capanga.</p><div class="support-minion-sheet-vitals"><span><small>HEALTH</small><b>${escapeHTML(vitals.currentHealth)}/${escapeHTML(vitals.maxHealth)}</b></span><span><small>FOCUS</small><b>${escapeHTML(vitals.currentFocus)}/${escapeHTML(vitals.maxFocus)}</b></span></div><div class="sheet">${abilities}</div>${movement?`<h3>MOVIMENTO</h3><ul>${movement}</ul>`:''}`);
+  }
+
+  function centralMasterAttackMarkup() {
+    ensureMasterAttackSelections();
+    const actors=masterAttackActors();
+    const actor=masterAttackFromKey(centralMasterAttackActor);
+    return `<div class="master-action-hub master-mirrored-actions support-action-hub"><div class="central-panel-head"><div><small>CENTRAL DE AÇÕES</small><h3>${actor?escapeHTML(actor.item?.name||actor.entity.n):'Rolagens do Mestre'}</h3></div>${centralTNControlMarkup()}</div><section class="master-action-step master-controlled-combatants support-actor-step"><small>QUEM ESTÁ AGINDO?</small>${masterActorCardsMarkup(actors,centralMasterAttackActor)}</section>${actor?masterActorToolsMarkup(actor):''}${actors.length?`<div class="action-category-tabs master-action-tabs"><button class="${centralMasterActionCategory==='combat'?'active':''}" data-master-category="combat">⚔ COMBATE</button><button class="${centralMasterActionCategory==='test'?'active':''}" data-master-category="test">🧠 TESTES</button><button class="${centralMasterActionCategory==='powers'?'active':''}" data-master-category="powers">🦸 PODERES</button><button class="${centralMasterActionCategory==='movement'?'active':''}" data-master-category="movement">🏃 MOVIMENTO</button></div><div id="central-master-action-options">${masterActionOptions(actor)}</div>${centralMasterActionCategory==='movement'?'':masterActionResultMarkup(actor,null,centralMasterAttackRoll)}`:''}</div>`;
   }
 
   async function finalizeMasterCentralAttack() {
     if(!centralMasterAttackRoll?.id||centralMasterAttackRoll.finalized)return centralMasterAttackRoll;
     centralMasterAttackRoll=await window.ArachneAPI.finalizeActionRoll(centralMasterAttackRoll.id);if(centralMasterAttackRoll?.historyEntry)syncServerHistoryEntry(centralMasterAttackRoll.historyEntry);return centralMasterAttackRoll;
   }
-  async function runMasterCentralAttack() {
+  async function runMasterCentralAction(ability) {
     if(state.role!=='master'||centralMasterAttackAnimating||!backendReady||!window.ArachneAPI)return;
-    const actorKey=$('central-attack-actor')?.value||centralMasterAttackActor,targetKey=$('central-attack-target')?.value||centralMasterAttackTarget,actor=masterAttackFromKey(actorKey),target=masterAttackFromKey(targetKey),ability=$('central-attack-ability')?.value||centralMasterAttackAbility,defense=clamp($('central-attack-defense')?.value||centralMasterAttackDefense,1,99),resource=$('central-attack-resource')?.value==='focus'?'focus':'health';
-    if(!actor||!target)return toast('Selecione atacante e alvo.');
-    centralMasterAttackActor=actorKey;centralMasterAttackTarget=targetKey;centralMasterAttackAbility=ability;centralMasterAttackDefense=defense;centralMasterAttackResource=resource;centralMasterAttackAnimating=true;centralMasterAttackRoll=null;renderSessionCentral();
-    try{const action=ability==='Melee'?'Ataque corpo a corpo':'Ataque à distância';centralMasterAttackRoll=await window.ArachneAPI.startActionRoll({actorId:actor.entity.id,kind:actor.kind,source:actor.kind==='villain'?'threat':'hero',ability,action,tn:defense,edge:Number(state.challenge?.edge||0),trouble:Number(state.challenge?.trouble||0),extra:Number(state.challenge?.extra||0),rollType:'attack',targetId:target.entity.id,targetKind:target.kind,damageResource:resource,deferFinalize:true});renderSessionCentral();await animateReusableD616Result(centralMasterAttackRoll,'central-master-attack-dice-stage');centralMasterAttackAnimating=false;if(centralMasterAttackRoll.edgeRemaining===0)await finalizeMasterCentralAttack();renderSessionCentral();settleReusableD616('central-master-attack-dice-stage',centralMasterAttackRoll);}
-    catch(error){centralMasterAttackAnimating=false;toast(error.message||'Não foi possível resolver o ataque.');renderSessionCentral();}
+    ensureMasterAttackSelections();
+    const actor=masterAttackFromKey(centralMasterAttackActor);
+    if(!actor)return toast('Selecione quem está agindo.');
+    const isCombat=centralMasterActionCategory==='combat';
+    const action=isCombat?`Combate · ${ability}`:centralMasterActionCategory==='powers'?`${centralMasterPowerName||'Poder'} · ${ability}`:`Teste · ${ability}`;
+    const actorPayload=actor.kind==='other'?{id:actor.entity.id,n:actor.item?.name||actor.entity.n,abilities:actor.entity.abilities||{}}:undefined;
+    centralMasterAttackAnimating=true;centralMasterAttackRoll=null;renderSessionCentral();
+    try{
+      centralMasterAttackRoll=await window.ArachneAPI.startActionRoll({actorId:actor.entity.id,kind:actor.kind==='hero'?'hero':'villain',source:actor.kind==='hero'?'hero':'threat',actor:actorPayload,ability,action,tn:clamp(state.challenge?.tn??14,1,99),rollType:isCombat?'attack':'test',deferFinalize:true});
+      renderSessionCentral();
+      await animateReusableD616Result(centralMasterAttackRoll,'central-master-attack-dice-stage');
+      centralMasterAttackAnimating=false;
+      if(centralMasterAttackRoll.edgeRemaining===0)await finalizeMasterCentralAttack();
+      renderSessionCentral();
+      settleReusableD616('central-master-attack-dice-stage',centralMasterAttackRoll);
+    }catch(error){centralMasterAttackAnimating=false;toast(error.message||'Não foi possível rolar a ação.');renderSessionCentral();}
   }
-  async function useMasterCentralAttackEdge(index) {if(!centralMasterAttackRoll?.id||centralMasterAttackAnimating||centralMasterAttackRoll.finalized)return;const previous=centralMasterAttackRoll;try{centralMasterAttackRoll=await window.ArachneAPI.useActionEdge(previous.id,index);centralMasterAttackAnimating=true;renderSessionCentral();await animateReusableD616Result(centralMasterAttackRoll,'central-master-attack-dice-stage',previous);centralMasterAttackAnimating=false;if(centralMasterAttackRoll.edgeRemaining===0)await finalizeMasterCentralAttack();renderSessionCentral();settleReusableD616('central-master-attack-dice-stage',centralMasterAttackRoll);}catch(error){centralMasterAttackAnimating=false;toast(error.message||'Edge indisponível');renderSessionCentral();}}
-  async function applyMasterCentralAttackDamage() {if(state.role!=='master'||!centralMasterAttackRoll?.id||!centralMasterAttackRoll.finalized)return;try{const result=await window.ArachneAPI.applyAttackDamage(centralMasterAttackRoll.id),target=result.target;if(result.targetKind==='hero'){const index=state.heroes.findIndex(item=>item.id===target.id);if(index>=0)state.heroes[index]={...state.heroes[index],...target};}else{const index=state.villains.findIndex(item=>item.id===target.id);if(index>=0)state.villains[index]={...state.villains[index],...target};}if(result.combat)state.combat=result.combat;const entry=result.historyEntry;state.diceHistory=(state.diceHistory||[]).map(item=>item?.rollId===entry.rollId?{...item,...entry}:item);state.actionHistory=(state.actionHistory||[]).map(item=>item?.rollId===entry.rollId?{...item,...entry}:item);centralMasterAttackRoll={...centralMasterAttackRoll,historyEntry:entry,damage:result.damage};renderHeroes();renderVillains();renderSessionCentral();renderCombatConsole();toast(`Dano aplicado em ${target.n}.`);}catch(error){toast(error.message||'Não foi possível aplicar o dano.');}}
 
+  async function useMasterCentralAttackEdge(index) {
+    if(!centralMasterAttackRoll?.id||centralMasterAttackAnimating||centralMasterAttackRoll.finalized)return;
+    const previous=centralMasterAttackRoll;
+    try{
+      centralMasterAttackRoll=await window.ArachneAPI.useActionEdge(previous.id,index);
+      centralMasterAttackAnimating=true;renderSessionCentral();
+      await animateReusableD616Result(centralMasterAttackRoll,'central-master-attack-dice-stage',previous);
+      centralMasterAttackAnimating=false;
+      if(centralMasterAttackRoll.edgeRemaining===0)await finalizeMasterCentralAttack();
+      renderSessionCentral();settleReusableD616('central-master-attack-dice-stage',centralMasterAttackRoll);
+    }catch(error){centralMasterAttackAnimating=false;toast(error.message||'Edge indisponível');renderSessionCentral();}
+  }
+
+  function playerCombatActionMarkup(hero) {
+    const actions=Object.entries(COMBAT_ATTACKS).map(([name,meta])=>`<button type="button" class="master-action-card" data-central-roll-ability="${name}" ${centralActionAnimating?'disabled':''}><small>${escapeHTML(meta.short)}</small><b>${escapeHTML(meta.label)}</b><strong>${signed(abilityValue(hero,name))}</strong><span>ROLAR D616</span></button>`).join('');
+    return `<div class="support-action-block"><small>ESCOLHA A AÇÃO</small><div class="master-action-grid support-action-grid">${actions}</div></div>`;
+  }
 
   function centralActionOptions(hero) {
     if(!hero)return'';
-    if(centralActionCategory==='movement')return `<div class="central-movement-list">${Object.entries(hero.movement||{}).map(([mode,value])=>`<span><b>${escapeHTML(MOVE_META[mode]?.label||mode)}</b><strong>${escapeHTML(value)}</strong></span>`).join('')||'<span>Movimento não estruturado nesta ficha.</span>'}</div><p class="central-note">O painel exibe os valores armazenados na ficha; não cria uma regra de movimento que não esteja cadastrada.</p>`;
-    if(centralActionCategory==='powers')return `<div class="central-power-list">${(hero.powers||[]).map(power=>`<button type="button" class="${centralPowerName===power?'active':''}" data-central-power="${escapeHTML(power)}">${escapeHTML(power)}</button>`).join('')||'<span>Nenhum poder cadastrado.</span>'}</div><p class="central-note">Os poderes atuais são texto de ficha e não possuem, no banco, um mapeamento automático de habilidade. Se o poder exigir um Action Check pelas regras da mesa, selecione o poder e depois a habilidade correspondente sem alterar o valor-base.</p>${centralPowerName?`<div class="central-ability-grid">${ABILITIES.map(ability=>`<button type="button" data-central-roll-ability="${ability}"><small>${escapeHTML(ability)}</small><b>${signed(abilityValue(hero,ability))}</b><span>ROLAR</span></button>`).join('')}</div>`:''}`;
-    const abilities=centralActionCategory==='combat'?['Melee','Agility']:ABILITIES;
-    return `<div class="central-ability-grid">${abilities.map(ability=>`<button type="button" data-central-roll-ability="${ability}"><small>${escapeHTML(ability)}</small><b>${signed(abilityValue(hero,ability))}</b><span>ROLAR</span></button>`).join('')}</div>`;
+    if(centralActionCategory==='combat')return playerCombatActionMarkup(hero);
+    if(centralActionCategory==='movement')return `<div class="central-movement-list">${Object.entries(hero.movement||{}).map(([mode,value])=>`<span><b>${escapeHTML(MOVE_META[mode]?.label||mode)}</b><strong>${escapeHTML(value)}</strong></span>`).join('')||'<span>Movimento não disponível.</span>'}</div>`;
+    if(centralActionCategory==='powers')return `<div class="central-power-list">${(hero.powers||[]).map(power=>`<button type="button" class="${centralPowerName===power?'active':''}" data-central-power="${escapeHTML(power)}">${escapeHTML(power)}</button>`).join('')||'<span>Nenhum poder cadastrado.</span>'}</div>${centralPowerName?`<div class="central-ability-grid">${ABILITIES.map(ability=>`<button type="button" data-central-roll-ability="${ability}"><small>${escapeHTML(ability)}</small><b>${signed(abilityValue(hero,ability))}</b><span>ROLAR</span></button>`).join('')}</div>`:''}`;
+    return `<div class="central-ability-grid">${ABILITIES.map(ability=>`<button type="button" data-central-roll-ability="${ability}"><small>${escapeHTML(ability)}</small><b>${signed(abilityValue(hero,ability))}</b><span>ROLAR</span></button>`).join('')}</div>`;
   }
+
 
   function centralCurrentSession() {
     const sessions=activeSessions();
@@ -2704,15 +2904,15 @@
     const choices=centralParticipantChoices(),current=active?(state.combat?.order||[]):(state.initiativeParticipants||[]),used=new Set(current.map(item=>String(item?.baseId||'')));
     const groups=['HERÓIS','VILÕES','NPCs / CAPANGAS'];
     const options=groups.map(group=>{const rows=choices.filter(item=>item.group===group);return rows.length?`<optgroup label="${group}">${rows.map(item=>{const repeatable=!active&&isRepeatableInitiativeEntity(item.entity),count=current.filter(entry=>String(entry?.baseId||'')===String(item.entity.id)).length,disabled=used.has(String(item.entity.id))&&!repeatable;return `<option value="${escapeHTML(item.key)}" ${disabled?'disabled':''}>${escapeHTML(item.label)}${disabled?' · JÁ NA INICIATIVA':repeatable&&count?` · ${count} NA INICIATIVA`:repeatable?' · PODE REPETIR':''}</option>`;}).join('')}</optgroup>`:'';}).join('');
-    if(active)return `<div class="central-participant-add"><div><small>ADICIONAR AO COMBATE</small><select id="central-participant-select">${options}</select></div><label>INICIATIVA<input id="central-participant-result" type="number" min="-99" max="199" placeholder="Obrigatória"></label><button type="button" data-central-participant-add="combat">ADICIONAR À ORDEM</button></div>`;
-    return `<div class="central-participant-add initiative-add-only"><div><small>ADICIONAR À INICIATIVA</small><select id="central-participant-select">${options}</select><span class="central-repeatable-hint">Capangas e ameaças LACAIO podem ser adicionados várias vezes.</span></div><button type="button" data-central-participant-add="initiative">ADICIONAR PARTICIPANTE</button></div>`;
+    if(active)return `<div class="central-participant-add master-quick-add"><div><small>ADICIONAR PARTICIPANTE</small><select id="central-participant-select">${options}</select></div><label>INICIATIVA<input id="central-participant-result" type="number" min="-99" max="199" placeholder="Ex.: 18"></label><button type="button" data-central-participant-add="combat">ADICIONAR</button></div>`;
+    return `<div class="central-participant-add initiative-add-only master-quick-add"><div><small>QUEM ENTRA?</small><select id="central-participant-select">${options}</select></div><button type="button" data-central-participant-add="initiative">ADICIONAR</button><span class="central-repeatable-hint">Capangas e ameaças LACAIO podem ser adicionados várias vezes na iniciativa.</span></div>`;
   }
 
   function centralInitiativeSetupMarkup() {
     const participants=Array.isArray(state.initiativeParticipants)?state.initiativeParticipants:[];
-    const rows=participants.length?participants.map((item,index)=>{const rolled=item.result!==null&&item.result!==''&&Number.isFinite(Number(item.result));return `<div class="central-init-row"><span>${index+1}</span><div><b>${escapeHTML(item.name||'Participante')}</b><small>Modificador ${escapeHTML(signed(Number(item.modifier||0)))}</small></div><div class="central-init-result"><small>${rolled?`D616 ${escapeHTML(initiativeDiceText(item))}`:'INICIATIVA'}</small><b>${rolled?escapeHTML(item.result):'—'}</b></div><button type="button" data-central-init-roll="${escapeHTML(item.id)}" ${rolled||initiativeRolling||initiativeBatchRolling?'disabled':''}>${rolled?'ROLADA':'ROLAR INICIATIVA'}</button><button type="button" data-central-init-remove-id="${escapeHTML(item.id)}" aria-label="Remover ${escapeHTML(item.name||'participante')}" ${initiativeRolling||initiativeBatchRolling?'disabled':''}>REMOVER</button></div>`;}).join(''):'<div class="central-empty compact"><span>Nenhum participante preparado. Adicione heróis, vilões ou NPCs.</span></div>';
+    const rows=participants.length?participants.map((item,index)=>{const rolled=item.result!==null&&item.result!==''&&Number.isFinite(Number(item.result));return `<div class="central-init-row master-init-row"><span>${index+1}</span><div><b>${escapeHTML(item.name||'Participante')}</b><small>${escapeHTML(signed(Number(item.modifier||0)))} iniciativa</small></div><div class="central-init-result"><small>${rolled?`D616 ${escapeHTML(initiativeDiceText(item))}`:'INICIATIVA'}</small><b>${rolled?escapeHTML(item.result):'—'}</b></div><button type="button" class="initiative-roll-one" data-central-init-roll="${escapeHTML(item.id)}" ${rolled||initiativeRolling||initiativeBatchRolling?'disabled':''}>${rolled?'OK':'ROLAR'}</button><button type="button" class="master-icon-danger" data-central-init-remove-id="${escapeHTML(item.id)}" aria-label="Remover ${escapeHTML(item.name||'participante')}" ${initiativeRolling||initiativeBatchRolling?'disabled':''}>×</button></div>`;}).join(''):'<div class="central-empty compact"><span>Adicione os participantes para definir a ordem inicial.</span></div>';
     const ready=participants.filter(item=>item.result!==null&&item.result!==''&&Number.isFinite(Number(item.result))).length,pending=participants.length-ready;
-    return `${centralParticipantFormMarkup(false)}<div class="central-initiative-roller"><div id="central-initiative-dice-stage" class="dice-stage-3d central-initiative-dice-stage" aria-label="Rolagem D616 de iniciativa"></div><div><small>ROLAGEM DE INICIATIVA</small><b id="central-initiative-roll-status">${lastInitiativeRoll?.snapshot?.actorName?`${escapeHTML(lastInitiativeRoll.snapshot.actorName)} · ${escapeHTML(lastInitiativeRoll.math?.total??'—')}`:'Aguardando rolagem'}</b><span>O servidor gera a D616 e usa o modificador da ficha.</span></div><button type="button" data-central-roll-all ${!pending||initiativeRolling||initiativeBatchRolling?'disabled':''}>ROLAR INICIATIVAS</button></div><div class="central-init-summary"><span>${participants.length} participante${participants.length===1?'':'s'}</span><b>${ready} rolada${ready===1?'':'s'} · ${pending} pendente${pending===1?'':'s'}</b></div><div class="central-init-list">${rows}</div>`;
+    return `${centralParticipantFormMarkup(false)}<div class="central-init-summary master-init-summary"><span>${participants.length} participante${participants.length===1?'':'s'}</span><b>${ready} pronto${ready===1?'':'s'} · ${pending} pendente${pending===1?'':'s'}</b><button type="button" data-central-roll-all ${!pending||initiativeRolling||initiativeBatchRolling?'disabled':''}>ROLAR PENDENTES</button></div><div class="central-init-list">${rows}</div><div class="central-initiative-roller compact-initiative-roller"><div id="central-initiative-dice-stage" class="dice-stage-3d central-initiative-dice-stage" aria-label="Rolagem D616 de iniciativa"></div><div><small>D616 DE INICIATIVA</small><b id="central-initiative-roll-status">${lastInitiativeRoll?.snapshot?.actorName?`${escapeHTML(lastInitiativeRoll.snapshot.actorName)} · ${escapeHTML(lastInitiativeRoll.math?.total??'—')}`:'Pronto para rolar'}</b></div></div>`;
   }
 
   function centralCharacterCardsMarkup() {
@@ -2728,7 +2928,7 @@
     if(!centralResourceTarget||!all.some(item=>`${item.kind}|${item.entity.id}`===centralResourceTarget))centralResourceTarget=preferred?`${preferred.kind}|${preferred.entity.id}`:`${all[0].kind}|${all[0].entity.id}`;
     const selected=all.find(item=>`${item.kind}|${item.entity.id}`===centralResourceTarget)||all[0],entity=selected.entity;
     const options=all.map(item=>`<option value="${item.kind}|${escapeHTML(item.entity.id)}" ${`${item.kind}|${item.entity.id}`===centralResourceTarget?'selected':''}>${item.kind==='hero'?'Herói':'Vilão'} · ${escapeHTML(item.entity.n)}</option>`).join('');
-    return `<div class="central-resource-manager"><div class="central-resource-manager-head"><div><small>RECURSOS RÁPIDOS</small><select id="central-resource-target">${options}</select></div><span>${escapeHTML(entity.n)}</span></div><div class="central-resource-meter-grid"><div><small>HEALTH</small><strong>${entity.currentHealth}/${entity.maxHealth}</strong><div><button type="button" data-combat-resource="health" data-combat-kind="${selected.kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="-5">−5</button><button type="button" data-combat-resource="health" data-combat-kind="${selected.kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="5">+5</button></div></div><div><small>FOCUS</small><strong>${entity.currentFocus}/${entity.maxFocus}</strong><div><button type="button" data-combat-resource="focus" data-combat-kind="${selected.kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="-5">−5</button><button type="button" data-combat-resource="focus" data-combat-kind="${selected.kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="5">+5</button></div></div></div></div>`;
+    return `<div class="central-resource-manager master-resource-bar"><div class="central-resource-manager-head"><div><small>PERSONAGEM</small><select id="central-resource-target">${options}</select></div></div><div class="master-resource-value"><span><small>HEALTH</small><b>${entity.currentHealth}/${entity.maxHealth}</b></span><div><button type="button" aria-label="Diminuir Health" data-combat-resource="health" data-combat-kind="${selected.kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="-5">−5</button><button type="button" aria-label="Aumentar Health" data-combat-resource="health" data-combat-kind="${selected.kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="5">+5</button></div></div><div class="master-resource-value"><span><small>FOCUS</small><b>${entity.currentFocus}/${entity.maxFocus}</b></span><div><button type="button" aria-label="Diminuir Focus" data-combat-resource="focus" data-combat-kind="${selected.kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="-5">−5</button><button type="button" aria-label="Aumentar Focus" data-combat-resource="focus" data-combat-kind="${selected.kind}" data-combat-id="${escapeHTML(entity.id)}" data-delta="5">+5</button></div></div></div>`;
   }
 
   function centralScenarioDetailMarkup() {
@@ -2737,30 +2937,56 @@
     return `${visual}<div class="central-scenario-facts"><span><small>LOCALIZAÇÃO</small><b>${escapeHTML(environment)}</b></span><span><small>GRADE</small><b>${escapeHTML(scenario.width||20)} × ${escapeHTML(scenario.height||14)}</b></span><span><small>ELEMENTOS</small><b>${pieces} peças · ${obstacles+terrain} marcadores</b></span></div><div class="central-scenario-brief"><small>BRIEFING / OBJETIVO DA SESSÃO</small><b>${escapeHTML(currentSession?.title||state.campaignContent?.title||'Sessão atual')}</b><p>${escapeHTML(currentSession?.text||state.campaignContent?.summary||'Sem descrição estruturada para a sessão atual.')}</p></div>`;
   }
 
+  function centralScenarioMarkup() {
+    const isMaster=state.role==='master';
+    return `<article class="central-panel support-scenario-card"><div class="central-panel-head support-scenario-head"><div><small>CENÁRIO</small><h3>${isMaster?'Controle das peças':'Seu movimento'}</h3><p>${isMaster?'Selecione qualquer peça no tabuleiro para movimentá-la.':'Seu personagem já fica selecionado. Clique em uma casa destacada para mover.'}</p></div><div class="support-scenario-actions"><button type="button" data-central-scenario-zoom="-0.1" aria-label="Diminuir zoom">−</button><span id="central-scenario-zoom-value">100%</span><button type="button" data-central-scenario-zoom="0.1" aria-label="Aumentar zoom">+</button><button type="button" data-central-scenario-fit>AJUSTAR</button>${isMaster?`<button type="button" data-central-scenario-reset-all>NOVA RODADA</button>`:''}</div></div><div id="central-scenario-selection" class="support-scenario-selection">${isMaster?'Selecione uma peça.':'Seu personagem está pronto para mover.'}</div><div id="central-scenario-movement-panel" class="scenario-movement-panel support-scenario-movement"></div><div class="support-scenario-board-scroll"><div class="board-surface"><div id="central-scenario-board" class="scenario-board" role="grid" aria-label="Cenário tático"></div></div></div></article>`;
+  }
+
+  function renderCentralScenarioMovementPanel() {
+    const panel=$('central-scenario-movement-panel');if(!panel)return;
+    if(state.role==='player'){
+      const own=playerScenarioPiece();if(!own){playerScenarioSelectedPieceId=null;panel.innerHTML='<div class="movement-empty"><b>MOVIMENTO</b><span>Seu personagem ainda não está posicionado no cenário.</span></div>';return;}
+      playerScenarioSelectedPieceId=own.id;
+      const piece=own,st=movementStatus(piece,playerScenarioMode),opts=st.valid.map(([k,v])=>`<option value="${k}" ${k===st.mode?'selected':''} ${st.locked&&k!==st.mode?'disabled':''}>${MOVE_META[k]?.label||k} · ${v}</option>`).join(''),stats=st.valid.map(([k,v])=>`<span class="speed-chip ${k===st.mode?'active':''} ${st.locked&&k!==st.mode?'locked':''}"><small>${MOVE_META[k]?.abbr||k.toUpperCase()}</small><b>${v}</b></span>`).join('');
+      panel.innerHTML=`<div class="speed-card"><div class="speed-card-title"><span>SEU PERSONAGEM · SPEED</span><b>${escapeHTML(piece.name)}</b></div><div class="speed-chips">${stats}</div><div class="movement-controls"><label>Modo<select id="central-scenario-move-mode" ${scenarioMovePending?'disabled':''}>${opts}</select></label><div class="movement-budget"><small>RESTANTE</small><strong>${st.remaining}</strong><span>/ ${st.max}</span></div></div><div class="movement-meter"><i style="width:${st.max?Math.max(0,Math.min(100,st.remaining/st.max*100)):0}%"></i></div><div class="movement-actions"><button type="button" data-central-scenario-reset-piece="${escapeHTML(piece.id)}">NOVO MOVIMENTO</button><span>${scenarioMovePending?'Movimentando…':'Clique em uma casa destacada.'}</span></div></div>`;
+      $('central-scenario-move-mode')?.addEventListener('change',e=>{if(st.locked&&e.target.value!==st.locked.mode){toast('Finalize ou reinicie o movimento antes de trocar o modo.');renderCentralScenario();return;}playerScenarioMode=e.target.value;renderCentralScenario();});return;
+    }
+    const piece=selectedScenarioPiece();if(!piece){panel.innerHTML='<div class="movement-empty"><b>CONTROLE DO MESTRE</b><span>Clique em qualquer peça para selecioná-la.</span></div>';return;}
+    const st=movementStatus(piece),opts=st.valid.map(([k,v])=>`<option value="${k}" ${k===st.mode?'selected':''} ${st.locked&&k!==st.mode?'disabled':''}>${MOVE_META[k]?.label||k} · ${v}</option>`).join(''),stats=st.valid.map(([k,v])=>`<span class="speed-chip ${k===st.mode?'active':''} ${st.locked&&k!==st.mode?'locked':''}"><small>${MOVE_META[k]?.abbr||k.toUpperCase()}</small><b>${v}</b></span>`).join('');
+    panel.innerHTML=`<div class="speed-card"><div class="speed-card-title"><span>PEÇA SELECIONADA · SPEED</span><b>${escapeHTML(piece.name)}</b></div><div class="speed-chips">${stats}</div><div class="movement-controls"><label>Modo<select id="central-scenario-move-mode">${opts}</select></label><div class="movement-budget"><small>RESTANTE</small><strong>${st.remaining}</strong><span>/ ${st.max}</span></div></div><div class="movement-meter"><i style="width:${st.max?Math.max(0,Math.min(100,st.remaining/st.max*100)):0}%"></i></div><div class="movement-actions"><button type="button" data-central-scenario-reset-piece="${escapeHTML(piece.id)}">NOVO MOVIMENTO</button><span>Clique em uma casa destacada para mover.</span></div></div>`;
+    $('central-scenario-move-mode')?.addEventListener('change',e=>{if(st.locked&&e.target.value!==st.locked.mode){toast('Finalize ou reinicie o movimento antes de trocar o modo.');renderCentralScenario();return;}state.scenario.selectedMode=e.target.value;saveScenario();renderCentralScenario();});
+  }
+
+  function renderCentralScenario() {
+    const board=$('central-scenario-board');if(!board)return;normalizeScenario();
+    if(state.role==='player'){const own=playerScenarioPiece();playerScenarioSelectedPieceId=own?.id||null;}
+    const {w,h}=boardSize(),selected=selectedScenarioPiece(),st=selected?movementStatus(selected,state.role==='player'?playerScenarioMode:''):null,canReach=selected&&(state.role==='master'||selected.id===playerScenarioPiece()?.id),reachable=canReach?reachableCells(selected,st.mode,st.remaining):new Map();
+    board.innerHTML='';board.style.setProperty('--board-zoom',String(state.scenario.zoom||1));board.style.gridTemplateColumns=`repeat(${w}, var(--cell))`;board.style.gridTemplateRows=`repeat(${h}, var(--cell))`;board.dataset.environment=state.scenario.environment;board.dataset.readonly='false';
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      const t=terrainAt(x,y),cell=document.createElement('button');cell.type='button';cell.className=`scenario-cell ${(x+y)%2?'cell-dark':'cell-light'} base-${escapeHTML(state.scenario.baseTerrain)} terrain-${escapeHTML(t.type)} elevation-${Math.max(0,t.elevation||0)}`;cell.dataset.x=x;cell.dataset.y=y;cell.setAttribute('role','gridcell');cell.setAttribute('aria-label',`${x+1},${y+1} · ${t.label}`);cell.title=t.label;
+      const decor=decorAt(x,y),obs=obstacleAt(x,y),piece=scenarioPieceAt(x,y),key=scenarioCellKey(x,y);if(decor&&DECOR_META[decor]){cell.classList.add('has-decor',`decor-${decor}`);cell.innerHTML=decorHTML(decor);}if(obs&&OBSTACLE_META[obs]){cell.classList.add('has-obstacle',`obstacle-${obs}`);cell.innerHTML+=obstacleHTML(obs);}if(reachable.has(key)){cell.classList.add('reachable');cell.innerHTML+=`<span class="move-cost">${reachable.get(key)}</span>`;}if(piece){cell.classList.add('has-piece');cell.innerHTML+=pieceHTML(piece);if(selected?.id===piece.id)cell.classList.add('selected');}board.appendChild(cell);
+    }
+    const selection=$('central-scenario-selection');if(selection){if(state.role==='player'){const own=playerScenarioPiece();selection.textContent=own&&st?`${own.name} · ${MOVE_META[st.mode]?.label||st.mode} ${st.remaining}/${st.max}`:'Seu personagem ainda não está no cenário.';}else selection.textContent=selected&&st?`${selected.name} · ${MOVE_META[st.mode]?.label||st.mode} ${st.remaining}/${st.max}`:'Selecione qualquer peça no tabuleiro.';}
+    if($('central-scenario-zoom-value'))$('central-scenario-zoom-value').textContent=`${Math.round((state.scenario.zoom||1)*100)}%`;renderCentralScenarioMovementPanel();
+  }
+
+  function renderScenarioViews(){if($('scenario-board'))renderScenario();if($('central-scenario-board'))renderCentralScenario();}
+
+  function fitCentralScenarioBoard(){const scroll=document.querySelector('.support-scenario-board-scroll');if(!scroll)return;const{w,h}=boardSize(),base=58,pad=24,availableW=Math.max(260,scroll.clientWidth-pad),availableH=Math.max(320,Math.min(window.innerHeight*.68,720)-pad),fit=Math.min(1.15,availableW/(w*base),availableH/(h*base));state.scenario.zoom=Math.max(.2,Math.min(1.15,fit));localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));renderCentralScenario();scroll.scrollLeft=0;scroll.scrollTop=0;}
+
   function renderSessionCentral() {
     const wrap=$('session-central');if(!wrap)return;
-    const campaignName=state.campaignContent?.title||activeCampaign?.name||'Campanha',current=combatCurrent(),combat=state.combat||{},currentSession=centralCurrentSession(),initiativeCount=(combat.active?combat.order:state.initiativeParticipants||[]).length;
+    const campaignName=state.campaignContent?.title||activeCampaign?.name||'Campanha';
     if(state.role==='master'){
-      wrap.innerHTML=`<section class="central-hero-header master-table"><div><small>CENTRAL DO MESTRE · ${escapeHTML(activeCampaign?.code||'')}</small><h2>${escapeHTML(campaignName)}</h2><p>${combat.active?`RODADA ${escapeHTML(combat.round)} · VEZ DE ${escapeHTML(current?.name||'—')}`:`${escapeHTML(currentSession?.title||'Mesa pronta')} · COMBATE INATIVO`}</p></div><span class="central-status ${combat.active?'live':''}">${combat.active?'SESSÃO EM COMBATE':'MESA EM CONTROLE'}</span></section>
-      <section class="central-session-strip" aria-label="Estado da sessão"><div><small>CAMPANHA</small><b>${escapeHTML(activeCampaign?.code||'—')}</b><span>${escapeHTML(currentSession?.title||'Sem sessão marcada')}</span></div><div><small>CENÁRIO</small><b>${escapeHTML(ENVIRONMENTS[state.scenario?.environment]?.label||'Mesa tática')}</b><span>${(state.scenario?.pieces||[]).length} peças na mesa</span></div><div><small>RODADA</small><b>${combat.active?escapeHTML(combat.round):'—'}</b><span>${combat.active?'Combate ativo':'Exploração'}</span></div><div class="${combat.active?'is-live':''}"><small>TURNO ATUAL</small><b>${escapeHTML(current?.name||'—')}</b><span>${combat.active?'Personagem ativo':'Aguardando combate'}</span></div><div><small>INICIATIVA</small><b>${initiativeCount}</b><span>${combat.active?'na ordem ativa':'preparados'}</span></div></section>
-      <div class="central-master-workbench"><article class="central-panel central-combat-card central-command-card"><div class="central-panel-head"><div><small>COMBATE</small><h3>${combat.active?`Rodada ${escapeHTML(combat.round)} · ${escapeHTML(current?.name||'—')}`:'Preparar combate'}</h3></div><div class="central-inline-actions">${combat.active?`<button type="button" data-central-combat="next">PASSAR TURNO</button><button type="button" class="danger" data-central-combat="end">ENCERRAR COMBATE</button>`:`<button type="button" data-central-combat="start" ${!(state.initiativeParticipants||[]).some(item=>item.result!==null&&item.result!==''&&Number.isFinite(Number(item.result)))?'disabled':''}>INICIAR COMBATE</button>`}<button type="button" data-go="combat">TELA COMPLETA</button></div></div>${combat.active?`${combatOrderMarkup({controls:true,orderControls:true})}${centralParticipantFormMarkup(true)}`:centralInitiativeSetupMarkup()}</article>
-      <article class="central-panel central-scenario-card central-session-scenario"><div class="central-panel-head"><div><small>CENÁRIO</small><h3>${escapeHTML(ENVIRONMENTS[state.scenario?.environment]?.label||'Cena atual')}</h3></div><button type="button" data-go="scenario">ABRIR CENÁRIO</button></div>${centralScenarioDetailMarkup()}</article></div>
-      <article class="central-panel central-master-attack">${centralMasterAttackMarkup()}</article>
-      <div class="central-master-secondary"><article class="central-panel central-characters-card"><div class="central-panel-head"><div><small>PERSONAGENS</small><h3>Mesa e recursos</h3></div><span class="central-section-count">${state.heroes.length} heróis · ${state.villains.length} vilões</span></div>${centralCharacterCardsMarkup()}${centralResourcePanelMarkup()}</article>
-      <article class="central-panel central-session-tools"><div class="central-panel-head"><div><small>SESSÃO</small><h3>Informações e apoio</h3></div></div><div class="central-tool-list"><button type="button" data-go="campaign"><span>▣</span><div><b>Campanha</b><small>${escapeHTML(state.campaignContent?.summary||'Sessões e conteúdo')}</small></div></button><button type="button" data-go="notes"><span>✎</span><div><b>Anotações</b><small>Registro privado do Mestre</small></div></button><button type="button" data-go="dice"><span>⚄</span><div><b>Dados completos</b><small>D616, histórico e iniciativa</small></div></button><button type="button" data-go="rules"><span>?</span><div><b>Regras</b><small>Referência da mesa</small></div></button></div></article></div>`;
-      requestAnimationFrame(()=>{renderMasterRecentRolls();settleInitiativeStage($('central-initiative-dice-stage'));if(centralMasterAttackRoll&&!centralMasterAttackAnimating)settleReusableD616('central-master-attack-dice-stage',centralMasterAttackRoll);});
+      wrap.innerHTML=`<section class="support-central-head"><div><small>${state.campaignContent?.mode==='solo'?'CENTRAL SOLO':'CENTRAL DO MESTRE'} · ${escapeHTML(activeCampaign?.code||'')}</small><h2>${escapeHTML(campaignName)}</h2><p>${state.campaignContent?.mode==='solo'?'Controle Johnny Blaze, inimigos, iniciativa e cenário em uma única tela.':'Iniciativa, rolagens e controle rápido dos personagens.'}</p></div></section><div class="support-master-grid"><article class="central-panel master-initiative-card support-initiative-card"><div class="central-panel-head"><div><small>INICIATIVA</small><h3>Ordem inicial</h3></div></div>${centralInitiativeSetupMarkup()}</article><article class="central-panel action-center central-master-attack support-actions-card">${centralMasterAttackMarkup()}</article>${centralScenarioMarkup()}${centralMasterRollHistoryMarkup()}</div>`;
+      requestAnimationFrame(()=>{settleInitiativeStage($('central-initiative-dice-stage'));renderCentralScenario();if(centralMasterAttackRoll&&!centralMasterAttackAnimating){const stage=$('central-master-attack-dice-stage');settleReusableD616('central-master-attack-dice-stage',centralMasterAttackRoll);setDiceInteraction(centralMasterAttackRoll.edgeRemaining>0&&!centralMasterAttackRoll.finalized,stage);}});
       return;
     }
-    const hero=selectedHero(),isTurn=!combat.active||current?.baseId===hero?.id;
+    const hero=selectedHero();
     if(!hero){wrap.innerHTML='<div class="central-empty"><b>Personagem não disponível.</b><span>Volte à seleção da campanha.</span></div>';return;}
-    const src=hero.image||characterArt(hero.id,'');
-    wrap.innerHTML=`<section class="central-hero-header player"><div><small>${escapeHTML(campaignName)} · ${escapeHTML(activeCampaign?.code||'')}</small><h2>${combat.active?(isTurn?'SEU TURNO':'AGUARDANDO'):'MESA ATIVA'}</h2><p>${combat.active?(isTurn?'Você pode executar suas ações de turno.':`Agora é a vez de ${escapeHTML(current?.name||'outro personagem')}.`):'O Mestre ainda não iniciou um combate.'}</p></div><span class="central-status ${isTurn&&combat.active?'live':''}">${combat.active?`RODADA ${escapeHTML(combat.round)}`:'EXPLORAÇÃO'}</span></section>
-      <div class="player-central-grid"><article class="central-panel player-character-card"><div class="player-character-art">${src?`<img src="${escapeHTML(portraitDisplaySrc(src,{small:true}))}" alt="${escapeHTML(hero.n)}" decoding="async">`:`<span>${escapeHTML(monogram(hero.n))}</span>`}</div><div class="player-character-copy"><small>SEU PERSONAGEM</small><h3>${escapeHTML(hero.n)}</h3><p>${escapeHTML(hero.r||'')}</p><div class="player-resource-grid"><span class="player-resource-control"><small>HEALTH</small><div class="player-resource-stepper"><button type="button" aria-label="Diminuir Health" data-player-resource="health" data-delta="-1" ${playerResourceUpdating||heroCurrentHealth(hero)<=0?'disabled':''}>−</button><b>${heroCurrentHealth(hero)} / ${heroMaxHealth(hero)}</b><button type="button" aria-label="Aumentar Health" data-player-resource="health" data-delta="1" ${playerResourceUpdating||heroCurrentHealth(hero)>=heroMaxHealth(hero)?'disabled':''}>+</button></div></span><span class="player-resource-control"><small>FOCUS</small><div class="player-resource-stepper"><button type="button" aria-label="Diminuir Focus" data-player-resource="focus" data-delta="-1" ${playerResourceUpdating||heroCurrentFocus(hero)<=0?'disabled':''}>−</button><b>${heroCurrentFocus(hero)} / ${heroMaxFocus(hero)}</b><button type="button" aria-label="Aumentar Focus" data-player-resource="focus" data-delta="1" ${playerResourceUpdating||heroCurrentFocus(hero)>=heroMaxFocus(hero)?'disabled':''}>+</button></div></span><span><small>INICIATIVA</small><b>${escapeHTML(hero.initiative||'+0')}</b></span></div><button type="button" data-go="heroes">ABRIR FICHA</button></div></article>
-      <article class="central-panel player-scenario-card"><div class="central-panel-head"><div><small>CENÁRIO ATUAL</small><h3>${escapeHTML(ENVIRONMENTS[state.scenario?.environment]?.label||'Cena atual')}</h3></div><button data-go="scenario">VER MESA</button></div>${scenarioMiniMarkup()}<p>Atualizado pelo Mestre em tempo real.</p></article></div>
-      <article class="central-panel player-combat-card"><div class="central-panel-head"><div><small>COMBATE</small><h3>${combat.active?`Rodada ${escapeHTML(combat.round)} · ${isTurn?'Seu turno':`Vez de ${escapeHTML(current?.name||'—')}`}`:'Aguardando combate'}</h3></div><button data-go="combat">VER ORDEM</button></div>${combatOrderMarkup()}</article>
-      <article class="central-panel action-center ${!isTurn&&combat.active?'waiting':''}"><div class="central-panel-head"><div><small>CENTRAL DE AÇÕES</small><h3>O que você pode fazer agora?</h3></div><span>TN ${escapeHTML(state.challenge?.tn??14)}</span></div><div class="action-category-tabs"><button class="${centralActionCategory==='combat'?'active':''}" data-central-category="combat">⚔ COMBATE</button><button class="${centralActionCategory==='test'?'active':''}" data-central-category="test">🧠 TESTES</button><button class="${centralActionCategory==='powers'?'active':''}" data-central-category="powers">🦸 PODERES</button><button class="${centralActionCategory==='movement'?'active':''}" data-central-category="movement">🏃 MOVIMENTO</button></div>${!isTurn&&combat.active?`<div class="action-waiting"><b>AGUARDANDO</b><span>Agora é a vez de ${escapeHTML(current?.name||'outro personagem')}.</span></div>`:`<div id="central-action-options">${centralActionOptions(hero)}</div>`}<div id="central-action-result">${centralActionResultMarkup()}</div></article>
-      <article class="central-panel player-history"><div class="central-panel-head"><div><small>HISTÓRICO RECENTE</small><h3>Ações da mesa</h3></div></div><div>${(state.actionHistory||state.diceHistory||[]).slice(0,5).map(entry=>`<div class="central-history-row"><span>${entry.type==='D616'?'A':'⚄'}</span><div><b>${escapeHTML(entry.label||'Ação')}</b><small>${escapeHTML(entry.outcome||entry.action||'')}</small></div><strong>${escapeHTML(entry.total??'—')}</strong></div>`).join('')||'<div class="central-empty"><span>Nenhuma ação registrada ainda.</span></div>'}</div></article>`;
-    if(centralActionRoll&&!centralActionAnimating)requestAnimationFrame(()=>settleCentralActionDice(centralActionRoll));
+    const src=hero.image||characterArt(hero.id,''),heroIndex=state.heroes.findIndex(item=>item.id===hero.id);
+    wrap.innerHTML=`<section class="support-central-head player"><div><small>${escapeHTML(campaignName)} · ${escapeHTML(activeCampaign?.code||'')}</small><h2>${escapeHTML(hero.n)}</h2><p>Rolagens e controle rápido do seu personagem.</p></div></section><article class="central-panel support-hero-identity"><span class="support-hero-avatar">${src?`<img src="${escapeHTML(portraitDisplaySrc(src,{small:true}))}" alt="${escapeHTML(hero.n)}" decoding="async">`:`<b>${escapeHTML(monogram(hero.n))}</b>`}</span><div class="support-hero-copy"><small>PERSONAGEM</small><b>${escapeHTML(hero.n)}</b><span>${escapeHTML(hero.r||'')}</span></div><div class="support-hero-controls">${supportResourceControlMarkup({kind:'hero',entity:hero,player:true})}${heroIndex>=0?`<button type="button" class="support-sheet-button" data-action="view-hero" data-index="${heroIndex}">VER FICHA</button>`:''}</div></article><article class="central-panel action-center support-actions-card"><div class="central-panel-head"><div><small>CENTRAL DE AÇÕES</small><h3>O que você quer rolar?</h3></div>${centralTNControlMarkup()}</div><div class="action-category-tabs"><button class="${centralActionCategory==='combat'?'active':''}" data-central-category="combat">⚔ COMBATE</button><button class="${centralActionCategory==='test'?'active':''}" data-central-category="test">🧠 TESTES</button><button class="${centralActionCategory==='powers'?'active':''}" data-central-category="powers">🦸 PODERES</button><button class="${centralActionCategory==='movement'?'active':''}" data-central-category="movement">🏃 MOVIMENTO</button></div><div id="central-action-options">${centralActionOptions(hero)}</div>${centralActionCategory==='movement'?'':`<div id="central-action-result">${centralActionResultMarkup()}</div>`}</article>${centralScenarioMarkup()}`;
+    requestAnimationFrame(()=>{renderCentralScenario();if(centralActionRoll&&!centralActionAnimating){const stage=$('central-action-dice-stage');settleCentralActionDice(centralActionRoll);setDiceInteraction(centralActionRoll.edgeRemaining>0&&!centralActionRoll.finalized,stage);}});
   }
 
   function renderCombatConsole() {
@@ -2769,17 +2995,39 @@
   }
 
   async function runCentralAction(ability) {
-    const hero=selectedHero();if(!hero||!backendReady||!window.ArachneAPI)return toast('A API precisa estar conectada para rolar.');
-    const action=centralActionCategory==='combat'?`Combate · ${ability}`:centralActionCategory==='powers'?`${centralPowerName||'Poder'} · ${ability}`:`Teste · ${ability}`;
-    try{markSaved('Rolando no servidor…');centralActionRoll=await window.ArachneAPI.startActionRoll({ability,action,attack:centralActionCategory==='combat'});centralActionAnimating=true;renderSessionCentral();await animateCentralActionResult(centralActionRoll);centralActionAnimating=false;renderSessionCentral();settleCentralActionDice(centralActionRoll);markSaved('Rolagem pronta');}catch(error){centralActionAnimating=false;toast(error.message||'Não foi possível rolar');renderSessionCentral();}
+    const hero=selectedHero();if(!hero||!backendReady||!window.ArachneAPI)return toast('Sem conexão para rolar.');
+    const isCombat=centralActionCategory==='combat';
+    const action=isCombat?`Combate · ${ability}`:centralActionCategory==='powers'?`${centralPowerName||'Poder'} · ${ability}`:`Teste · ${ability}`;
+    try{
+      markSaved('Rolando…');
+      centralActionRoll=await window.ArachneAPI.startActionRoll({ability,action,tn:clamp(state.challenge?.tn??14,1,99),attack:isCombat});
+      centralActionAnimating=true;renderSessionCentral();
+      await animateCentralActionResult(centralActionRoll);
+      centralActionAnimating=false;renderSessionCentral();settleCentralActionDice(centralActionRoll);markSaved('Rolagem pronta');
+    }catch(error){centralActionAnimating=false;toast(error.message||'Não foi possível rolar');renderSessionCentral();}
   }
 
-  async function useCentralEdge(index) {if(!centralActionRoll?.id||centralActionAnimating)return;const previous=centralActionRoll;try{centralActionRoll=await window.ArachneAPI.useActionEdge(centralActionRoll.id,index);centralActionAnimating=true;renderSessionCentral();await animateCentralActionResult(centralActionRoll,previous);centralActionAnimating=false;renderSessionCentral();settleCentralActionDice(centralActionRoll);}catch(error){centralActionAnimating=false;toast(error.message||'Edge indisponível');renderSessionCentral();}}
-  async function finalizeCentralAction() {if(!centralActionRoll?.id)return;try{centralActionRoll=await window.ArachneAPI.finalizeActionRoll(centralActionRoll.id);renderSessionCentral();}catch(error){toast(error.message||'Não foi possível finalizar');}}
-  async function centralCombatAction(action) {if(state.role!=='master'||!backendReady)return;try{const combat=action==='start'?await window.ArachneAPI.startCombat():action==='next'?await window.ArachneAPI.nextCombatTurn():await window.ArachneAPI.endCombat();state.combat=combat;localStorage.setItem(STORAGE.combat,JSON.stringify(combat));renderSessionCentral();renderCombatConsole();toast(action==='start'?'Combate iniciado':action==='next'?'Turno avançado':'Combate encerrado');}catch(error){toast(error.message||'Não foi possível atualizar o combate');}}
+  async function useCentralEdge(index) {
+    if(!centralActionRoll?.id||centralActionAnimating)return;
+    const previous=centralActionRoll;
+    try{
+      centralActionRoll=await window.ArachneAPI.useActionEdge(centralActionRoll.id,index);
+      centralActionAnimating=true;renderSessionCentral();
+      await animateCentralActionResult(centralActionRoll,previous);
+      centralActionAnimating=false;renderSessionCentral();settleCentralActionDice(centralActionRoll);
+    }catch(error){centralActionAnimating=false;toast(error.message||'Edge indisponível');renderSessionCentral();}
+  }
+
+  async function finalizeCentralAction() {
+    if(!centralActionRoll?.id)return;
+    try{centralActionRoll=await window.ArachneAPI.finalizeActionRoll(centralActionRoll.id);renderSessionCentral();}
+    catch(error){toast(error.message||'Não foi possível finalizar');}
+  }
+
+  async function centralCombatAction(action) {if(state.role!=='master'||!backendReady)return;try{const combat=action==='start'?await window.ArachneAPI.startCombat():action==='next'?await window.ArachneAPI.nextCombatTurn():await window.ArachneAPI.endCombat();state.combat=combat;localStorage.setItem(STORAGE.combat,JSON.stringify(combat));if(state.page==='home')renderSessionCentral();if(state.page==='combat')renderCombatConsole();toast(action==='start'?'Combate iniciado':action==='next'?'Turno avançado':'Combate encerrado');}catch(error){toast(error.message||'Não foi possível atualizar o combate');}}
   async function updateCentralCombatOrder(payload) {
     if(state.role!=='master'||!backendReady||!window.ArachneAPI?.updateCombatOrder)return;
-    try{const combat=await window.ArachneAPI.updateCombatOrder(payload);state.combat=combat;localStorage.setItem(STORAGE.combat,JSON.stringify(combat));renderSessionCentral();renderCombatConsole();}
+    try{const combat=await window.ArachneAPI.updateCombatOrder(payload);state.combat=combat;localStorage.setItem(STORAGE.combat,JSON.stringify(combat));if(state.page==='home')renderSessionCentral();if(state.page==='combat')renderCombatConsole();}
     catch(error){toast(error.message||'Não foi possível alterar a ordem de combate');}
   }
 
@@ -2797,13 +3045,13 @@
     toast(`${entity.n} adicionado ao combate`);
   }
 
-  async function adjustCombatResource(kind,id,resource,delta) {if(state.role!=='master')return;try{const values=resource==='focus'?{focusDelta:delta}:{healthDelta:delta},updated=await window.ArachneAPI.adjustResources(kind,id,values),list=kind==='hero'?state.heroes:state.villains,index=list.findIndex(item=>item.id===id);if(index>=0)list[index]={...list[index],...updated};if(state.combat?.order)state.combat.order=state.combat.order.map(item=>item.baseId===id?{...item,currentHealth:updated.currentHealth,currentFocus:updated.currentFocus,maxHealth:updated.maxHealth,maxFocus:updated.maxFocus}:item);renderHeroes();if(state.role==='master')renderVillains();renderSessionCentral();renderCombatConsole();}catch(error){toast(error.message||'Falha ao alterar recurso');}}
+  async function adjustCombatResource(kind,id,resource,delta) {if(state.role!=='master')return;try{const values=resource==='focus'?{focusDelta:delta}:{healthDelta:delta},updated=await window.ArachneAPI.adjustResources(kind,id,values),list=kind==='hero'?state.heroes:state.villains,index=list.findIndex(item=>item.id===id);if(index>=0)list[index]={...list[index],...updated};if(state.combat?.order)state.combat.order=state.combat.order.map(item=>item.baseId===id?{...item,currentHealth:updated.currentHealth,currentFocus:updated.currentFocus,maxHealth:updated.maxHealth,maxFocus:updated.maxFocus}:item);if(state.page==='heroes')renderHeroes();if(state.page==='villains'&&state.role==='master')renderVillains();if(state.page==='home')renderSessionCentral();if(state.page==='combat')renderCombatConsole();}catch(error){toast(error.message||'Falha ao alterar recurso');}}
 
   async function adjustPlayerResource(resource, delta) {
     if (state.role !== 'player' || playerResourceUpdating) return;
     const hero = selectedHero();
     if (!hero) return toast('Personagem não disponível.');
-    if (!backendReady || !window.ArachneAPI?.adjustResources) return toast('A API precisa estar conectada para alterar recursos.');
+    if (!backendReady || !window.ArachneAPI?.adjustResources) return toast('Sem conexão para alterar recursos.');
     const current = resource === 'focus' ? heroCurrentFocus(hero) : heroCurrentHealth(hero);
     const max = resource === 'focus' ? heroMaxFocus(hero) : heroMaxHealth(hero);
     const step = Number(delta || 0);
@@ -2818,8 +3066,6 @@
       if (state.combat?.order) state.combat.order = state.combat.order.map(item => item.baseId === hero.id ? {...item,currentHealth:updated.currentHealth,currentFocus:updated.currentFocus,maxHealth:updated.maxHealth,maxFocus:updated.maxFocus} : item);
       localStorage.setItem(STORAGE.heroes, JSON.stringify(state.heroes));
       localStorage.setItem(STORAGE.combat, JSON.stringify(state.combat));
-      renderHeroes();
-      renderCombatConsole();
       markSaved(`${resource === 'focus' ? 'Focus' : 'Health'} atualizado`);
     } catch (error) {
       toast(error.message || 'Falha ao alterar recurso.');
@@ -2829,28 +3075,95 @@
     }
   }
 
+  async function setCentralTN(value) {
+    const previous=clamp(state.challenge?.tn??14,1,99),raw=String(value??'').trim();
+    if(!raw||!Number.isFinite(Number(raw))){renderSessionCentral();return;}
+    const next=clamp(raw,1,99);
+    if(next===previous)return;
+    state.challenge={...state.challenge,tn:next};
+    localStorage.setItem(STORAGE.challenge,JSON.stringify(state.challenge));
+    renderSessionCentral();
+    if(!backendReady||!window.ArachneAPI?.setChallengeTN)return;
+    try{const challenge=await window.ArachneAPI.setChallengeTN(next);if(challenge&&typeof challenge==='object')state.challenge={...DEFAULT_CHALLENGE,...challenge};localStorage.setItem(STORAGE.challenge,JSON.stringify(state.challenge));renderSessionCentral();}
+    catch(error){state.challenge={...state.challenge,tn:previous};localStorage.setItem(STORAGE.challenge,JSON.stringify(state.challenge));renderSessionCentral();toast(error.message||'Não foi possível alterar o TN.');}
+  }
+
+  async function setPlayerResourceValue(resource,value) {
+    if(state.role!=='player'||playerResourceUpdating)return;
+    const hero=selectedHero();if(!hero)return;
+    const raw=String(value??'').trim();if(!raw||!Number.isFinite(Number(raw))){renderSessionCentral();return;}
+    const max=resource==='focus'?heroMaxFocus(hero):heroMaxHealth(hero),next=Math.max(0,Math.min(max,Number(raw)));
+    playerResourceUpdating=resource;renderSessionCentral();
+    try{
+      const values=resource==='focus'?{currentFocus:next}:{currentHealth:next};
+      const updated=await window.ArachneAPI.adjustResources('hero',hero.id,values),index=state.heroes.findIndex(item=>item.id===hero.id);
+      if(index>=0)state.heroes[index]={...state.heroes[index],...updated};
+      localStorage.setItem(STORAGE.heroes,JSON.stringify(state.heroes));
+    }catch(error){toast(error.message||'Falha ao alterar recurso.');}
+    finally{playerResourceUpdating='';renderSessionCentral();}
+  }
+
+  async function setMasterResourceValue(kind,id,resource,value) {
+    if(state.role!=='master'||!backendReady||!window.ArachneAPI?.adjustResources)return;
+    const list=kind==='hero'?state.heroes:state.villains,index=list.findIndex(item=>item.id===id);if(index<0)return;
+    const raw=String(value??'').trim();if(!raw||!Number.isFinite(Number(raw))){renderSessionCentral();return;}
+    const entity=list[index],max=resource==='focus'?Number(entity.maxFocus||0):Number(entity.maxHealth||0),next=Math.max(0,Math.min(max,Number(raw)));
+    try{
+      const values=resource==='focus'?{currentFocus:next}:{currentHealth:next},updated=await window.ArachneAPI.adjustResources(kind,id,values);
+      list[index]={...list[index],...updated};localStorage.setItem(kind==='hero'?STORAGE.heroes:STORAGE.villains,JSON.stringify(list));renderSessionCentral();
+    }catch(error){toast(error.message||'Falha ao alterar recurso.');}
+  }
+
+  function minionResourceState(id) {
+    normalizeScenario();
+    const template=MINION_TEMPLATES[id];if(!template)return null;
+    const current=state.scenario.minionVitals[id]||{};
+    return {...template,...current};
+  }
+
+  function setMinionResourceLocal(id,resource,value) {
+    const entity=minionResourceState(id);if(!entity)return;
+    const current={...(state.scenario.minionVitals[id]||{})};
+    const maxKey=resource==='focus'?'maxFocus':'maxHealth',currentKey=resource==='focus'?'currentFocus':'currentHealth',max=Math.max(0,Number(entity[maxKey]||0));
+    current[maxKey]=max;current[currentKey]=Math.max(0,Math.min(max,Number(value)||0));state.scenario.minionVitals[id]=current;saveScenario();renderSessionCentral();
+  }
+
+  function adjustMinionResource(id,resource,delta) {
+    if(state.role!=='master')return;const entity=minionResourceState(id);if(!entity)return;const currentKey=resource==='focus'?'currentFocus':'currentHealth';setMinionResourceLocal(id,resource,Number(entity[currentKey]||0)+Number(delta||0));
+  }
+
+  function setMinionResourceValue(id,resource,value) {
+    if(state.role!=='master')return;const raw=String(value??'').trim();if(!raw||!Number.isFinite(Number(raw))){renderSessionCentral();return;}setMinionResourceLocal(id,resource,Number(raw));
+  }
+
   function safeRender(label, renderer) {
     try { renderer(); }
     catch (error) { console.error(`[Arachne] Falha ao renderizar ${label}`, error); }
   }
 
   function renderAll() {
-    // Central e Combate são painéis críticos e devem aparecer mesmo que um renderer secundário falhe.
-    safeRender('Central', renderSessionCentral);
-    safeRender('Rolagens recentes do Mestre', renderMasterRecentRolls);
-    safeRender('Combate', renderCombatConsole);
-    safeRender('Heróis', renderHeroes);
-    if(state.role==='master') safeRender('Vilões', renderVillains);
-    safeRender('Campanha', renderCampaign);
-    safeRender('Histórico de dados', renderDiceHistory);
-    safeRender('Desafio', syncChallengeInputs);
-    safeRender('Ameaças da iniciativa', renderInitiativeThreatPicker);
-    safeRender('Participantes da iniciativa', renderInitiativeParticipants);
-    safeRender('Ameaças do cenário', renderScenarioThreatPicker);
-    if(state.page==='scenario') safeRender('Cenário', renderScenario);
-    safeRender('Rolagens da Central', renderHomeLiveRolls);
-    safeRender('Rolagens do jogador', renderPlayerLiveDice);
-    safeRender('Contador de notas', updateNotesCount);
+    // Estado e regras continuam globais; apenas o DOM da página visível é reconstruído.
+    if(state.page==='home'){
+      safeRender('Central', renderSessionCentral);
+      safeRender('Rolagens recentes do Mestre', renderMasterRecentRolls);
+      safeRender('Rolagens da Central', renderHomeLiveRolls);
+      safeRender('Rolagens do jogador', renderPlayerLiveDice);
+    }
+    if(state.page==='heroes') safeRender('Heróis', renderHeroes);
+    if(state.page==='villains'&&state.role==='master') safeRender('Vilões', renderVillains);
+    if(state.page==='campaign'&&state.role==='master') safeRender('Campanha', renderCampaign);
+    if(state.page==='dice'&&state.role==='master'){
+      safeRender('Histórico de dados', renderDiceHistory);
+      safeRender('Desafio', syncChallengeInputs);
+      safeRender('Ameaças da iniciativa', renderInitiativeThreatPicker);
+      safeRender('Participantes da iniciativa', renderInitiativeParticipants);
+    }
+    if(state.page==='combat') safeRender('Combate', renderCombatConsole);
+    if(state.page==='scenario'){
+      safeRender('Ameaças do cenário', renderScenarioThreatPicker);
+      safeRender('Cenário', renderScenario);
+    }
+    if(state.page==='notes') safeRender('Contador de notas', updateNotesCount);
     safeRender('Resultado atual', () => clearCurrentRollVisual(true));
   }
 
@@ -2974,15 +3287,24 @@
     if(event.target.closest('#image-search-run')){await runCharacterImageSearch();return;}
     const candidate=event.target.closest('[data-image-candidate]');if(candidate){const item=imageSearchResults[Number(candidate.dataset.imageCandidate)];if(item?.imageUrl)await applyCharacterImage(item.imageUrl);return;}
     if(event.target.closest('#image-direct-import')){await importDirectCharacterImage();return;}
+    const centralScenarioCell=event.target.closest('#central-scenario-board .scenario-cell');if(centralScenarioCell){await handleScenarioCell(centralScenarioCell,{central:true});return;}
+    const centralScenarioZoom=event.target.closest('[data-central-scenario-zoom]');if(centralScenarioZoom){setScenarioZoom(Number(centralScenarioZoom.dataset.centralScenarioZoom||0));return;}
+    if(event.target.closest('[data-central-scenario-fit]')){fitCentralScenarioBoard();return;}
+    const centralScenarioReset=event.target.closest('[data-central-scenario-reset-piece]');if(centralScenarioReset){await resetScenarioPieceMovement(centralScenarioReset.dataset.centralScenarioResetPiece,false);return;}
+    if(event.target.closest('[data-central-scenario-reset-all]')){await resetScenarioPieceMovement('',true);return;}
     const category=event.target.closest('[data-central-category]');if(category){centralActionCategory=category.dataset.centralCategory;centralActionRoll=null;if(centralActionCategory!=='powers')centralPowerName='';renderSessionCentral();return;}
     const power=event.target.closest('[data-central-power]');if(power){centralPowerName=power.dataset.centralPower;renderSessionCentral();return;}
     const roll=event.target.closest('[data-central-roll-ability]');if(roll){await runCentralAction(roll.dataset.centralRollAbility);return;}
     const edge=event.target.closest('[data-central-edge]');if(edge){await useCentralEdge(Number(edge.dataset.centralEdge));return;}
     if(event.target.closest('[data-central-finalize]')){await finalizeCentralAction();return;}
-    if(event.target.closest('[data-master-attack-roll]')){await runMasterCentralAttack();return;}
-    const masterAttackEdge=event.target.closest('[data-master-attack-edge]');if(masterAttackEdge){await useMasterCentralAttackEdge(Number(masterAttackEdge.dataset.masterAttackEdge));return;}
-    if(event.target.closest('[data-master-attack-finalize]')){try{await finalizeMasterCentralAttack();renderSessionCentral();}catch(error){toast(error.message||'Não foi possível finalizar o ataque.');}return;}
-    if(event.target.closest('[data-master-attack-apply]')){await applyMasterCentralAttackDamage();return;}
+    const masterCategory=event.target.closest('[data-master-category]');if(masterCategory){centralMasterActionCategory=masterCategory.dataset.masterCategory;centralMasterAttackRoll=null;if(centralMasterActionCategory!=='powers')centralMasterPowerName='';renderSessionCentral();return;}
+    const masterPower=event.target.closest('[data-master-power]');if(masterPower){centralMasterPowerName=masterPower.dataset.masterPower;centralMasterAttackRoll=null;renderSessionCentral();return;}
+    const masterRoll=event.target.closest('[data-master-roll-ability]');if(masterRoll){await runMasterCentralAction(masterRoll.dataset.masterRollAbility);return;}
+    const masterActor=event.target.closest('[data-master-attack-actor-card]');if(masterActor){centralMasterAttackActor=masterActor.dataset.masterAttackActorCard;centralMasterAttackRoll=null;renderSessionCentral();return;}
+    const minionSheet=event.target.closest('[data-master-minion-sheet]');if(minionSheet){openMasterMinionSheet(minionSheet.dataset.masterMinionSheet);return;}
+    const masterStageDie=event.target.closest('#central-master-attack-dice-stage .die-select[data-die-index]');if(masterStageDie&&!masterStageDie.disabled){await useMasterCentralAttackEdge(Number(masterStageDie.dataset.dieIndex));return;}
+    if(event.target.closest('[data-master-attack-finalize]')){try{await finalizeMasterCentralAttack();renderSessionCentral();}catch(error){toast(error.message||'Não foi possível finalizar a rolagem.');}return;}
+    const playerStageDie=event.target.closest('#central-action-dice-stage .die-select[data-die-index]');if(playerStageDie&&!playerStageDie.disabled){await useCentralEdge(Number(playerStageDie.dataset.dieIndex));return;}
     const combatAction=event.target.closest('[data-central-combat]');if(combatAction){await centralCombatAction(combatAction.dataset.centralCombat);return;}
     const participantAdd=event.target.closest('[data-central-participant-add]');if(participantAdd){if(participantAdd.dataset.centralParticipantAdd==='combat')await addCentralCombatParticipant();else await addCentralInitiativeParticipant();return;}
     const initRoll=event.target.closest('[data-central-init-roll]');if(initRoll){await rollInitiativeParticipantById(initRoll.dataset.centralInitRoll,{rootId:'central-initiative-dice-stage',statusId:'central-initiative-roll-status'});return;}
@@ -2991,14 +3313,14 @@
     const orderRemove=event.target.closest('[data-central-order-remove]');if(orderRemove){await updateCentralCombatOrder({action:'remove',id:orderRemove.dataset.centralOrderRemove});return;}
     const playerResource=event.target.closest('[data-player-resource]');if(playerResource){await adjustPlayerResource(playerResource.dataset.playerResource,Number(playerResource.dataset.delta));return;}
     const resource=event.target.closest('[data-combat-resource]');if(resource){await adjustCombatResource(resource.dataset.combatKind,resource.dataset.combatId,resource.dataset.combatResource,Number(resource.dataset.delta));return;}
+    const minionResource=event.target.closest('[data-minion-resource]');if(minionResource){adjustMinionResource(minionResource.dataset.minionId,minionResource.dataset.minionResource,Number(minionResource.dataset.delta));return;}
   });
 
   document.addEventListener('change', async event => {
-    if(event.target?.id==='central-attack-actor'){centralMasterAttackActor=event.target.value;centralMasterAttackTarget='';centralMasterAttackRoll=null;renderSessionCentral();return;}
-    if(event.target?.id==='central-attack-target'){centralMasterAttackTarget=event.target.value;centralMasterAttackRoll=null;return;}
-    if(event.target?.id==='central-attack-ability'){centralMasterAttackAbility=event.target.value;centralMasterAttackRoll=null;renderSessionCentral();return;}
-    if(event.target?.id==='central-attack-resource'){centralMasterAttackResource=event.target.value==='focus'?'focus':'health';centralMasterAttackRoll=null;return;}
-    if(event.target?.id==='central-attack-defense'){centralMasterAttackDefense=clamp(event.target.value,1,99);centralMasterAttackRoll=null;return;}
+    if(event.target?.matches?.('[data-central-tn-input]')){await setCentralTN(event.target.value);return;}
+    if(event.target?.matches?.('[data-player-resource-input]')){await setPlayerResourceValue(event.target.dataset.playerResourceInput,event.target.value);return;}
+    if(event.target?.matches?.('[data-master-resource-input]')){await setMasterResourceValue(event.target.dataset.combatKind,event.target.dataset.combatId,event.target.dataset.masterResourceInput,event.target.value);return;}
+    if(event.target?.matches?.('[data-minion-resource-input]')){setMinionResourceValue(event.target.dataset.minionId,event.target.dataset.minionResourceInput,event.target.value);return;}
     if(event.target?.id==='central-resource-target'){centralResourceTarget=event.target.value;renderSessionCentral();return;}
     if(event.target?.matches?.('[data-central-order-initiative]')){const result=Number(event.target.value);if(Number.isFinite(result))await updateCentralCombatOrder({action:'update',id:event.target.dataset.centralOrderInitiative,result});return;}
   });
@@ -3061,7 +3383,7 @@
     const remove=event.target.closest('[data-init-remove-id]');if(remove)await removeInitiativeParticipant(remove.dataset.initRemoveId);
   });
   $('roll-initiative').addEventListener('click', () => rollInitiative({rootId:'initiative-dice-stage',statusId:'initiative-current'}));
-  $('clear-initiative').addEventListener('click', async () => {if(!backendReady||!window.ArachneAPI?.clearInitiativeParticipants)return toast('A iniciativa requer conexão com o servidor.');try{const data=await window.ArachneAPI.clearInitiativeParticipants();setInitiativeState(data?.initiative||[]);if(data?.scenario){state.scenario={...clone(DEFAULT_SCENARIO),...data.scenario};normalizeScenario();localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));renderScenario();}lastInitiativeRoll=null;renderInitiativeParticipants();renderSessionCentral();$('initiative-current').textContent='Aguardando rolagem';toast('Iniciativa limpa');}catch(error){toast(error?.message||'Não foi possível limpar a iniciativa.');}});
+  $('clear-initiative').addEventListener('click', async () => {if(!backendReady||!window.ArachneAPI?.clearInitiativeParticipants)return toast('Sem conexão para rolar iniciativa.');try{const data=await window.ArachneAPI.clearInitiativeParticipants();setInitiativeState(data?.initiative||[]);if(data?.scenario){state.scenario={...clone(DEFAULT_SCENARIO),...data.scenario};normalizeScenario();localStorage.setItem(STORAGE.scenario,JSON.stringify(state.scenario));renderScenario();}lastInitiativeRoll=null;renderInitiativeParticipants();renderSessionCentral();$('initiative-current').textContent='Aguardando rolagem';toast('Iniciativa limpa');}catch(error){toast(error?.message||'Não foi possível limpar a iniciativa.');}});
 
   // Montador de cenário
   $('scenario-threat-tier').addEventListener('change', renderScenarioThreatPicker);

@@ -43,5 +43,5 @@ test('casos de corte mais sensíveis possuem focos específicos e CSS é cache-b
   assert.match(css,/img\[src\$="villain-kingpin\.webp"\]\{--portrait-position:center 8%/);
   assert.match(css,/img\[src\$="hero-daredevil\.webp"\]\{--portrait-position:center 44%;--portrait-scale:1\.40/);
   assert.match(css,/img\[src\$="hero-vision\.webp"\]\{--portrait-position:center 18%;--portrait-scale:1\.25/);
-  assert.match(html,/style\.css\?v=33\.4\.4-repeatable-generics/);
+  assert.match(html,/style\.css\?v=33\.4\.7-v42-ghost-rider/);
 });

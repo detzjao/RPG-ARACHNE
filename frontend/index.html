@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#090b10">
   <meta name="description" content="Mesa virtual multi-campanha para Marvel Multiverse RPG.">
   <title>RPG Arachne — Marvel Multiverse RPG</title>
-  <link rel="stylesheet" href="style.css?v=33.4.4-repeatable-generics">
+  <link rel="stylesheet" href="style.css?v=33.4.7-v42-ghost-rider">
 </head>
 <body>
   <div id="login" class="login" aria-labelledby="login-title">
@@ -114,9 +114,7 @@
         <button type="button" data-page="heroes"><span>♙</span><em>Heróis</em></button>
         <button type="button" data-page="villains" data-master="true"><span>☠</span><em>Vilões</em></button>
                 <button type="button" data-page="campaign" data-master="true"><span>▣</span><em>Campanha</em></button>
-        <button type="button" data-page="dice" data-master="true"><span>⚄</span><em>Dados do Mestre</em></button>
         <button type="button" data-page="scenario"><span>▦</span><em>Cenário</em></button>
-        <button type="button" data-page="combat"><span>⚔</span><em>Combate</em></button>
         <button type="button" data-page="rules"><span>?</span><em>Regras</em></button>
         <button type="button" data-page="notes" data-master="true"><span>✎</span><em>Anotações do Mestre</em></button>
       </nav>
@@ -136,15 +134,15 @@
       <div class="content-shell">
         <section id="home" class="page active">
           <div id="session-central" class="session-central" aria-live="polite">
-            <article class="central-panel central-loading-fallback"><small>CENTRAL DA SESSÃO</small><h3>Carregando mesa...</h3><p>Sincronizando campanha, personagens, cenário e combate.</p></article>
+            <article class="central-panel central-loading-fallback"><small>CENTRAL DA SESSÃO</small><h3>Carregando mesa...</h3><p>Preparando a sessão.</p></article>
           </div>
           <article id="master-recent-rolls" class="central-panel master-recent-rolls hidden" aria-live="polite">
             <div class="central-panel-head"><div><small>DADOS DA SESSÃO</small><h3>Rolagens em tempo real</h3></div><div class="central-inline-actions"><span id="master-live-roll-status">AGUARDANDO</span><button type="button" data-go="dice">ABRIR DADOS COMPLETOS</button></div></div>
             <div class="master-live-roll-grid">
               <div id="master-live-dice-stage" class="dice-stage-3d master-live-dice-stage" aria-label="Rolagem D616 do jogador"></div>
-              <div id="master-live-roll-result" class="master-live-roll-result"><small>ÚLTIMA ROLAGEM</small><strong>—</strong><b>Aguardando jogador</b><span>As rolagens validadas pelo servidor aparecerão aqui.</span></div>
+              <div id="master-live-roll-result" class="master-live-roll-result"><small>ÚLTIMA ROLAGEM</small><strong>—</strong><b>Aguardando jogador</b><span>As rolagens dos jogadores aparecem aqui.</span></div>
             </div>
-            <div class="master-roll-history-columns"><section><div class="central-subhead"><b>Jogadores</b><small>Histórico autoritativo</small></div><div id="master-recent-roll-list" class="master-recent-roll-list"><div class="central-empty compact"><span>Nenhuma rolagem de jogador registrada ainda.</span></div></div></section><section><div class="central-subhead"><b>Mestre</b><small>Últimas rolagens</small></div><div id="master-master-roll-list" class="master-recent-roll-list"><div class="central-empty compact"><span>Nenhuma rolagem do Mestre registrada ainda.</span></div></div></section></div>
+            <div class="master-roll-history-columns"><section><div class="central-subhead"><b>Jogadores</b><small>Histórico recente</small></div><div id="master-recent-roll-list" class="master-recent-roll-list"><div class="central-empty compact"><span>Nenhuma rolagem de jogador registrada ainda.</span></div></div></section><section><div class="central-subhead"><b>Mestre</b><small>Últimas rolagens</small></div><div id="master-master-roll-list" class="master-recent-roll-list"><div class="central-empty compact"><span>Nenhuma rolagem do Mestre registrada ainda.</span></div></div></section></div>
           </article>
           <div class="legacy-home-metrics hidden" aria-hidden="true">
             <span id="hero-count">00</span><span id="home-role">JOGADOR</span><span id="campaign-percent">0%</span><span id="campaign-summary">0/0 sessões</span><span id="phase-label">FASE 1</span>
@@ -418,11 +416,11 @@
           <div class="intro"><div><small>COMO O ARACHNE EXECUTA A MESA</small><h2>Regras do Sistema</h2></div></div>
           <div class="rules-grid">
             <article class="panel"><small>D616</small><h3>Action Check</h3><p>O Arachne usa dois d6 comuns e um Marvel Die. Quando o Marvel Die mostra 1, ele vale 6 no total e marca o resultado como Fantastic. O resultado final soma os três dados, o valor da habilidade e o modificador extra configurado pelo Mestre, e é comparado ao TN.</p></article>
-            <article class="panel"><small>ATAQUES</small><h3>Uma única rolagem</h3><p>Um ataque usa a própria rolagem D616 para resolver o teste e, quando acerta, calcular o dano. O Marvel Die é sempre o dado central da mesma rolagem: seu valor efetivo é multiplicado pelo multiplicador de dano do perfil e somado ao modificador da habilidade. Na Central, o Mestre seleciona atacante, alvo e o TN/Defesa utilizado pela mesa; ao aplicar o dano, o backend recalcula o valor a partir da mesma rollId antes de alterar Health ou Focus e sincroniza o recurso pelo SSE existente. Não existe uma segunda rolagem de dano. O Fantastic Success preserva o multiplicador adicional já implementado pelo sistema.</p></article>
+            <article class="panel"><small>ATAQUES</small><h3>D616</h3><p>Melee e Agility atingem Health. Ego e Logic atingem Focus. A defesa usada no ataque vem da habilidade correspondente do alvo.</p></article>
             <article class="panel"><small>EDGE / TROUBLE</small><h3>Rerrolagens</h3><p>Edge e Trouble se cancelam entre si. Trouble rerrola o melhor dado e mantém o pior resultado. Edge permite rerrolar um dado escolhido e mantém o melhor resultado. Um 6 · M · 6 é tratado pela implementação existente como Ultimate Fantastic.</p></article>
-            <article class="panel"><small>TURNOS</small><h3>Combate</h3><p>O Mestre adiciona participantes e rola a iniciativa D616 diretamente na preparação de combate. O servidor usa o modificador de iniciativa da ficha, registra a mesma rolagem no histórico e ordena a lista por resultado, modificador e nome. Participantes duplicados são bloqueados. Depois, o Mestre inicia o combate e controla a passagem de turnos. Quando há combate ativo, a Central do Jogador bloqueia Action Checks comuns fora do turno e informa quem está agindo.</p></article>
-            <article class="panel"><small>PERMISSÕES</small><h3>Mestre e Jogador</h3><p>Ficha, Health, Focus, iniciativa, cenário administrativo e imagens são alterações do Mestre validadas no backend. O jogador controla suas anotações e executa Action Checks apenas com o personagem vinculado à própria sessão.</p></article>
-            <article class="panel"><small>CENÁRIO</small><h3>Mesa tática</h3><p>O Mestre edita a grade, peças, terreno e obstáculos. Durante combate ativo, o jogador pode selecionar e movimentar somente o próprio personagem quando for seu turno; fora do turno e para qualquer outra peça, o backend bloqueia a ação. O orçamento de movimento daquele token é renovado quando um novo turno dele começa. As posições são sincronizadas pelo SSE existente.</p></article>
+            <article class="panel"><small>TURNOS</small><h3>Combate</h3><p>Role a iniciativa, inicie o combate e avance os turnos pela ordem definida.</p></article>
+            <article class="panel"><small>PERMISSÕES</small><h3>Mestre e Jogador</h3><p>O Mestre administra a mesa. Cada jogador executa ações com o próprio personagem.</p></article>
+            <article class="panel"><small>CENÁRIO</small><h3>Mesa tática</h3><p>O Mestre organiza o cenário. Durante o combate, cada jogador movimenta o próprio personagem no seu turno.</p></article>
             <article class="panel"><small>MODIFICADORES</small><h3>Valores da ficha</h3><p>Os Action Checks utilizam o valor da habilidade armazenado na ficha somado ao modificador extra do desafio atual. A Central não grava bônus temporários por cima do valor original da habilidade.</p></article>
           </div>
         </section>
@@ -454,7 +452,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="config.js?v=33.4.0-player-movement"></script>
-  <script src="api-client.js?v=33.4.4-repeatable-generics"></script>
-  <script src="script.js?v=33.4.4-repeatable-generics"></script>
+  <script src="api-client.js?v=33.4.7-v42-ghost-rider"></script>
+  <script src="script.js?v=33.4.7-v42-ghost-rider"></script>
 </body>
 </html>

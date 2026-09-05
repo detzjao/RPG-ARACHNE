@@ -1,3 +1,8 @@
+
+## Central v41 — dano apenas como referência
+
+Na categoria Combate, a mesma D616 já usada pela Central passa a solicitar ao backend o cálculo de dano do perfil do personagem. O valor é exibido abaixo do resultado para servir de referência na mesa. A rolagem continua sem alvo e não altera Health ou Focus de nenhum personagem. Testes, Poderes e Movimento permanecem como rolagens simples.
+
 # RPG Arachne Frontend — v33.4
 
 Frontend estático em HTML/CSS/JavaScript para a mesa virtual do Arachne.
@@ -36,7 +41,7 @@ A preparação de combate permite adicionar participantes e rolar a iniciativa d
 
 ## Ataque + dano na Central v33.2
 
-A Central do Mestre possui um painel de resolução de ataque que seleciona atacante, habilidade, alvo e TN/Defesa e reutiliza a mesma `ArachneDiceAnimation` para os três valores D616 retornados pelo servidor. O resultado exibe total, defesa, outcome, Marvel Die, multiplicador e dano derivado da mesma rolagem. O botão `APLICAR DANO` envia somente a `rollId`; o valor aplicado e o alvo autoritativo são resolvidos novamente pelo backend. A mesma entrada D616 é atualizada no histórico, sem criar uma rolagem de dano paralela.
+Na Central do Mestre, o fluxo de combate é visual: o Mestre escolhe um vilão por cartão, escolhe Melee, Agility, Ego ou Logic e clica diretamente no herói alvo. Não há formulário de ataque nem botão separado de dano. A mesma D616 existente é usada para resolver a ação. Melee/Agility reduzem Health; Ego/Logic reduzem Focus. Defesa, modificador, redução e recursos são obtidos das fichas.
 
 
 ## Iniciativa → Grid v33.3
@@ -46,3 +51,13 @@ Ao adicionar herói, vilão ou NPC à iniciativa, a resposta da API já inclui o
 ## Movimentação do jogador v33.4
 
 Durante combate ativo, o jogador vê o painel de movimento do cenário. No próprio turno ele pode selecionar apenas seu token e clicar em uma casa alcançável; fora do turno a interface informa `Aguarde seu turno para movimentar seu personagem.`. A resposta da API atualiza imediatamente o cliente de origem e o SSE existente atualiza os demais clientes.
+
+
+## v36 — Central simplificada
+
+A tela inicial do Mestre foi reduzida a dois blocos: iniciativa e ações. O Mestre controla os vilões por cartões; jogadores controlam seus próprios heróis. Ataques são feitos clicando no personagem, escolhendo a habilidade e clicando no alvo. A área antiga de dano manual foi retirada da Central.
+
+
+## Central em modo de apoio — v38
+
+A Central foi simplificada para apoiar uma mesa presencial/remota, sem tentar resolver o combate inteiro dentro da aplicação. Jogadores usam a D616 a partir das habilidades da própria ficha, sem selecionar alvos e sem aplicação automática de dano. O Mestre possui o mesmo fluxo para vilões/NPCs e mantém somente a iniciativa inicial como ferramenta adicional. A animação de dados original continua sendo reutilizada.

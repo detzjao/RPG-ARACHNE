@@ -1,3 +1,117 @@
+# v42 — Motoqueiro Fantasma: Estrada dos Condenados
+
+- Adicionada a campanha solo **Motoqueiro Fantasma — Estrada dos Condenados** (5 atos) ao seletor de campanhas.
+- Adicionada a ficha homebrew de Johnny Blaze / Motoqueiro Fantasma (Rank 5) com retrato fornecido pelo usuário.
+- Adicionadas fichas homebrew para Cultista da Cinza, Acólito Infernal, Hellhound, Guardião da Estrada, Cavaleiro Condenado e Homem Sem Rosto / Zarathos Fragmentado.
+- Anexado pacote PDF completo da campanha + fichas e PDFs individuais por personagem.
+- Campanhas `mode: solo` usam uma única entrada **ENTRAR NA CAMPANHA SOLO**; a Central Solo permite controlar Johnny e os inimigos sem troca de papel.
+- A iniciativa, Health/Focus, rolagens D616, dano informativo e cenário continuam usando os sistemas já existentes.
+- Perfil de dano do Motoqueiro Fantasma usa os multiplicadores explicitamente fornecidos para Corrente Infernal / Hellfire; habilidades sem fórmula fornecida não recebem multiplicador inventado.
+
+> Observação: o PDF da campanha informa nome, Rank e função dos inimigos, mas não fornece blocos completos de atributos. Os números e poderes detalhados das seis fichas de inimigos desta versão são adaptações homebrew para uso no Arachne.
+
+## [v41 UI / 33.4.6] - 2026-09-05
+
+### Dano informativo na Central
+- Rolagens da categoria **Combate** agora são registradas como ataques apenas para calcular o dano da própria ficha.
+- O dano aparece logo abaixo do resultado da D616 na Central do jogador e na Central do Mestre.
+- Nenhum alvo é selecionado, nenhum Health/Focus é alterado e não existe aplicação automática de dano.
+- Em falha, a Central mostra dano 0; quando o perfil não possui multiplicador configurado, mostra `—`.
+- Fantastic Success preserva o multiplicador de dano já existente no backend.
+- Testes, Poderes e Movimento continuam sem cálculo de dano.
+- Cache-busting do frontend atualizado para a v41.
+
+## [v40 UI / 33.4.5] - 2026-09-05
+
+### Cenário dentro da Central de apoio
+- O cenário tático passa a aparecer diretamente abaixo da Central de Ações do jogador e do Mestre, reutilizando o mesmo `scenario.pieces` e o mesmo realtime existentes.
+- Jogador movimenta somente o token do próprio herói pela Central, sem depender da vez do combate; ocupação, alcance e orçamento de movimento continuam validados pelo backend.
+- Mestre pode selecionar e movimentar qualquer peça do cenário pela própria Central.
+- Controles compactos de modo de movimento, orçamento restante, zoom, ajuste à tela e reinício de movimento foram adicionados ao cenário integrado.
+- Realtime de cenário atualiza somente o tabuleiro integrado quando a Central está aberta, evitando reconstrução desnecessária da tela inteira.
+
+### Capangas
+- Capangas genéricos agora possuem Health/Focus de apoio: curta distância 40/30, longo alcance 30/30 e suporte 30/40.
+- Agentes Hydra e I.M.A. ficam com 30 de Health nas fichas-base de capanga.
+- Mestre pode ajustar Health/Focus dos capangas genéricos pela Central.
+
+### Compatibilidade
+- Rolagens continuam sem alvo e sem dano automático.
+- D616, animação de dados, regras de movimentação, SSE e estado do cenário foram reutilizados em vez de duplicados.
+- Cache-busting do frontend atualizado para a v40.
+- Suíte completa validada com 112/112 testes aprovados.
+
+## [v39 UI] - 2026-09-05
+
+### Central de apoio com controles essenciais
+- TN virou um controle compacto e editável tanto para jogadores quanto para o Mestre; a alteração é sincronizada pela campanha.
+- Jogador pode alterar o Health e o Focus do próprio herói diretamente na Central, além de abrir a ficha completa sem sair da tela principal.
+- Mestre pode alterar Health e Focus do vilão selecionado diretamente na Central e abrir sua ficha.
+- Os três capangas genéricos de apoio aparecem sempre na seleção de personagens do Mestre, sem depender da iniciativa.
+- Capangas possuem ficha rápida para consultar habilidades e movimento.
+- A Central do Mestre agora exibe o histórico completo de rolagens da sessão, incluindo jogadores, Mestre e iniciativa, em ordem cronológica inversa.
+- Mantida a proposta de apoio de mesa: nenhuma seleção de alvo ou aplicação automática de dano foi reintroduzida.
+- Animação D616 e lógica de cálculo das rolagens permanecem preservadas.
+
+## [v38 UI] - 2026-09-05
+
+### Modo de apoio de mesa
+- A Central deixou de tentar executar o combate dentro do VTT e passou a funcionar como apoio de rolagens.
+- Jogadores não selecionam alvo, não aplicam dano e não alteram Health/Focus pela Central.
+- Ações de Combate, Testes e Poderes apenas rolam a D616 com o modificador da ficha e o TN atual como referência.
+- A ordem de turnos não bloqueia mais as rolagens dos jogadores.
+- A Central do Mestre usa o mesmo fluxo de rolagens, com uma seleção simples de quem está agindo.
+- O único recurso extra do Mestre na Central é a rolagem de iniciativa inicial.
+- O Mestre pode rolar pelos vilões cadastrados e por NPCs/capangas adicionados à iniciativa.
+- Removidos da navegação principal os painéis duplicados "Dados do Mestre" e "Combate"; o código legado permanece preservado para compatibilidade.
+- Mantida sem alterações a animação D616 existente e as regras de cálculo dos dados.
+- Central reduzida para uma coluna, com breakpoints específicos para tablet e celular.
+
+## [v37 UI] - 2026-09-05
+
+- Central do Mestre agora espelha a Central de Ações dos jogadores: Combate, Testes, Poderes e Movimento.
+- O Mestre escolhe visualmente qual vilão participante do combate controla; não há dropdown ou formulário de atacante.
+- Somente vilões/NPCs presentes na ordem ativa do combate aparecem na Central do Mestre.
+- Somente heróis presentes na ordem ativa aparecem como alvos do Mestre.
+- Na Central do jogador, somente vilões presentes na ordem ativa aparecem como alvos de ataque; a lista geral de vilões não é mais usada como fallback.
+- Ao remover um participante da ordem, ele deixa de aparecer imediatamente nas respectivas Centrais de Ações.
+- Ataques continuam usando Melee/Agility para Health e Ego/Logic para Focus, puxando defesa e recursos das fichas.
+- Testes, Poderes e Movimento dos vilões usam os mesmos dados de ficha e a mesma D616/animação já existentes.
+- Nenhuma nova implementação de dados, realtime ou regra de dano foi criada.
+- Suíte validada com 105/105 testes aprovados.
+
+## [v36 UI] - 2026-09-05
+
+- Central do Mestre reduzida às duas funções principais do VTT: iniciativa e ações.
+- Removidos os formulários de atacante, alvo, defesa e recurso da Central.
+- Mestre escolhe o personagem por cartão, escolhe Melee/Agility/Ego/Logic e clica diretamente no alvo para rolar.
+- Central do jogador também passou a usar seleção visual de ataque + clique no alvo.
+- Melee e Agility afetam Health; Ego e Logic afetam Focus.
+- Defesa e redução são resolvidas a partir da ficha do alvo.
+- Dano de ataques bem-sucedidos é aplicado automaticamente; não existe mais botão separado de aplicar dano na Central.
+- Rolagem D616 e animação 3D existentes foram preservadas, com tamanho corrigido na iniciativa e nas ações.
+- Textos técnicos de implementação foram removidos da interface.
+- Suíte validada com 104/104 testes aprovados.
+
+## [v35 UI] - 2026-09-05
+
+### Performance / responsividade
+- A renderização do frontend passa a ser sob demanda por página: eventos realtime e `renderAll()` deixam de reconstruir telas invisíveis.
+- Cards, listas, Central, iniciativa, combate e grid passam a priorizar os thumbnails WebP já existentes; extensões PNG/JPG também são normalizadas para o thumbnail `.webp` correspondente.
+- Adicionada contenção de renderização para cards pesados e ajustes para toque, tablets e celulares em 1180 px, 820 px, 560 px e 380 px.
+- Viewport recebeu `viewport-fit=cover` para dispositivos móveis com áreas seguras.
+
+### UX / UI do Mestre
+- Central do Mestre reorganizada como cockpit: preparação/ordem de combate e ataque ficam em primeiro plano; recursos e cenário ficam como apoio.
+- Formulários de iniciativa, participante e recursos foram compactados em ações rápidas.
+- Ataque mantém atacante, ação e alvo no fluxo principal; Defesa/TN e destino do dano ficam em opções avançadas.
+- Edição manual de iniciativa e remoção da ordem ficam em menu contextual por participante, reduzindo ruído visual.
+- Fichas rápidas da mesa ficam recolhidas e acessíveis sob demanda.
+
+### Compatibilidade / validação
+- Nenhuma regra de jogo, cálculo server-side, endpoint, estado realtime ou animação D616 foi alterado.
+- Suíte completa validada com 100/100 testes aprovados, incluindo regressões de combate, iniciativa, ataque/dano, movimento, Health/Focus e animação de dados.
+
 ## [33.4.4] - 2026-09-03
 
 ### Combate / ameaças genéricas

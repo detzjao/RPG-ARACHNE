@@ -9,16 +9,17 @@ const css=fs.readFileSync(path.join(frontend,'style.css'),'utf8');
 const api=fs.readFileSync(path.join(frontend,'api-client.js'),'utf8');
 const server=fs.readFileSync(path.resolve(import.meta.dirname,'../src/server.js'),'utf8');
 
-test('jogador vê o painel de movimento e a mensagem de bloqueio fora do turno',()=>{
+test('jogador vê o painel de movimento sem bloqueio por turno',()=>{
   assert.doesNotMatch(css,/body\[data-role="player"\] #scenario \.scenario-movement-panel,\s*body\[data-role="player"\] #scenario \.scenario-selection\{display:none\}/);
-  assert.match(script,/Aguarde seu turno para movimentar seu personagem\./);
-  assert.match(script,/SEU TURNO/);
+  assert.doesNotMatch(script,/Aguarde seu turno para movimentar seu personagem\./);
+  assert.match(script,/function playerCanMoveScenario\(\)/);
+  assert.match(script,/return state\.role==='player'&&!!hero&&!!playerScenarioPiece\(\)/);
 });
 
 test('backend resolve o token pelo personagem da sessão e não pelo pieceId enviado',()=>{
   assert.match(server,/String\(item\?\.characterId\|\|item\?\.baseId\|\|''\)===String\(session\.heroId\)/);
   assert.match(server,/Você só pode movimentar o próprio personagem\./);
-  assert.match(server,/current\.baseId!==session\.heroId/);
+  assert.doesNotMatch(server,/current\.baseId!==session\.heroId/);
 });
 
 test('movimentação continua usando um único grid e um único realtime',()=>{

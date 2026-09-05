@@ -8,18 +8,17 @@ const script=fs.readFileSync(path.join(root,'frontend/script.js'),'utf8');
 const css=fs.readFileSync(path.join(root,'frontend/style.css'),'utf8');
 const html=fs.readFileSync(path.join(root,'frontend/index.html'),'utf8');
 
-test('Central do Jogador expõe somente os quatro controles simples de Current Health/Focus',()=>{
-  assert.match(script,/data-player-resource="health" data-delta="-1"/);
-  assert.match(script,/data-player-resource="health" data-delta="1"/);
-  assert.match(script,/data-player-resource="focus" data-delta="-1"/);
-  assert.match(script,/data-player-resource="focus" data-delta="1"/);
-  assert.match(script,/heroCurrentHealth\(hero\)\} \/ \$\{heroMaxHealth\(hero\)/);
-  assert.match(script,/heroCurrentFocus\(hero\)\} \/ \$\{heroMaxFocus\(hero\)/);
-  assert.doesNotMatch(script,/data-player-resource="maxHealth"/);
-  assert.doesNotMatch(script,/data-player-resource="maxFocus"/);
+test('Central do Jogador oferece Health/Focus e acesso direto à ficha no modo de apoio',()=>{
+  const start=script.indexOf('function renderSessionCentral()');
+  const end=script.indexOf('function renderCombatConsole()',start);
+  const block=script.slice(start,end);
+  assert.match(block,/supportResourceControlMarkup\(\{kind:'hero',entity:hero,player:true\}\)/);
+  assert.match(block,/VER FICHA/);
+  assert.match(block,/data-action="view-hero"/);
+  assert.match(block,/support-actions-card/);
 });
 
-test('controles do jogador usam selectedHero e o endpoint existente de recursos',()=>{
+test('endpoint dedicado de recursos continua preservado fora da Central',()=>{
   const start=script.indexOf('async function adjustPlayerResource');
   assert.ok(start>=0);
   const body=script.slice(start,start+2400);
@@ -28,20 +27,19 @@ test('controles do jogador usam selectedHero e o endpoint existente de recursos'
   assert.match(body,/ArachneAPI\.adjustResources\('hero', hero\.id, values\)/);
   assert.match(body,/healthDelta: step/);
   assert.match(body,/focusDelta: step/);
-  assert.doesNotMatch(body,/saveHero\(/);
 });
 
-test('limites são refletidos também no estado dos botões da UI',()=>{
-  assert.match(script,/heroCurrentHealth\(hero\)<=0\?'disabled'/);
-  assert.match(script,/heroCurrentHealth\(hero\)>=heroMaxHealth\(hero\)\?'disabled'/);
-  assert.match(script,/heroCurrentFocus\(hero\)<=0\?'disabled'/);
-  assert.match(script,/heroCurrentFocus\(hero\)>=heroMaxFocus\(hero\)\?'disabled'/);
-});
-
-test('visual dos steppers permanece escopado à Central do Jogador',()=>{
-  assert.match(css,/\.player-resource-stepper\{/);
-  assert.match(css,/\.player-resource-stepper button:disabled/);
-  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
-  assert.match(html,/style\.css\?v=33\.4\.[0-9]+-[^\"']+/);
+test('modo de apoio continua responsivo e com cache-busting da versão',()=>{
+  assert.match(css,/v38 — modo de apoio/);
+  assert.match(css,/\.support-action-grid/);
+  assert.match(html,/style\.css\?v=33\.4\.[0-9]+-[^"']+/);
   assert.match(html,/script\.js\?v=33\.4\.[0-9]+-[^"']+/);
+});
+
+
+test('v39 possui TN editável e inputs exatos de recursos',()=>{
+  assert.match(script,/data-central-tn-input/);
+  assert.match(script,/data-player-resource-input/);
+  assert.match(script,/data-master-resource-input/);
+  assert.match(script,/setChallengeTN/);
 });

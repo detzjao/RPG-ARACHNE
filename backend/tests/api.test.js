@@ -64,7 +64,7 @@ test.after(async()=>{
 test('health informa versão, realtime e busca de imagens',async()=>{
   const r=await api('/health');
   assert.equal(r.status,200);
-  assert.equal(r.data.version,'33.4.4');
+  assert.equal(r.data.version,'33.4.5');
   assert.equal(r.data.realtime,'sse');
   assert.equal(r.data.imageSearch,true);
 });
@@ -160,17 +160,18 @@ test('Mestre continua podendo alterar recursos de vilões',async()=>{
   assert.equal(restored.status,200,JSON.stringify(restored.data));
 });
 
-test('rolagem do jogador usa habilidade da ficha e TN do estado do servidor',async()=>{
-  const master=await joinMaster();
-  await api('/state/challenge',{method:'PUT',token:master,body:{value:{action:'Teste seguro',tn:18,edge:0,trouble:0,extra:0}}});
+test('jogador pode alterar o TN da campanha e a rolagem usa o novo valor',async()=>{
   const player=await joinPlayer();
-  const r=await api('/actions/d616/start',{method:'POST',token:player,body:{actorId:'qualquer-outro',ability:'Agility',action:'Teste do jogador',tn:1}});
+  const updated=await api('/challenge/tn',{method:'PATCH',token:player,body:{tn:18}});
+  assert.equal(updated.status,200,JSON.stringify(updated.data));
+  assert.equal(updated.data.data.tn,18);
+  const r=await api('/actions/d616/start',{method:'POST',token:player,body:{actorId:'qualquer-outro',ability:'Agility',action:'Teste do jogador',tn:18}});
   assert.equal(r.status,200,JSON.stringify(r.data));
   assert.equal(r.data.data.snapshot.actorId,'spider');
   assert.equal(r.data.data.snapshot.tn,18);
 });
 
-test('combate bloqueia ação normal do jogador fora do turno',async()=>{
+test('modo de apoio permite rolagem do jogador independentemente do turno de combate',async()=>{
   const master=await joinMaster();
   const state=await api('/state',{token:master});
   const heroes=state.data.data.heroes;
@@ -183,9 +184,9 @@ test('combate bloqueia ação normal do jogador fora do turno',async()=>{
   const start=await api('/combat/start',{method:'POST',token:master,body:{}});
   assert.equal(start.status,200,JSON.stringify(start.data));
   const player=await joinPlayer();
-  const blocked=await api('/actions/d616/start',{method:'POST',token:player,body:{ability:'Agility'}});
-  assert.equal(blocked.status,409);
-  assert.match(blocked.data.error,/AGUARDANDO/i);
+  const rolled=await api('/actions/d616/start',{method:'POST',token:player,body:{ability:'Agility'}});
+  assert.equal(rolled.status,200,JSON.stringify(rolled.data));
+  assert.equal(rolled.data.data.snapshot.actorId,'spider');
   await api('/combat/end',{method:'POST',token:master,body:{}});
 });
 
@@ -334,7 +335,7 @@ test('Central do Mestre pode editar a ordem de combate ativa sem criar outro est
 });
 
 
-test('movimentação no grid valida dono, turno e sincroniza Mestre + 2 jogadores pelo SSE existente',async()=>{
+test('movimentação no grid valida dono e sincroniza Mestre + 2 jogadores sem bloquear por turno',async()=>{
   const master=await joinMaster(),snapshot=await api('/state',{token:master}),heroes=snapshot.data.data.heroes||[];
   assert.ok(heroes.some(h=>h.id==='spider'));
   assert.ok(heroes.some(h=>h.id==='wolverine'));
@@ -369,20 +370,20 @@ test('movimentação no grid valida dono, turno e sincroniza Mestre + 2 jogadore
     const npcSteal=await api('/scenario/move',{method:'PATCH',token:player1,body:{pieceId:'enemy-part5',x:13,y:2,mode:'run',from:{x:12,y:2}}});
     assert.equal(npcSteal.status,403);assert.match(npcSteal.data.error,/próprio personagem/i);
     const outOfTurn=await api('/scenario/move',{method:'PATCH',token:player2,body:{pieceId:wolverinePiece.id,x:7,y:2,mode:'run',from:{x:6,y:2}}});
-    assert.equal(outOfTurn.status,409);assert.equal(outOfTurn.data.error,'Aguarde seu turno para movimentar seu personagem.');
+    assert.equal(outOfTurn.status,200,JSON.stringify(outOfTurn.data));assert.equal(outOfTurn.data.data.piece.baseId,'wolverine');
 
-    const occupied=await api('/scenario/move',{method:'PATCH',token:player1,body:{pieceId:spiderPiece.id,x:6,y:2,mode:'run',from:{x:3,y:2}}});
+    const occupied=await api('/scenario/move',{method:'PATCH',token:player1,body:{pieceId:spiderPiece.id,x:7,y:2,mode:'run',from:{x:3,y:2}}});
     assert.equal(occupied.status,409);assert.match(occupied.data.error,/Casa indisponível/i);
 
     const masterNpcMove=await api('/scenario/move',{method:'PATCH',token:master,body:{pieceId:'enemy-part5',x:13,y:2,mode:'run',from:{x:12,y:2}}});
     assert.equal(masterNpcMove.status,200,JSON.stringify(masterNpcMove.data));assert.equal(masterNpcMove.data.data.piece.kind,'enemy');
-    const masterMove=await api('/scenario/move',{method:'PATCH',token:master,body:{pieceId:wolverinePiece.id,x:7,y:2,mode:'run',from:{x:6,y:2}}});
+    const masterMove=await api('/scenario/move',{method:'PATCH',token:master,body:{pieceId:wolverinePiece.id,x:8,y:2,mode:'run',from:{x:7,y:2}}});
     assert.equal(masterMove.status,200,JSON.stringify(masterMove.data));assert.equal(masterMove.data.data.piece.baseId,'wolverine');
 
     const next=await api('/combat/next',{method:'POST',token:master,body:{}});assert.equal(next.status,200);assert.equal(next.data.data.order[next.data.data.turnIndex].baseId,'wolverine');
     const player1Blocked=await api('/scenario/move',{method:'PATCH',token:player1,body:{pieceId:spiderPiece.id,x:4,y:2,mode:'run',from:{x:3,y:2}}});
-    assert.equal(player1Blocked.status,409);assert.equal(player1Blocked.data.error,'Aguarde seu turno para movimentar seu personagem.');
-    const player2Move=await api('/scenario/move',{method:'PATCH',token:player2,body:{pieceId:wolverinePiece.id,x:8,y:2,mode:'run',from:{x:7,y:2}}});
+    assert.equal(player1Blocked.status,200,JSON.stringify(player1Blocked.data));assert.equal(player1Blocked.data.data.piece.baseId,'spider');
+    const player2Move=await api('/scenario/move',{method:'PATCH',token:player2,body:{pieceId:wolverinePiece.id,x:9,y:2,mode:'run',from:{x:8,y:2}}});
     assert.equal(player2Move.status,200,JSON.stringify(player2Move.data));assert.equal(player2Move.data.data.piece.baseId,'wolverine');
   }finally{
     masterStream.close();player2Stream.close();await api('/combat/end',{method:'POST',token:master,body:{}});await api('/state/scenario',{method:'PUT',token:master,body:{value:originalScenario}});
@@ -557,22 +558,28 @@ test('Central do Mestre resolve ataque e aplica o dano da mesma rollId no backen
   assert.ok(target);
   const originalHealth=Number(target.currentHealth);
 
-  const started=await api('/actions/d616/start',{method:'POST',token:master,body:{
-    actorId:'spider',kind:'hero',source:'hero',ability:'Melee',action:'Ataque corpo a corpo',tn:1,
-    edge:0,trouble:0,extra:0,rollType:'attack',targetId:'wolverine',targetKind:'hero',damageResource:'health',deferFinalize:true,
-    damageMultiplier:999,damageReduction:0
-  }});
-  assert.equal(started.status,200,JSON.stringify(started.data));
-  const roll=started.data.data;
+  let roll=null,finalized=null;
+  for(let attempt=0;attempt<40;attempt++){
+    const started=await api('/actions/d616/start',{method:'POST',token:master,body:{
+      actorId:'spider',kind:'hero',source:'hero',ability:'Melee',action:'Ataque corpo a corpo',tn:1,
+      edge:0,trouble:0,extra:0,rollType:'attack',targetId:'wolverine',targetKind:'hero',damageResource:'focus',deferFinalize:true,
+      damageMultiplier:999,damageReduction:20
+    }});
+    assert.equal(started.status,200,JSON.stringify(started.data));
+    roll=started.data.data;
+    finalized=await api(`/actions/d616/${encodeURIComponent(roll.id)}/finalize`,{method:'POST',token:master,body:{}});
+    assert.equal(finalized.status,200,JSON.stringify(finalized.data));
+    if(finalized.data.data.outcome.success)break;
+  }
+  assert.equal(finalized?.data?.data?.outcome?.success,true,'esperava obter ao menos um ataque bem-sucedido');
   assert.equal(roll.snapshot.targetId,'wolverine');
   assert.equal(roll.snapshot.targetName,target.n);
+  assert.equal(roll.snapshot.tn,10+Number(target.abilities.Melee||0));
   assert.equal(roll.snapshot.damageResource,'health');
   assert.equal(roll.values.length,3);
   assert.equal(roll.damage.rawMarvelDie,roll.values[1]);
   assert.equal(roll.damage.multiplier,5);
 
-  const finalized=await api(`/actions/d616/${encodeURIComponent(roll.id)}/finalize`,{method:'POST',token:master,body:{}});
-  assert.equal(finalized.status,200,JSON.stringify(finalized.data));
   const entry=finalized.data.data.historyEntry;
   assert.equal(entry.rollId,roll.id);
   assert.equal(entry.targetId,'wolverine');
@@ -603,14 +610,32 @@ test('Central do Mestre resolve ataque e aplica o dano da mesma rollId no backen
 
 test('ataque que falha não permite aplicar dano',async()=>{
   const master=await joinMaster();
-  const started=await api('/actions/d616/start',{method:'POST',token:master,body:{actorId:'spider',kind:'hero',source:'hero',ability:'Melee',action:'Ataque impossível',tn:99,edge:0,trouble:0,extra:0,rollType:'attack',targetId:'wolverine',targetKind:'hero',damageResource:'health',deferFinalize:true}});
-  assert.equal(started.status,200,JSON.stringify(started.data));
-  const finalized=await api(`/actions/d616/${encodeURIComponent(started.data.data.id)}/finalize`,{method:'POST',token:master,body:{}});
-  assert.equal(finalized.status,200,JSON.stringify(finalized.data));
-  assert.equal(finalized.data.data.outcome.success,false);
-  const applied=await api(`/actions/d616/${encodeURIComponent(started.data.data.id)}/apply-damage`,{method:'POST',token:master,body:{}});
+  let failed=null;
+  for(let attempt=0;attempt<50;attempt++){
+    const started=await api('/actions/d616/start',{method:'POST',token:master,body:{actorId:'spider',kind:'hero',source:'hero',ability:'Melee',action:'Ataque',tn:99,edge:0,trouble:0,extra:0,rollType:'attack',targetId:'wolverine',targetKind:'hero',damageResource:'focus',deferFinalize:true}});
+    assert.equal(started.status,200,JSON.stringify(started.data));
+    const finalized=await api(`/actions/d616/${encodeURIComponent(started.data.data.id)}/finalize`,{method:'POST',token:master,body:{}});
+    assert.equal(finalized.status,200,JSON.stringify(finalized.data));
+    if(!finalized.data.data.outcome.success){failed=finalized.data.data;break;}
+  }
+  assert.ok(failed,'esperava obter ao menos uma falha para validar bloqueio de dano');
+  const applied=await api(`/actions/d616/${encodeURIComponent(failed.id)}/apply-damage`,{method:'POST',token:master,body:{}});
   assert.equal(applied.status,409);
   assert.match(applied.data.error,/não acertou/i);
+});
+
+test('EGO e LOGIC usam a defesa correspondente da ficha e afetam Focus',async()=>{
+  const master=await joinMaster();
+  const snapshot=await api('/state',{token:master});
+  const target=snapshot.data.data.villains.find(villain=>villain.id==='aim-agent');
+  assert.ok(target);
+  for(const ability of ['Ego','Logic']){
+    const started=await api('/actions/d616/start',{method:'POST',token:master,body:{actorId:'spider',kind:'hero',source:'hero',ability,action:`Ataque de ${ability}`,tn:1,rollType:'attack',targetId:target.id,targetKind:'villain',damageResource:'health',deferFinalize:true}});
+    assert.equal(started.status,200,JSON.stringify(started.data));
+    assert.equal(started.data.data.snapshot.tn,10+Number(target.abilities[ability]||0));
+    assert.equal(started.data.data.snapshot.damageResource,'focus');
+    await api(`/actions/d616/${encodeURIComponent(started.data.data.id)}/finalize`,{method:'POST',token:master,body:{}});
+  }
 });
 
 test('novo turno renova o movimento do próprio personagem e mantém autorização server-side',async()=>{

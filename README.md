@@ -1,8 +1,8 @@
-# RPG Arachne — v33.4
+# RPG Arachne — v33.4.7
 
 Mesa virtual online para campanhas de **Marvel Multiverse RPG**, preservando a arquitetura existente do projeto: frontend estático, backend Node.js, persistência SQLite/Supabase, Supabase Storage para uploads e realtime por Server-Sent Events (SSE).
 
-A **v33.4** consolida a movimentação autoritativa do jogador no grid existente e, nas etapas posteriores de Health/Focus, permite que cada jogador ajuste somente o `currentHealth` e o `currentFocus` do próprio herói. O backend valida o `heroId` da sessão, mantém os limites `0..maxHealth` e `0..maxFocus`, sincroniza a ordem de combate quando necessário, persiste as alterações, distribui o novo estado pelo SSE existente e registra mudanças efetivas no `actionHistory`. A edição completa da ficha continua exclusiva do Mestre.
+A **v33.4.7 / UI v42** mantém o Arachne como ferramenta de apoio de mesa e adiciona a campanha solo **Motoqueiro Fantasma — Estrada dos Condenados**: cada jogador rola pela própria ficha, ajusta Health/Focus e movimenta somente o próprio token no cenário integrado à Central; o Mestre recebe a iniciativa, o histórico geral, controla os vilões e pode movimentar qualquer peça do tabuleiro. O movimento do jogador não depende mais do turno ativo, mas propriedade do token, alcance, orçamento, terreno, obstáculos e ocupação continuam validados pelo backend.
 
 O núcleo funcional continua preservando as frentes anteriores: Central do Mestre/Jogador, busca e persistência de imagens, performance/realtime/segurança e movimentação autoritativa. O projeto não foi recriado e não recebeu um segundo backend, banco, grid, animação D616 ou sistema realtime.
 
@@ -11,7 +11,7 @@ O núcleo funcional continua preservando as frentes anteriores: Central do Mestr
 
 > **Ataques v33.0:** o backend gera a única D616 do ataque. O dado central é o Marvel Die; quando o ataque acerta, o dano é derivado da mesma `rollId` usando o valor efetivo do Marvel Die, o multiplicador de dano do perfil e o modificador da habilidade. Não existe mais `ROLAR DANO`, cubo de dano ou evento de histórico `DMG`.
 
-> **Movimentação v33.4:** durante combate ativo, cada jogador pode selecionar e mover somente o próprio token quando for seu turno. O backend valida sessão, campanha, propriedade, turno, posição, modo, orçamento, terreno, obstáculos e ocupação antes de persistir a nova posição. Ao começar um novo turno daquele participante, seu orçamento é renovado. O Mestre continua podendo mover qualquer peça.
+> **Central v33.4.7 / UI v42:** o cenário aparece diretamente na Central. Cada jogador pode selecionar e mover somente o próprio token, sem bloqueio pela ordem de turnos. O backend valida sessão, campanha, propriedade, posição, modo, orçamento, terreno, obstáculos e ocupação antes de persistir. O Mestre pode selecionar e mover qualquer peça e reiniciar o orçamento de movimento pela Central.
 
 > **Health/Focus do jogador:** na Central do Jogador, os controles `−/+` alteram somente os recursos atuais do herói vinculado à sessão. O backend rejeita alterações em outro personagem, `maxHealth`, `maxFocus` ou outros atributos, mantém os valores entre zero e o máximo da ficha e sincroniza as mudanças por SSE. Alterações efetivas são registradas no `actionHistory` com personagem, valor anterior, novo valor, autor e horário.
 
@@ -405,7 +405,7 @@ Validação automatizada da v33.4 no pacote entregue:
 0 falhas
 ```
 
-A suíte cobre health/versionamento, sanitização de jogador, proteção de ficha/recursos, ajustes de `currentHealth`/`currentFocus` pelo próprio jogador, limites 0..máximo, recursos do Mestre, persistência, `actionHistory`, sincronização SSE com Mestre e outros jogadores, TN e habilidade autoritativos, bloqueio fora do turno, isolamento entre campanhas, permissões de imagens, D616, Central do Mestre, movimentação do grid com Mestre + dois jogadores e os contratos visuais da v32. A v33.0 acrescentou o ataque com uma única D616 e dano derivado; a v33.1 acrescentou iniciativa D616 server-side; a v33.2 cobre aplicação autoritativa de dano; a v33.3 valida iniciativa → grid; a v33.4 mantém essas frentes enquanto adiciona movimentação autoritativa e ajuste seguro de Health/Focus do próprio herói; e a v33.4.4 permite múltiplas instâncias de ameaças genéricas/LACAIOS na preparação sem duplicar personagens únicos.
+A suíte cobre health/versionamento, sanitização de jogador, proteção de ficha/recursos, ajustes de `currentHealth`/`currentFocus` pelo próprio jogador, limites 0..máximo, recursos do Mestre, persistência, `actionHistory`, sincronização SSE com Mestre e outros jogadores, TN e habilidade autoritativos, movimentação do próprio token sem bloqueio por turno no modo de apoio, isolamento entre campanhas, permissões de imagens, D616, Central do Mestre, movimentação do grid com Mestre + dois jogadores e os contratos visuais da v32. A v33.0 acrescentou o ataque com uma única D616 e dano derivado; a v33.1 acrescentou iniciativa D616 server-side; a v33.2 cobre aplicação autoritativa de dano; a v33.3 valida iniciativa → grid; a v33.4 mantém essas frentes enquanto adiciona movimentação autoritativa e ajuste seguro de Health/Focus do próprio herói; a v33.4.4 permite múltiplas instâncias de ameaças genéricas/LACAIOS na preparação sem duplicar personagens únicos; a v33.4.5 integra o cenário à Central de apoio, mantendo a posse de tokens e liberando o Mestre para controlar todas as peças; e a v33.4.6 faz rolagens de COMBATE calcularem e exibirem o dano da ficha sem selecionar ou afetar um alvo. A v33.4.7 adiciona a campanha solo do Motoqueiro Fantasma, suas fichas/PDFs e uma Central Solo única para Johnny e inimigos.
 
 ## Variáveis de ambiente
 

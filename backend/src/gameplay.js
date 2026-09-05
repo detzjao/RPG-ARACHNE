@@ -18,7 +18,14 @@ const DAMAGE_MULTIPLIERS={
   sinister:{Melee:7,Agility:5,Ego:5,Logic:7},
   'minion-melee':{Melee:2,Agility:1,Ego:1,Logic:1},
   'minion-ranged':{Melee:1,Agility:2,Ego:1,Logic:1},
-  'minion-support':{Melee:1,Agility:1,Ego:1,Logic:2}
+  'minion-support':{Melee:1,Agility:1,Ego:1,Logic:2},
+  'ghost-rider':{Melee:5,Ego:5},
+  'ash-cultist':{Melee:1,Ego:1},
+  'infernal-acolyte':{Melee:2,Ego:2},
+  hellhound:{Melee:2,Agility:2},
+  'road-guardian':{Melee:3,Ego:3},
+  'damned-rider':{Melee:4,Agility:4,Ego:4},
+  'faceless-man':{Melee:5,Ego:5}
 };
 
 export function dieScore(value,index){return index===1&&Number(value)===1?6:Number(value||0);}
