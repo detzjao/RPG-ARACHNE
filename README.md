@@ -1,4 +1,13 @@
-# RPG Arachne — v33.4.7
+# RPG Arachne — v33.5.0 / UI v44
+
+## React + Tailwind
+
+A **UI v44** mantém a interface principal em **React + Tailwind CSS** e adiciona Edge e Trouble diretamente à Central de Ações de jogador, Mestre e modo Solo. TN, Health/Focus, ficha, iniciativa do Mestre, histórico, cenário integrado e a campanha solo do Motoqueiro Fantasma permanecem preservados.
+
+A produção é self-contained: React/ReactDOM ficam em `frontend/vendor`, Tailwind é pré-compilado em `frontend/styles/tailwind.css` e não existe dependência de CDN no navegador. Para detalhes da migração, consulte `CHANGELOG_V43_REACT_TAILWIND.md`; para Edge/Trouble, consulte `CHANGELOG_V44_EDGE_TROUBLE.md`.
+
+---
+
 
 Mesa virtual online para campanhas de **Marvel Multiverse RPG**, preservando a arquitetura existente do projeto: frontend estático, backend Node.js, persistência SQLite/Supabase, Supabase Storage para uploads e realtime por Server-Sent Events (SSE).
 

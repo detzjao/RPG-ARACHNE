@@ -74,11 +74,13 @@ test('perfil existente do Homem-Aranha continua fornecendo multiplicador sem seg
   assert.doesNotMatch(script,/const\s+DAMAGE_PROFILES/);
 });
 
-test('D616, iniciativa, outros dados e animação existente permanecem presentes',()=>{
-  assert.match(html,/data-master-dice-tab="d616"/);
-  assert.match(html,/data-master-dice-tab="initiative"/);
-  assert.match(html,/data-master-dice-tab="generic"/);
-  assert.match(html,/id="dice-stage"/);
-  assert.match(script,/window\.ArachneDiceAnimation\s*=\s*Object\.freeze/);
-  assert.equal((css.match(/@keyframes\s+cubeTumble\b/g)||[]).length,1);
+test('D616 e iniciativa permanecem presentes na Central React com uma única animação',()=>{
+  const app=fs.readFileSync(path.join(projectRoot,'frontend/src/app.js'),'utf8');
+  const custom=fs.readFileSync(path.join(projectRoot,'frontend/styles/custom.css'),'utf8');
+  assert.match(app,/function DiceStage/);
+  assert.match(app,/function InitiativePanel/);
+  assert.match(app,/central-dice-stage/);
+  assert.match(app,/initiative-dice-stage/);
+  assert.match(app,/animateDiceStage/);
+  assert.equal((custom.match(/@keyframes\s+cubeTumble\b/g)||[]).length,1);
 });

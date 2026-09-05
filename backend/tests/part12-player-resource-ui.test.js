@@ -29,11 +29,15 @@ test('endpoint dedicado de recursos continua preservado fora da Central',()=>{
   assert.match(body,/focusDelta: step/);
 });
 
-test('modo de apoio continua responsivo e com cache-busting da versão',()=>{
-  assert.match(css,/v38 — modo de apoio/);
-  assert.match(css,/\.support-action-grid/);
-  assert.match(html,/style\.css\?v=33\.4\.[0-9]+-[^"']+/);
-  assert.match(html,/script\.js\?v=33\.4\.[0-9]+-[^"']+/);
+test('modo de apoio React continua responsivo e usa Tailwind compilado',()=>{
+  const app=fs.readFileSync(path.join(root,'frontend/src/app.js'),'utf8');
+  const custom=fs.readFileSync(path.join(root,'frontend/styles/custom.css'),'utf8');
+  assert.match(html,/styles\/tailwind\.css/);
+  assert.match(html,/vendor\/react\.production\.min\.js/);
+  assert.match(html,/src\/app\.js/);
+  assert.match(app,/sm:grid-cols-2/);
+  assert.match(app,/lg:grid-cols-4/);
+  assert.match(custom,/@media\(max-width:640px\)/);
 });
 
 

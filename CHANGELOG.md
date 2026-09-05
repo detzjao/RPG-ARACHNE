@@ -1,3 +1,19 @@
+# Changelog
+
+## [UI 44] - 2026-09-05
+
+### Adicionado
+- Controles compactos de Edge e Trouble ao lado do TN na Central de Ações.
+- Suporte para jogador, Mestre e campanha Solo escolherem Edge/Trouble em cada rolagem D616.
+- Exibição de Edge/Trouble aplicados no resumo do resultado.
+- Testes de regressão para o fluxo React e para o endpoint de rolagem de jogador.
+
+### Preservado
+- Trouble continua automático no servidor e mantém o pior resultado.
+- Edge continua permitindo escolher diretamente qual dado rerrolar.
+- Edge e Trouble continuam se anulando um a um.
+- Nenhum alvo ou dano automático foi reintroduzido.
+
 # v42 — Motoqueiro Fantasma: Estrada dos Condenados
 
 - Adicionada a campanha solo **Motoqueiro Fantasma — Estrada dos Condenados** (5 atos) ao seletor de campanhas.

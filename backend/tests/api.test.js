@@ -64,7 +64,7 @@ test.after(async()=>{
 test('health informa versão, realtime e busca de imagens',async()=>{
   const r=await api('/health');
   assert.equal(r.status,200);
-  assert.equal(r.data.version,'33.4.5');
+  assert.equal(r.data.version,'33.5.0');
   assert.equal(r.data.realtime,'sse');
   assert.equal(r.data.imageSearch,true);
 });
@@ -265,6 +265,18 @@ test('Edge do Mestre é calculado no servidor e permanece pendente até o fronte
   assert.equal(finish.data.data.finalized,true);
 });
 
+
+test('jogador define Edge e Trouble por rolagem na Central',async()=>{
+  const player=await joinPlayer();
+  const rolled=await api('/actions/d616/start',{method:'POST',token:player,body:{
+    ability:'Agility',action:'Teste com Edge e Trouble',tn:14,edge:1,trouble:1
+  }});
+  assert.equal(rolled.status,200,JSON.stringify(rolled.data));
+  assert.equal(rolled.data.data.snapshot.edge,1);
+  assert.equal(rolled.data.data.snapshot.trouble,1);
+  assert.equal(rolled.data.data.edgeRemaining,0);
+  assert.equal(rolled.data.data.finalized,true);
+});
 
 test('rolagem do jogador chega ao Mestre por SSE com o mesmo resultado e atualiza o histórico',async()=>{
   const master=await joinMaster();

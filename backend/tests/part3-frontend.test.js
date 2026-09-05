@@ -9,10 +9,12 @@ const script=fs.readFileSync(path.join(frontend,'script.js'),'utf8');
 const api=fs.readFileSync(path.join(frontend,'api-client.js'),'utf8');
 const css=fs.readFileSync(path.join(frontend,'style.css'),'utf8');
 
-test('Central do Mestre possui área estável de rolagens recentes',()=>{
-  assert.match(html,/id="master-recent-rolls"/);
-  assert.match(html,/id="master-live-dice-stage"/);
-  assert.match(html,/id="master-recent-roll-list"/);
+test('Central do Mestre possui histórico estável no frontend React',()=>{
+  const app=fs.readFileSync(path.join(frontend,'src/app.js'),'utf8');
+  assert.match(app,/function RollHistory/);
+  assert.match(app,/HISTÓRICO DA SESSÃO/);
+  assert.match(app,/rows\.slice\(\)\.reverse\(\)/);
+  assert.match(app,/isMaster\?h\(RollHistory/);
 });
 
 test('rolagem do jogador e do Mestre reutilizam ArachneDiceAnimation',()=>{

@@ -41,5 +41,6 @@ test('troca de tela reutiliza o estado sincronizado em memória',()=>{
   const body=functionBody('goToPage','openNav');
   assert.match(body,/if\(id==='home'\)renderSessionCentral\(\)/);
   assert.match(body,/if\(id==='combat'\)renderCombatConsole\(\)/);
-  assert.match(html,/script\.js\?v=33\.4\.7-v42-ghost-rider/);
+  assert.match(html,/src\/api\.js/);
+  assert.match(html,/src\/app\.js/);
 });

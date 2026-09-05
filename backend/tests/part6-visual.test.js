@@ -11,12 +11,15 @@ const apiClient=fs.readFileSync(path.join(projectRoot,'frontend/api-client.js'),
 
 function occurrences(text,pattern){return (text.match(pattern)||[]).length;}
 
-test('v32 aplica polimento visual sem criar uma segunda lógica de dados ou realtime',()=>{
-  assert.match(css,/v32\.0 · Polimento visual e feedback de interação/);
-  assert.match(html,/style\.css\?v=[^"']+/);
-  assert.equal(occurrences(script,/window\.ArachneDiceAnimation\s*=/g),1);
-  assert.equal(occurrences(css,/@keyframes\s+cubeTumble\b/g),1);
-  assert.equal(occurrences(apiClient,/new\s+EventSource\s*\(/g),1);
+test('v43 usa React + Tailwind sem criar uma segunda lógica de realtime',()=>{
+  const app=fs.readFileSync(path.join(projectRoot,'frontend/src/app.js'),'utf8');
+  const api=fs.readFileSync(path.join(projectRoot,'frontend/src/api.js'),'utf8');
+  const custom=fs.readFileSync(path.join(projectRoot,'frontend/styles/custom.css'),'utf8');
+  assert.match(html,/vendor\/react\.production\.min\.js/);
+  assert.match(html,/styles\/tailwind\.css/);
+  assert.match(app,/ReactDOM\.render/);
+  assert.equal(occurrences(custom,/@keyframes\s+cubeTumble\b/g),1);
+  assert.equal(occurrences(api,/new\s+EventSource\s*\(/g),1);
 });
 
 test('v32 cobre hover, clique, foco, desabilitado e movimento reduzido',()=>{

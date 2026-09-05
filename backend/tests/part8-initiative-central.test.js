@@ -41,9 +41,11 @@ test('rolar iniciativas em lote filtra apenas participantes ainda sem resultado'
   assert.doesNotMatch(script,/const face=rand\(6\).*initiative/s);
 });
 
-test('aba Dados do Mestre mantém iniciativa e histórico usando D616',()=>{
-  assert.match(html,/data-master-dice-tab="initiative"/);
-  assert.match(html,/id="initiative-dice-stage" class="dice-stage-3d initiative-d616-stage"/);
-  assert.match(html,/ROLAR INICIATIVAS/);
-  assert.match(script,/syncServerHistoryEntry\(data\.historyEntry\)/);
+test('Central React do Mestre mantém iniciativa e histórico usando D616',()=>{
+  const app=fs.readFileSync(path.join(root,'frontend/src/app.js'),'utf8');
+  assert.match(app,/function InitiativePanel/);
+  assert.match(app,/D616 DE INICIATIVA/);
+  assert.match(app,/ROLAR PENDENTES/);
+  assert.match(app,/function RollHistory/);
+  assert.match(app,/isMaster\?h\(RollHistory/);
 });

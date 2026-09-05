@@ -1,0 +1,15 @@
+{
+  "name": "projeto-arachne-frontend",
+  "version": "44.0.0",
+  "private": true,
+  "description": "Frontend React + Tailwind do Projeto Arachne, otimizado como apoio de mesa para Marvel Multiverse RPG.",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build:css": "node scripts/build-tailwind.mjs",
+    "check": "node --check src/api.js && node --check src/app.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.10",
+    "vite": "^7.1.4"
+  }
+}

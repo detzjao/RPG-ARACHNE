@@ -1,4 +1,4 @@
-# RPG Arachne Backend — v33.4
+# RPG Arachne Backend — v33.5
 
 API Node.js sem framework, compatível com SQLite ou Supabase/PostgreSQL. É responsável por autenticação, campanhas, estado, gameplay D616, combate, SSE, uploads e busca/importação de imagens.
 
@@ -14,7 +14,7 @@ Testes:
 npm test
 ```
 
-A suíte atual inclui regressões do backend, iniciativa → grid, ameaças genéricas repetíveis, movimentação autoritativa, Mestre + dois jogadores, renovação de orçamento por turno, sincronização SSE e as etapas anteriores. A API/health reporta versão 33.4.4.
+A suíte atual inclui regressões do backend, iniciativa → grid, ameaças genéricas repetíveis, movimentação autoritativa, Mestre + dois jogadores, renovação de orçamento por turno, sincronização SSE e as etapas anteriores. A API/health reporta versão 33.5.0.
 
 ## Funções principais
 

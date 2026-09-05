@@ -1,0 +1,55 @@
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#080b10;color:#f8fafc}*{box-sizing:border-box}html{background:#080b10}body{margin:0;min-width:320px;overflow-x:hidden}button,input,select,textarea{font:inherit}button{touch-action:manipulation}img{max-width:100%}::selection{background:#ef3340;color:#fff}
+
+/* D616: preserva a animação tridimensional do projeto original. */
+.dice-stage-3d{min-height:184px;display:flex;justify-content:center;align-items:center;gap:12px;padding:12px 0 4px;perspective:1100px;perspective-origin:50% 40%;overflow:hidden}
+.die-select{appearance:none;background:transparent;border:1px solid transparent;border-radius:14px;color:#fff;padding:8px;display:grid;gap:10px;justify-items:center;cursor:default;transition:border-color .18s ease,background .18s ease,transform .18s ease;min-width:108px;opacity:1!important}
+.die-select:disabled{color:#fff;opacity:1!important}.die-select.edge-ready{cursor:pointer;border-color:#315640;background:#102018}.die-select.edge-ready:hover{transform:translateY(-3px);border-color:#66c68b;background:#13281d}.die-select.edge-ready::after{content:"USAR EDGE";font-size:8px;letter-spacing:1px;color:#7be7a5;font-weight:950}.die-label{font-size:8px;letter-spacing:1.5px;color:#7e8794;font-weight:950}.marvel-die .die-label{color:#ff747f}.plus{color:#5b6472;font-size:20px}
+.cube-wrap{width:78px;height:78px;display:grid;place-items:center;perspective:700px;filter:drop-shadow(0 15px 16px rgba(0,0,0,.42))}.cube{width:70px;height:70px;position:relative;transform-style:preserve-3d;transform:rotateX(0deg) rotateY(0deg);will-change:transform}.cube .face{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(145deg,#222a36,#0b0e13);border:1px solid #4a5565;border-radius:12px;box-shadow:inset 0 0 18px rgba(255,255,255,.035);font-style:normal;font-size:27px;font-weight:950;backface-visibility:hidden}.cube .face::after{content:"";position:absolute;inset:6px;border:1px solid rgba(255,255,255,.035);border-radius:8px;pointer-events:none}.marvel-cube .face{border-color:#7a303a;background:linear-gradient(145deg,#30151a,#0b0d12);box-shadow:inset 0 0 20px rgba(230,57,70,.07)}.marvel-cube .f1{color:#ff6874;font-size:30px;text-shadow:0 0 20px rgba(230,57,70,.35)}.cube .f1{transform:translateZ(35px)}.cube .f6{transform:rotateY(180deg) translateZ(35px)}.cube .f3{transform:rotateY(90deg) translateZ(35px)}.cube .f4{transform:rotateY(-90deg) translateZ(35px)}.cube .f2{transform:rotateX(90deg) translateZ(35px)}.cube .f5{transform:rotateX(-90deg) translateZ(35px)}.cube.rolling{animation:cubeTumble var(--roll-duration,820ms) cubic-bezier(.16,.72,.26,1) both}
+@keyframes cubeTumble{0%{transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateY(0) scale(1)}18%{transform:rotateX(315deg) rotateY(420deg) rotateZ(90deg) translateY(-18px) scale(.96)}45%{transform:rotateX(650deg) rotateY(780deg) rotateZ(180deg) translateY(7px) scale(1.02)}66%{transform:rotateX(970deg) rotateY(1120deg) rotateZ(270deg) translateY(-7px) scale(.98)}100%{transform:rotateX(var(--spin-x)) rotateY(var(--spin-y)) rotateZ(var(--spin-z)) translateY(0) scale(1)}}
+.compact-dice-stage{min-height:124px;gap:4px;padding:2px 0}.compact-dice-stage .die-select{min-width:76px;padding:3px;gap:5px}.compact-dice-stage .cube-wrap{width:54px;height:54px}.compact-dice-stage .cube{width:48px;height:48px}.compact-dice-stage .cube .face{font-size:19px;border-radius:8px}.compact-dice-stage .marvel-cube .f1{font-size:21px}.compact-dice-stage .cube .f1{transform:translateZ(24px)}.compact-dice-stage .cube .f6{transform:rotateY(180deg) translateZ(24px)}.compact-dice-stage .cube .f3{transform:rotateY(90deg) translateZ(24px)}.compact-dice-stage .cube .f4{transform:rotateY(-90deg) translateZ(24px)}.compact-dice-stage .cube .f2{transform:rotateX(90deg) translateZ(24px)}.compact-dice-stage .cube .f5{transform:rotateX(-90deg) translateZ(24px)}
+
+/* Cenário: apenas CSS específico do grid. O restante é Tailwind. */
+.board-scroll{min-height:250px;max-height:min(70vh,760px);scrollbar-width:thin;scrollbar-color:#374151 #080b10}.board-grid{display:grid;position:relative;transition:transform .16s ease}.board-cell{position:relative;width:40px;height:40px;border:1px solid rgba(255,255,255,.075);background:linear-gradient(145deg,#1a2029,#12171f);padding:0;overflow:visible}.board-cell:nth-child(odd){background:linear-gradient(145deg,#1b212b,#131922)}.board-cell:hover{outline:1px solid rgba(239,51,64,.32);z-index:1}.board-cell.has-obstacle{background:#21171a}.obstacle-mark{position:absolute;inset:0;display:grid;place-items:center;color:#a76c74;font-size:11px;font-weight:900;opacity:.8}.board-token{position:absolute;inset:3px;border-radius:50%;overflow:hidden;border:2px solid #687385;background:#10151d;box-shadow:0 5px 12px #0008;display:grid;place-items:center;font-size:9px;font-weight:950;z-index:2}.board-token img{width:100%;height:100%;object-fit:cover}.board-token.movable{border-color:#d9a12b;cursor:pointer}.board-cell.selected-piece .board-token{outline:2px solid #ef3340;outline-offset:2px;box-shadow:0 0 0 4px rgba(239,51,64,.12),0 7px 18px #0009}.terrain-water{background:linear-gradient(145deg,#122738,#0c1924)!important}.terrain-difficult{background:linear-gradient(145deg,#292218,#17130e)!important}.terrain-fire{background:linear-gradient(145deg,#351818,#1b0c0c)!important}
+
+.scrollbar-thin{scrollbar-width:thin;scrollbar-color:#3b4350 transparent}.scrollbar-thin::-webkit-scrollbar,.board-scroll::-webkit-scrollbar{height:8px;width:8px}.scrollbar-thin::-webkit-scrollbar-thumb,.board-scroll::-webkit-scrollbar-thumb{background:#353e4b;border-radius:999px}.scrollbar-thin::-webkit-scrollbar-track,.board-scroll::-webkit-scrollbar-track{background:transparent}
+
+@media(max-width:640px){.dice-stage-3d{gap:1px;min-height:148px}.die-select{min-width:78px;padding:5px 2px}.cube-wrap{width:60px;height:60px}.cube{width:54px;height:54px}.cube .face{font-size:21px;border-radius:9px}.marvel-cube .f1{font-size:23px}.cube .f1{transform:translateZ(27px)}.cube .f6{transform:rotateY(180deg) translateZ(27px)}.cube .f3{transform:rotateY(90deg) translateZ(27px)}.cube .f4{transform:rotateY(-90deg) translateZ(27px)}.cube .f2{transform:rotateX(90deg) translateZ(27px)}.cube .f5{transform:rotateX(-90deg) translateZ(27px)}.die-label{font-size:7px}.plus{font-size:14px}.board-scroll{padding:10px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.cube.rolling{animation:none!important}.die-select.edge-ready:hover{transform:none}}
+
+/* Enquadramento preservado dos retratos da UI anterior. */
+img[src*="/portraits/"]{object-fit:cover;object-position:var(--portrait-position,center center)!important;transform:scale(var(--portrait-scale,1));transform-origin:center}
+img[src$="villain-abomination.webp"]{--portrait-position:center 16%;--portrait-scale:1.12}
+img[src$="villain-ajax.webp"]{--portrait-position:center 15%;--portrait-scale:1.05}
+img[src$="villain-annihilus.webp"]{--portrait-position:center 28%;--portrait-scale:1.02}
+img[src$="villain-zemo.webp"]{--portrait-position:center 18%;--portrait-scale:1.02}
+img[src$="hero-black-panther.webp"]{--portrait-position:center 42%;--portrait-scale:1.03}
+img[src$="villain-blastaar.webp"]{--portrait-position:center 25%;--portrait-scale:1.03}
+img[src$="hero-captain-marvel.webp"]{--portrait-position:center 20%;--portrait-scale:1.02}
+img[src$="hero-thing.webp"]{--portrait-position:center 80%;--portrait-scale:1.08}
+img[src$="hero-deadpool.webp"]{--portrait-position:center 22%;--portrait-scale:1.02}
+img[src$="hero-daredevil.webp"]{--portrait-position:center 44%;--portrait-scale:1.40}
+img[src$="hero-doctor-strange.webp"]{--portrait-position:center 38%;--portrait-scale:1.03}
+img[src$="villain-elektra.webp"]{--portrait-position:center 12%;--portrait-scale:1.08}
+img[src$="hero-scarlet-witch.webp"]{--portrait-position:center 16%;--portrait-scale:1.12}
+img[src$="hero-gambit.webp"]{--portrait-position:center 24%;--portrait-scale:1.10}
+img[src$="hero-hawkeye.webp"]{--portrait-position:center 32%;--portrait-scale:1}
+img[src$="villain-molecule-man.webp"]{--portrait-position:center 18%;--portrait-scale:1.15}
+img[src$="hero-hulk.webp"]{--portrait-position:center 32%;--portrait-scale:1.02}
+img[src$="villain-juggernaut.webp"]{--portrait-position:center 12%;--portrait-scale:1.10}
+img[src$="villain-loki.webp"]{--portrait-position:center 42%;--portrait-scale:1.03}
+img[src$="hero-luke-cage.webp"]{--portrait-position:center 18%;--portrait-scale:1.03}
+img[src$="villain-madcap.webp"]{--portrait-position:center 25%;--portrait-scale:1.04}
+img[src$="villain-magneto.webp"]{--portrait-position:center 18%;--portrait-scale:1.02}
+img[src$="hero-war-machine.webp"]{--portrait-position:center 27%;--portrait-scale:1.05}
+img[src$="villain-bullseye.webp"]{--portrait-position:center 22%;--portrait-scale:1.05}
+img[src$="villain-mystique.webp"]{--portrait-position:center 18%;--portrait-scale:1.06}
+img[src$="hero-she-hulk.webp"]{--portrait-position:center 30%;--portrait-scale:1}
+img[src$="hero-invisible-woman.webp"]{--portrait-position:center 20%;--portrait-scale:1.02}
+img[src$="hero-shang-chi.webp"]{--portrait-position:center 22%;--portrait-scale:1}
+img[src$="hero-mr-fantastic.webp"]{--portrait-position:center 32%;--portrait-scale:1.05}
+img[src$="villain-super-skrull.webp"]{--portrait-position:center 30%;--portrait-scale:1.02}
+img[src$="hero-human-torch.webp"]{--portrait-position:center 34%;--portrait-scale:1.03}
+img[src$="villain-tombstone.webp"]{--portrait-position:center 24%;--portrait-scale:1.02}
+img[src$="villain-t-ray.webp"]{--portrait-position:62% 0%;--portrait-scale:1.03}
+img[src$="hero-vision.webp"]{--portrait-position:center 18%;--portrait-scale:1.25}
+img[src$="villain-kingpin.webp"]{--portrait-position:center 8%;--portrait-scale:1.05}
