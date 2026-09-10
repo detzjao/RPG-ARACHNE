@@ -34,6 +34,12 @@ export function createSupabaseRepository({ url, serviceRoleKey }) {
       });
       return this.getCampaignById(campaign.id);
     },
+    async updateCampaign(id, values = {}) {
+      const current=await this.getCampaignById(id); if(!current) return null;
+      const name=String(values.name || current.name || 'Campanha').trim().slice(0,80) || current.name;
+      await call(`/campaigns?id=eq.${encodeURIComponent(id)}`, {method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({name,updated_at:new Date().toISOString()})});
+      return this.getCampaignById(id);
+    },
     async getCampaignByCode(code) {
       const rows = await call(`/campaigns?code=ilike.${encodeURIComponent(String(code || '').trim())}&select=id,code,name,password_hash,template,created_at,updated_at&limit=1`) || [];
       return mapCampaign(rows[0]);

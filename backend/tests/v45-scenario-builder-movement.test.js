@@ -14,11 +14,11 @@ test('v45 aumenta o retrato principal sem abandonar thumbnails',()=>{
   assert.match(app,/const thumb = src/);
 });
 
-test('v45 destaca no grid somente as casas alcançáveis e mostra o custo',()=>{
+test('v45/v47 mantém cálculo e destaque das casas alcançáveis',()=>{
   assert.match(app,/function reachableScenarioCellsUI/);
   assert.match(app,/reachableScenarioCellsUI\(current,selectedPiece,movement\.mode,movement\.remaining\)/);
   assert.match(app,/reachable-cell/);
-  assert.match(app,/move-cost/);
+  assert.doesNotMatch(app,/className:'move-cost'/);
   assert.match(css,/\.board-cell\.reachable-cell/);
   assert.match(movement,/export function reachableScenarioCells/);
 });

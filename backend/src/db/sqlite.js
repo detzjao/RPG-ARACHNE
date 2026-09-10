@@ -54,6 +54,7 @@ export function createSqliteRepository({ file }) {
     INSERT INTO campaigns (id,code,name,password_hash,template,created_at,updated_at)
     VALUES (?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
   `);
+  const updateCampaignStmt = db.prepare(`UPDATE campaigns SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
   const ensureCampaignStmt = db.prepare(`
     INSERT INTO campaigns (id,code,name,password_hash,template,created_at,updated_at)
     VALUES (?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
@@ -73,6 +74,12 @@ export function createSqliteRepository({ file }) {
     async createCampaign(campaign) {
       createCampaignStmt.run(campaign.id, campaign.code, campaign.name, campaign.passwordHash || null, campaign.template || 'arachne');
       return campaignByIdStmt.get(campaign.id);
+    },
+    async updateCampaign(id, values = {}) {
+      const current=campaignByIdStmt.get(id); if(!current) return null;
+      const name=String(values.name || current.name || 'Campanha').trim().slice(0,80) || current.name;
+      updateCampaignStmt.run(name,id);
+      return campaignByIdStmt.get(id);
     },
     async getCampaignByCode(code) { return campaignByCodeStmt.get(String(code || '').trim()) || null; },
     async getCampaignById(id) { return campaignByIdStmt.get(id) || null; },

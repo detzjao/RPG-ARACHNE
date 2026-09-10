@@ -58,6 +58,7 @@
   async function getTemplates() { return (await request('/templates', {}, false)).data || []; }
   async function getCharacters() { return (await request('/characters', {}, false)).data || {heroes:[],villains:[]}; }
   async function createCampaign(payload) { return (await request('/campaigns', {method:'POST', body:JSON.stringify(payload)}, false)).data; }
+  async function updateCampaignMeta(values) { return (await request('/campaigns/current', {method:'PATCH', body:JSON.stringify(values || {})})).data; }
   async function join(role, payload) {
     const result = await request('/session/join', {method:'POST', body:JSON.stringify({role, ...payload})}, false);
     setSession(result.token, result.profile);
@@ -70,7 +71,14 @@
   async function setChallengeTN(tn) { return (await request('/challenge/tn', {method:'PATCH', body:JSON.stringify({tn})})).data; }
   async function adjustResources(kind,id,values) { return (await request(`/characters/${kind}/${encodeURIComponent(id)}/resources`, {method:'PATCH', body:JSON.stringify(values || {})})).data; }
   async function saveHero(hero) { return (await request(`/heroes/${encodeURIComponent(hero.id)}`, {method:'PUT', body:JSON.stringify({hero})})).data; }
+  async function deleteHero(id) { return (await request(`/heroes/${encodeURIComponent(id)}`, {method:'DELETE'})).data; }
   async function saveVillain(villain) { return (await request(`/villains/${encodeURIComponent(villain.id)}`, {method:'PUT', body:JSON.stringify({villain})})).data; }
+  async function deleteVillain(id) { return (await request(`/villains/${encodeURIComponent(id)}`, {method:'DELETE'})).data; }
+  async function uploadAsset(file) {
+    if (!file) throw new Error('Selecione um arquivo.');
+    const dataBase64 = await new Promise((resolve,reject)=>{ const reader=new FileReader(); reader.onerror=()=>reject(new Error('Não foi possível ler o arquivo.')); reader.onload=()=>resolve(String(reader.result||'').split(',')[1]||''); reader.readAsDataURL(file); });
+    return (await request('/assets/upload', {method:'POST', body:JSON.stringify({fileName:file.name,mimeType:file.type||'application/octet-stream',dataBase64})})).data;
+  }
   async function startActionRoll(values) { return (await request('/actions/d616/start', {method:'POST', body:JSON.stringify(values || {})})).data; }
   async function useActionEdge(id,index) { return (await request(`/actions/d616/${encodeURIComponent(id)}/edge`, {method:'POST', body:JSON.stringify({index})})).data; }
   async function finalizeActionRoll(id) { return (await request(`/actions/d616/${encodeURIComponent(id)}/finalize`, {method:'POST', body:'{}'})).data; }
@@ -99,8 +107,8 @@
   function disconnectRealtime() { if (eventSource) eventSource.close(); eventSource = null; }
 
   window.ArachneAPI2 = {
-    CLIENT_ID, health, lookupCampaigns, lookupCampaign, getTemplates, getCharacters, createCampaign, join, profileSession, loadAll,
-    saveMany, saveState, setChallengeTN, adjustResources, saveHero, saveVillain,
+    CLIENT_ID, health, lookupCampaigns, lookupCampaign, getTemplates, getCharacters, createCampaign, updateCampaignMeta, join, profileSession, loadAll,
+    saveMany, saveState, setChallengeTN, adjustResources, saveHero, deleteHero, saveVillain, deleteVillain, uploadAsset,
     startActionRoll, useActionEdge, finalizeActionRoll,
     addInitiativeParticipant, removeInitiativeParticipant, clearInitiativeParticipants, rollInitiativeParticipant,
     moveScenarioPiece, resetScenarioMovement, savePlayerNote,

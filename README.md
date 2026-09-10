@@ -101,6 +101,8 @@ O Mestre possui controle administrativo das fichas. Jogadores podem alterar apen
 
 O Arachne suporta campanhas separadas, cada uma com seu próprio estado de sessão, personagens, cenário, iniciativa e histórico.
 
+Na criação de uma mesa, o Mestre pode começar com uma campanha vazia ou usar um modelo pronto e selecionar os heróis e vilões que farão parte dela. Depois de entrar, a área **Campanha** permite editar título, subtítulo, Rank recomendado, resumo, notas, sessões, PDF e o elenco. Heróis e vilões podem ser adicionados da biblioteca, editados, removidos ou criados do zero.
+
 O projeto também inclui a campanha solo:
 
 **Motoqueiro Fantasma — Estrada dos Condenados**

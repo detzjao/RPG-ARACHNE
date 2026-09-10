@@ -1,3 +1,26 @@
+# Changelog
+
+## v48 — Campanhas e cenário revisado
+
+- Restaura criação e edição completa de campanhas.
+- Permite selecionar, adicionar, criar, editar e remover heróis e vilões.
+- Mantém cenário, iniciativa e peças coerentes quando o elenco muda.
+- Reduz renderizações desnecessárias no montador de cenário.
+
+# Atualização do cenário
+
+- Movimentação do grid otimizada e com resposta visual imediata.
+- Casas alcançáveis continuam verdes, sem números sobre o mapa.
+- Montador de cenário carrega de forma progressiva e agrupa salvamentos de edição.
+- Regras e validações de movimento do backend foram preservadas.
+
+# v46 — Cenário mais legível
+
+- Redesign do montador de cenário com ferramentas agrupadas e explicadas.
+- Objetos e estruturas ganharam ícones reconhecíveis e legenda automática.
+- Grid recebeu melhor diferenciação de terreno, tooltips e leitura de movimento.
+- Nenhuma alteração na lógica de movimento, D616 ou backend.
+
 # v45.1 — Correção de atualização do frontend
 
 - Corrige cache de JavaScript e CSS que podia fazer a v45 abrir visualmente como a v44.

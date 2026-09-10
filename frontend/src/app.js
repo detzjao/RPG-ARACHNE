@@ -28,20 +28,17 @@
     ruins:{label:'Ruínas / beco',base:'stone'},city:{label:'Rua da cidade',base:'road'}
   };
   const TERRAIN_META = {
-    floor:{label:'Piso',elevation:0,land:true},labfloor:{label:'Piso técnico',elevation:0,land:true},parking:{label:'Concreto',elevation:0,land:true},roof:{label:'Telhado',elevation:0,land:true},wood:{label:'Madeira',elevation:0,land:true},stone:{label:'Pedra',elevation:0,land:true},grass:{label:'Solo',elevation:0,land:true},road:{label:'Asfalto',elevation:0,land:true},
-    elev1:{label:'Elevação 1',elevation:1,land:true,raised:true,climbable:true},elev2:{label:'Elevação 2',elevation:2,land:true,raised:true,climbable:true},
-    ramp1:{label:'Rampa 1',elevation:1,land:true,ramp:true,climbable:true},ramp2:{label:'Rampa 2',elevation:2,land:true,ramp:true,climbable:true},
-    water:{label:'Água',elevation:0,water:true},gap:{label:'Vão',elevation:-1,gap:true}
+    floor:{label:'Piso',icon:'·',tone:'slate',elevation:0,land:true},labfloor:{label:'Piso técnico',icon:'⌁',tone:'steel',elevation:0,land:true},parking:{label:'Concreto',icon:'▦',tone:'concrete',elevation:0,land:true},roof:{label:'Telhado',icon:'▧',tone:'roof',elevation:0,land:true},wood:{label:'Madeira',icon:'≋',tone:'wood',elevation:0,land:true},stone:{label:'Pedra',icon:'◆',tone:'stone',elevation:0,land:true},grass:{label:'Solo / grama',icon:'✤',tone:'grass',elevation:0,land:true},road:{label:'Asfalto',icon:'━',tone:'road',elevation:0,land:true},
+    elev1:{label:'Elevação +1',icon:'1',badge:'E1',tone:'elev1',elevation:1,land:true,raised:true,climbable:true},elev2:{label:'Elevação +2',icon:'2',badge:'E2',tone:'elev2',elevation:2,land:true,raised:true,climbable:true},
+    ramp1:{label:'Rampa +1',icon:'↗',badge:'R1',tone:'ramp1',elevation:1,land:true,ramp:true,climbable:true},ramp2:{label:'Rampa +2',icon:'⇈',badge:'R2',tone:'ramp2',elevation:2,land:true,ramp:true,climbable:true},
+    water:{label:'Água',icon:'≈',badge:'ÁGUA',tone:'water',elevation:0,water:true},gap:{label:'Vão / queda',icon:'↓',badge:'VÃO',tone:'gap',elevation:-1,gap:true}
   };
   const TERRAIN_TOOLS = new Set(['elev1','elev2','ramp1','ramp2','water','gap']);
   const OBSTACLE_META = {
-    wall:{label:'Parede',block:true,symbol:'▰'},crate:{label:'Caixa',block:true,symbol:'□'},terminal:{label:'Terminal',block:true,symbol:'T'},barrel:{label:'Barril',block:true,symbol:'●'},
-    door:{label:'Porta',block:false,symbol:'↔'},pillar:{label:'Pilar',block:true,symbol:'◆'},cover:{label:'Cobertura',block:true,symbol:'▱'},rubble:{label:'Entulho',block:false,cost:2,symbol:'✦'},
-    tree:{label:'Árvore',block:true,symbol:'♣'},rock:{label:'Rocha',block:true,symbol:'⬟'},car:{label:'Veículo',block:true,symbol:'▣'},table:{label:'Mesa',block:true,symbol:'▭'},
-    bed:{label:'Cama',block:true,symbol:'▤'},counter:{label:'Balcão',block:true,symbol:'▥'},shelf:{label:'Estante',block:true,symbol:'▧'},dock:{label:'Cais',block:false,symbol:'═'},
-    log:{label:'Tora',block:true,symbol:'▬'},stump:{label:'Toco',block:true,symbol:'●'},campfire:{label:'Fogueira',block:false,symbol:'♨'},booth:{label:'Cabine',block:true,symbol:'▦'},statue:{label:'Estátua',block:true,symbol:'♟'},fence:{label:'Grade',block:true,symbol:'╫'}
+    wall:{label:'Parede',icon:'🧱',block:true,group:'structure',help:'Bloqueia passagem.'},door:{label:'Porta',icon:'🚪',block:false,group:'structure',help:'Passagem entre paredes.'},fence:{label:'Grade',icon:'🚧',block:true,group:'structure',help:'Bloqueia passagem.'},pillar:{label:'Pilar',icon:'▮',block:true,group:'structure',help:'Estrutura sólida.'},cover:{label:'Cobertura',icon:'🛡',block:true,group:'structure',help:'Objeto grande usado como cobertura.'},
+    crate:{label:'Caixa',icon:'📦',block:true,group:'objects',help:'Caixa que ocupa a casa.'},terminal:{label:'Terminal',icon:'🖥',block:true,group:'objects',help:'Computador ou painel.'},barrel:{label:'Barril',icon:'🛢',block:true,group:'objects',help:'Barril ou cilindro.'},rubble:{label:'Entulho',icon:'🪨',block:false,cost:2,group:'objects',help:'Pode atravessar, mas custa movimento extra.'},tree:{label:'Árvore',icon:'🌳',block:true,group:'objects',help:'Árvore que bloqueia a casa.'},rock:{label:'Rocha',icon:'🪨',block:true,group:'objects',help:'Rocha grande.'},car:{label:'Veículo',icon:'🚙',block:true,group:'objects',help:'Carro ou veículo parado.'},table:{label:'Mesa',icon:'▰',block:true,group:'objects',help:'Mesa que ocupa a casa.'},bed:{label:'Cama',icon:'🛏',block:true,group:'objects',help:'Cama ou maca.'},counter:{label:'Balcão',icon:'▤',block:true,group:'objects',help:'Balcão ou bancada.'},shelf:{label:'Estante',icon:'📚',block:true,group:'objects',help:'Estante ou arquivo.'},dock:{label:'Cais',icon:'═',block:false,group:'objects',help:'Passarela/cais transitável.'},log:{label:'Tora',icon:'🪵',block:true,group:'objects',help:'Tora caída.'},stump:{label:'Toco',icon:'🌲',block:true,group:'objects',help:'Toco de árvore.'},campfire:{label:'Fogueira',icon:'🔥',block:false,group:'objects',help:'Fogueira transitável.'},booth:{label:'Cabine',icon:'🏠',block:true,group:'objects',help:'Cabine pequena.'},statue:{label:'Estátua',icon:'🗿',block:true,group:'objects',help:'Estátua ou monumento.'}
   };
-  const DECOR_META = {lane:{label:'Faixa',symbol:'━'},hazard:{label:'Faixa de risco',symbol:'⚠'},lamp:{label:'Luz',symbol:'✦'},stain:{label:'Marca',symbol:'●'},rug:{label:'Tapete',symbol:'▧'},books:{label:'Livros',symbol:'≡'},shrub:{label:'Arbusto',symbol:'♧'},pier:{label:'Passarela',symbol:'═'},debris:{label:'Destroços',symbol:'·'},tarp:{label:'Lona',symbol:'▱'}};
+  const DECOR_META = {lane:{label:'Faixa no chão',icon:'━'},hazard:{label:'Área de risco',icon:'⚠'},lamp:{label:'Luz',icon:'💡'},stain:{label:'Marca no chão',icon:'●'},rug:{label:'Tapete',icon:'▧'},books:{label:'Livros',icon:'📚'},shrub:{label:'Arbusto',icon:'🌿'},pier:{label:'Passarela',icon:'═'},debris:{label:'Destroços',icon:'·'},tarp:{label:'Lona',icon:'▱'}};
   const SCENARIO_PRESETS = {
     empty:{label:'Vazio',env:'large-room',w:18,h:12,obstacles:[],terrain:[]},
     lab:{label:'Laboratório',env:'lab',w:20,h:14,obstacles:[['wall',9,2],['wall',9,3],['wall',9,4],['door',9,5],['wall',9,6],['wall',9,7],['terminal',15,3],['terminal',16,3],['crate',13,9],['crate',14,9],['barrel',16,9],['pillar',4,4],['pillar',17,4],['shelf',2,2],['counter',3,10],['counter',4,10]],terrain:[['elev1',14,2],['elev1',15,2],['elev1',16,2],['ramp1',13,2]]},
@@ -78,7 +75,39 @@
   function scenarioNeighbors(x,y){const out=[];for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(dx||dy)out.push([x+dx,y+dy]);}return out;}
   function scenarioDirectCost(scenario,piece,x,y){const horizontal=Math.max(Math.abs(x-Number(piece.x)),Math.abs(y-Number(piece.y)));return Math.max(horizontal,Math.abs(Number(scenarioTerrain(scenario,x,y).elevation||0)-Number(scenarioTerrain(scenario,Number(piece.x),Number(piece.y)).elevation||0)));}
   function scenarioDirectAllowed(scenario,piece,x,y,mode){if(!scenarioInBounds(scenario,x,y)||scenarioOccupied(scenario,x,y,piece))return false;const terrain=scenarioTerrain(scenario,x,y),obs=OBSTACLE_META[scenarioObstacle(scenario,x,y)];if(obs?.block)return false;if(mode==='flight'||mode==='swingline')return true;if(mode==='glide')return!terrain.water&&!terrain.gap;if(mode==='jump')return!!terrain.land&&!terrain.water&&!terrain.gap;if(mode==='climb'){const from=scenarioTerrain(scenario,Number(piece.x),Number(piece.y)),horizontal=Math.max(Math.abs(x-Number(piece.x)),Math.abs(y-Number(piece.y)));return horizontal<=1&&!from.water&&!from.gap&&!!terrain.land&&!!terrain.climbable&&terrain.elevation!==from.elevation;}return false;}
-  function reachableScenarioCellsUI(scenario,piece,mode,budget){const result=new Map(),limit=Number(budget||0);if(!piece||limit<=0)return result;if(['jump','flight','glide','swingline','climb'].includes(mode)){const{w,h}=scenarioSize(scenario);for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(x===Number(piece.x)&&y===Number(piece.y))continue;if(!scenarioDirectAllowed(scenario,piece,x,y,mode))continue;const cost=scenarioDirectCost(scenario,piece,x,y);if(cost>0&&cost<=limit)result.set(scenarioKey(x,y),cost);}return result;}if(mode==='run'&&scenarioTerrain(scenario,Number(piece.x),Number(piece.y)).water)return result;const q=[[Number(piece.x),Number(piece.y),0]],best=new Map([[scenarioKey(Number(piece.x),Number(piece.y)),0]]);while(q.length){const[x,y,cost]=q.shift();for(const[nx,ny]of scenarioNeighbors(x,y)){if(!scenarioInBounds(scenario,nx,ny))continue;const ok=mode==='swim'?canScenarioSwim(scenario,x,y,nx,ny,piece):canScenarioRun(scenario,x,y,nx,ny,piece);if(!ok)continue;const nextCost=cost+scenarioCellCost(scenario,nx,ny,mode),key=scenarioKey(nx,ny);if(nextCost>limit)continue;if(best.has(key)&&best.get(key)<=nextCost)continue;best.set(key,nextCost);q.push([nx,ny,nextCost]);if(!(nx===Number(piece.x)&&ny===Number(piece.y)))result.set(key,nextCost);}}return result;}
+  function reachableScenarioCellsUI(scenario,piece,mode,budget){
+    const result=new Map(),limit=Number(budget||0);
+    if(!piece||limit<=0)return result;
+    const px=Number(piece.x),py=Number(piece.y);
+    if(['jump','flight','glide','swingline','climb'].includes(mode)){
+      const{w,h}=scenarioSize(scenario);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        if(x===px&&y===py)continue;
+        if(!scenarioDirectAllowed(scenario,piece,x,y,mode))continue;
+        const cost=scenarioDirectCost(scenario,piece,x,y);
+        if(cost>0&&cost<=limit)result.set(scenarioKey(x,y),cost);
+      }
+      return result;
+    }
+    if(mode==='run'&&scenarioTerrain(scenario,px,py).water)return result;
+    // Fila com cursor em vez de Array.shift(): evita realocar o array em cada passo.
+    const queue=[[px,py,0]],best=new Map([[scenarioKey(px,py),0]]);
+    let head=0;
+    while(head<queue.length){
+      const[x,y,cost]=queue[head++];
+      for(const[nx,ny]of scenarioNeighbors(x,y)){
+        if(!scenarioInBounds(scenario,nx,ny))continue;
+        const ok=mode==='swim'?canScenarioSwim(scenario,x,y,nx,ny,piece):canScenarioRun(scenario,x,y,nx,ny,piece);
+        if(!ok)continue;
+        const nextCost=cost+scenarioCellCost(scenario,nx,ny,mode),key=scenarioKey(nx,ny);
+        if(nextCost>limit)continue;
+        if(best.has(key)&&best.get(key)<=nextCost)continue;
+        best.set(key,nextCost);queue.push([nx,ny,nextCost]);
+        if(!(nx===px&&ny===py))result.set(key,nextCost);
+      }
+    }
+    return result;
+  }
   function movementStatusUI(scenario,piece,entity,preferredMode='run'){const movement=movementForBoardPiece(piece,entity),valid=Object.entries(movement).filter(([,value])=>Number(value)>0),locked=scenario?.turnMovement?.[piece?.id]||null;let mode=locked?.mode||String(preferredMode||'');if(!valid.some(([key])=>key===mode))mode=valid[0]?.[0]||'run';const max=Number(movement[mode]||0),spent=locked&&locked.mode===mode?Number(locked.spent||0):0;return{movement,valid,mode,max,spent,remaining:Math.max(0,max-spent),locked};}
   function safePlacementCells(scenario){const{w,h}=scenarioSize(scenario),out=[];for(let y=0;y<h;y++)for(let x=0;x<w;x++){const terrain=scenarioTerrain(scenario,x,y),obs=OBSTACLE_META[scenarioObstacle(scenario,x,y)];if(!terrain.water&&!terrain.gap&&!scenarioObstacle(scenario,x,y))out.push({x,y});}return out;}
   function placePiecesSafely(scenario){const next=normalizedScenario(scenario),spots=safePlacementCells(next),used=new Set();let cursor=0;next.pieces=next.pieces.map(piece=>{let x=clamp(piece.x,0,next.width-1),y=clamp(piece.y,0,next.height-1),key=scenarioKey(x,y),terrain=scenarioTerrain(next,x,y),blocked=OBSTACLE_META[scenarioObstacle(next,x,y)]?.block;if(used.has(key)||terrain.water||terrain.gap||blocked){while(cursor<spots.length&&used.has(scenarioKey(spots[cursor].x,spots[cursor].y)))cursor++;const spot=spots[cursor++]||{x:0,y:0};x=spot.x;y=spot.y;key=scenarioKey(x,y);}used.add(key);return{...piece,x,y};});return next;}
@@ -168,6 +197,79 @@
     ]));
   }
 
+
+  function uniqueCharacterLibrary(characters,templates,kind='hero'){
+    const key=kind==='hero'?'heroes':'villains',map=new Map();
+    for(const item of characters?.[key]||[])if(item?.id&&!map.has(item.id))map.set(item.id,item);
+    for(const template of templates||[])for(const item of template?.[key]||[])if(item?.id&&!map.has(item.id))map.set(item.id,item);
+    return [...map.values()].sort((a,b)=>String(a?.n||'').localeCompare(String(b?.n||''),'pt-BR'));
+  }
+  function blankCharacter(kind='hero'){
+    const id=`${kind}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
+    return {id,n:kind==='hero'?'Novo Herói':'Novo Vilão',r:'',rank:4,tier:kind==='hero'?'HERÓI':'AMEAÇA',image:'',pdf:'',role:'',origin:'',initiative:'+0',maxHealth:90,currentHealth:90,maxFocus:90,currentFocus:90,movement:{run:5,climb:3,swim:3,jump:3},speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3',abilities:{Melee:0,Agility:0,Resilience:0,Vigilance:0,Ego:0,Logic:0},traits:[],tags:kind==='hero'?['Heroic']:['Villainous'],powers:[]};
+  }
+  function CharacterPickerModal({kind,items,existing,onAdd,onCreate,onClose}){
+    const [search,setSearch]=React.useState('');
+    const term=search.trim().toLocaleLowerCase('pt-BR');
+    const filtered=items.filter(item=>!term||`${item.n||''} ${item.r||''} ${item.role||''}`.toLocaleLowerCase('pt-BR').includes(term));
+    return h('div',{className:'fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-[#0d1118] shadow-2xl'},[
+      h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3 border-b border-white/10 p-4 sm:p-5'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'BIBLIOTECA'),h('h2',{key:'n',className:'mt-1 text-xl font-black'},`Adicionar ${kind==='hero'?'herói':'vilão'}`),h('p',{key:'p',className:'mt-1 text-xs text-[#7e8997]'},'Escolha um personagem já cadastrado ou crie uma ficha nova.')]),h(Button,{key:'x',onClick:onClose,className:'px-3'},'×')]),
+      h('div',{key:'search',className:'flex flex-wrap gap-2 border-b border-white/5 p-4'},[h('input',{key:'i',value:search,onChange:e=>setSearch(e.target.value),placeholder:'Buscar por nome...',autoFocus:true,className:'min-h-11 min-w-[220px] flex-1 rounded-xl border border-white/10 bg-black/30 px-4 text-sm outline-none focus:border-[#ef3340]/60'}),h(Button,{key:'new',primary:true,onClick:onCreate},'CRIAR DO ZERO')]),
+      h('div',{key:'g',className:'grid max-h-[62vh] gap-2 overflow-auto p-4 sm:grid-cols-2 lg:grid-cols-3'},filtered.length?filtered.map(item=>{const used=existing.has(item.id);return h('button',{key:item.id,type:'button',disabled:used,onClick:()=>onAdd(item.id),className:cx('flex items-center gap-3 rounded-xl border p-3 text-left',used?'cursor-not-allowed border-white/5 bg-white/[.02] opacity-45':'border-white/10 bg-[#111720] hover:border-[#ef3340]/55')},[h(Portrait,{key:'p',entity:item,size:'sm'}),h('div',{key:'c',className:'min-w-0 flex-1'},[h('b',{key:'n',className:'block truncate text-xs'},item.n),h('small',{key:'r',className:'mt-1 block truncate text-[9px] text-[#778291]'},item.r||item.role||`Rank ${item.rank||4}`),used?h('span',{key:'u',className:'mt-1 block text-[8px] font-black text-emerald-400'},'JÁ NA CAMPANHA'):null])]);}):h('div',{className:'col-span-full py-10 text-center text-sm text-[#74808f]'},'Nenhum personagem encontrado.'))
+    ]));
+  }
+  function CharacterEditorModal({kind,entity,isNew,onSave,onClose}){
+    const [draft,setDraft]=React.useState(()=>JSON.parse(JSON.stringify(entity||blankCharacter(kind))));
+    const set=(key,value)=>setDraft(prev=>({...prev,[key]:value}));
+    const setAbility=(ability,value)=>setDraft(prev=>({...prev,abilities:{...(prev.abilities||{}),[ability]:clamp(value,-10,20)}}));
+    const setMove=(mode,value)=>setDraft(prev=>({...prev,movement:{...(prev.movement||{}),[mode]:clamp(value,0,99)}}));
+    const submit=()=>{const maxHealth=Math.max(0,Number(draft.maxHealth||0)),maxFocus=Math.max(0,Number(draft.maxFocus||0)),movement={...(draft.movement||{})};const speed=Object.entries(movement).filter(([,v])=>Number(v)>0).map(([k,v])=>`${MOVE_META[k]?.label||k} ${v}`).join(' · ');onSave({...draft,n:String(draft.n||'').trim()|| (kind==='hero'?'Novo Herói':'Novo Vilão'),r:String(draft.r||'').trim(),rank:clamp(draft.rank,1,6),tier:kind==='hero'?'HERÓI':(draft.tier||'AMEAÇA'),maxHealth,currentHealth:clamp(draft.currentHealth??maxHealth,0,maxHealth),maxFocus,currentFocus:clamp(draft.currentFocus??maxFocus,0,maxFocus),movement,speed,abilities:Object.fromEntries(ABILITIES.map(a=>[a,Number(draft.abilities?.[a]||0)])),powers:Array.isArray(draft.powers)?draft.powers:String(draft.powers||'').split(/\n/).map(x=>x.trim()).filter(Boolean),traits:Array.isArray(draft.traits)?draft.traits:String(draft.traits||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean),tags:Array.isArray(draft.tags)?draft.tags:String(draft.tags||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean)});};
+    const inputClass='min-h-10 w-full rounded-lg border border-white/10 bg-black/25 px-3 text-sm outline-none focus:border-[#ef3340]/60';
+    const listText=value=>Array.isArray(value)?value.join('\n'):String(value||'');
+    return h('div',{className:'fixed inset-0 z-[55] flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[94vh] w-full max-w-5xl overflow-auto rounded-2xl border border-white/10 bg-[#0d1118] p-4 shadow-2xl sm:p-6'},[
+      h('div',{key:'h',className:'flex items-start justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},isNew?'NOVA FICHA':'EDITAR FICHA'),h('h2',{key:'n',className:'mt-1 text-2xl font-black'},draft.n||'Personagem'),h('p',{key:'p',className:'mt-1 text-xs text-[#7c8796]'},'Campos essenciais usados pela Central, iniciativa e cenário.')]),h(Button,{key:'x',onClick:onClose,className:'px-3'},'×')]),
+      h('div',{key:'base',className:'mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[
+        ['Nome','n',draft.n,'text'],['Nome civil / descrição','r',draft.r,'text'],['Rank','rank',draft.rank,'number'],[kind==='hero'?'Função':'Tipo','tier',draft.tier||'', 'text']
+      ].map(([label,key,value,type])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',type,value,onChange:e=>set(key,type==='number'?Number(e.target.value):e.target.value),className:inputClass})]))),
+      h('div',{key:'meta',className:'mt-3 grid gap-3 sm:grid-cols-2'},[['Origem','origin',draft.origin||''],['Imagem (URL ou caminho)','image',draft.image||'']].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',value,onChange:e=>set(key,e.target.value),className:inputClass})]))),
+      h('div',{key:'vitals',className:'mt-5'},[h(TinyLabel,{key:'l'},'RECURSOS'),h('div',{key:'g',className:'mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[['Health máximo','maxHealth',draft.maxHealth],['Health atual','currentHealth',draft.currentHealth],['Focus máximo','maxFocus',draft.maxFocus],['Focus atual','currentFocus',draft.currentFocus]].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h('span',{key:'l',className:'text-[10px] text-[#8792a1]'},label),h('input',{key:'i',type:'number',min:0,value:value??0,onChange:e=>set(key,Number(e.target.value)),className:inputClass})])))]),
+      h('div',{key:'abilities',className:'mt-5'},[h(TinyLabel,{key:'l'},'ABILITIES'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'},ABILITIES.map(a=>h('label',{key:a,className:'rounded-xl border border-white/10 bg-[#111720] p-2'},[h('span',{key:'l',className:'block text-[9px] font-black text-[#8e98a6]'},a.toUpperCase()),h('input',{key:'i',type:'number',value:draft.abilities?.[a]??0,onChange:e=>setAbility(a,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
+      h('div',{key:'movement',className:'mt-5'},[h(TinyLabel,{key:'l'},'MOVIMENTO'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7'},['run','climb','swim','jump','flight','glide','swingline'].map(mode=>h('label',{key:mode,className:'rounded-xl border border-white/10 p-2'},[h('span',{key:'l',className:'block text-[9px] text-[#8d97a5]'},MOVE_META[mode]?.label||mode),h('input',{key:'i',type:'number',min:0,value:draft.movement?.[mode]??0,onChange:e=>setMove(mode,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
+      h('div',{key:'text',className:'mt-5 grid gap-3 lg:grid-cols-3'},[
+        ['Poderes (um por linha)','powers',listText(draft.powers)],['Traits (separados por vírgula)','traits',Array.isArray(draft.traits)?draft.traits.join(', '):String(draft.traits||'')],['Tags (separadas por vírgula)','tags',Array.isArray(draft.tags)?draft.tags.join(', '):String(draft.tags||'')]
+      ].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('textarea',{key:'i',rows:5,value,onChange:e=>set(key,e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none focus:border-[#ef3340]/60'})]))),
+      h('div',{key:'actions',className:'mt-5 flex justify-end gap-2'},[h(Button,{key:'c',onClick:onClose},'CANCELAR'),h(Button,{key:'s',primary:true,onClick:submit},'SALVAR FICHA')])
+    ]));
+  }
+  function CampaignEditor({content,campaign,heroes,villains,onSave,onCancel,onAddHero,onAddVillain,onEditCharacter,onRemoveCharacter,onUploadPdf,saving=false}){
+    const [draft,setDraft]=React.useState(()=>({...content,sessions:(content?.sessions||[]).map(s=>({...s}))}));
+    const set=(key,value)=>setDraft(prev=>({...prev,[key]:value}));
+    const updateSession=(index,key,value)=>setDraft(prev=>({...prev,sessions:(prev.sessions||[]).map((row,i)=>i===index?{...row,[key]:value}:row)}));
+    const addSession=()=>setDraft(prev=>({...prev,sessions:[...(prev.sessions||[]),{id:String((prev.sessions?.length||0)+1).padStart(2,'0'),title:`Sessão ${(prev.sessions?.length||0)+1}`,text:''}]}));
+    const removeSession=index=>setDraft(prev=>({...prev,sessions:(prev.sessions||[]).filter((_,i)=>i!==index).map((row,i)=>({...row,id:String(i+1).padStart(2,'0')}))}));
+    const field='min-h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-sm outline-none focus:border-[#ef3340]/60';
+    const roster=(kind,items,onAdd)=>h(Card,{className:'p-4'},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},kind==='hero'?'HERÓIS':'VILÕES'),h('b',{key:'n',className:'mt-1 block text-sm'},`${items.length} na campanha`)]),h(Button,{key:'a',onClick:onAdd,className:'min-h-9 py-1'},'+ ADICIONAR')]),h('div',{key:'l',className:'mt-3 space-y-2'},items.length?items.map(entity=>h('div',{key:entity.id,className:'flex items-center gap-3 rounded-xl border border-white/8 bg-black/15 p-2'},[h(Portrait,{key:'p',entity,size:'sm'}),h('div',{key:'n',className:'min-w-0 flex-1'},[h('b',{key:'b',className:'block truncate text-xs'},entity.n),h('small',{key:'s',className:'block truncate text-[9px] text-[#7c8795]'},entity.r||`Rank ${entity.rank||4}`)]),h(Button,{key:'e',onClick:()=>onEditCharacter(kind,entity),className:'min-h-8 px-2 py-1'},'EDITAR'),h(Button,{key:'r',danger:true,onClick:()=>onRemoveCharacter(kind,entity),className:'min-h-8 px-2 py-1'},'×')])):h('div',{className:'rounded-xl border border-dashed border-white/10 p-5 text-center text-xs text-[#75808e]'},`Nenhum ${kind==='hero'?'herói':'vilão'} adicionado.`))]);
+    return h('div',{className:'space-y-4'},[
+      h(Card,{key:'head',className:'p-4 sm:p-5'},[h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},`CÓDIGO ${campaign?.code||'—'}`),h('h1',{key:'n',className:'mt-1 text-2xl font-black'},'Editar campanha'),h('p',{key:'p',className:'mt-1 text-xs text-[#7d8795]'},'Conteúdo, sessões e personagens ficam salvos na mesma campanha.')]),h(Button,{key:'x',onClick:onCancel},'VOLTAR')])]),
+      h('div',{key:'grid',className:'grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(340px,.8fr)]'},[
+        h(Card,{key:'content',className:'p-4 sm:p-5'},[
+          h(TinyLabel,{key:'l'},'CONTEÚDO'),
+          h('div',{key:'fields',className:'mt-3 grid gap-3 sm:grid-cols-2'},[
+            h('label',{key:'title',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'TÍTULO'),h('input',{key:'i',value:draft.title||'',onChange:e=>set('title',e.target.value),className:field})]),
+            h('label',{key:'sub',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'SUBTÍTULO'),h('input',{key:'i',value:draft.subtitle||'',onChange:e=>set('subtitle',e.target.value),className:field})]),
+            h('label',{key:'rank',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'RANK RECOMENDADO'),h('input',{key:'i',type:'number',min:1,max:6,value:draft.rank||4,onChange:e=>set('rank',clamp(e.target.value,1,6)),className:field})]),
+            h('label',{key:'sum',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'RESUMO'),h('textarea',{key:'i',rows:3,value:draft.summary||'',onChange:e=>set('summary',e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none focus:border-[#ef3340]/60'})]),
+            h('label',{key:'txt',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'TEXTO / NOTAS DA CAMPANHA'),h('textarea',{key:'i',rows:8,value:draft.editorText||'',onChange:e=>set('editorText',e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm leading-6 outline-none focus:border-[#ef3340]/60'})])
+          ]),
+          h('div',{key:'pdf',className:'mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-black/15 p-3'},[h('label',{key:'u',className:'inline-flex min-h-10 cursor-pointer items-center rounded-xl border border-white/10 bg-[#171d27] px-3 text-xs font-black'},['ENVIAR PDF',h('input',{key:'i',type:'file',accept:'application/pdf',className:'hidden',onChange:async e=>{const file=e.target.files?.[0];if(file){const url=await onUploadPdf(file);if(url)set('campaignPdf',url);}e.target.value='';}})]),draft.campaignPdf?h('a',{key:'a',href:draft.campaignPdf,target:'_blank',rel:'noopener',className:'text-xs font-bold text-[#ff737d]'},'ABRIR PDF ATUAL'):h('span',{key:'e',className:'text-xs text-[#75808e]'},'Nenhum PDF vinculado.')]),
+          h('div',{key:'sessions',className:'mt-5'},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'SESSÕES'),h('b',{key:'b',className:'mt-1 block text-sm'},'Estrutura da campanha')]),h(Button,{key:'a',onClick:addSession,className:'min-h-9 py-1'},'+ SESSÃO')]),h('div',{key:'rows',className:'mt-3 space-y-2'},(draft.sessions||[]).length?(draft.sessions||[]).map((session,index)=>h('div',{key:session.id||index,className:'grid gap-2 rounded-xl border border-white/10 bg-black/15 p-3 lg:grid-cols-[180px_1fr_auto]'},[h('input',{key:'t',value:session.title||'',onChange:e=>updateSession(index,'title',e.target.value),placeholder:'Título da sessão',className:field}),h('textarea',{key:'x',rows:2,value:session.text||'',onChange:e=>updateSession(index,'text',e.target.value),placeholder:'Resumo, objetivo e acontecimentos',className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none'}),h(Button,{key:'r',danger:true,onClick:()=>removeSession(index),className:'px-3'},'×')])):h('div',{className:'rounded-xl border border-dashed border-white/10 p-5 text-center text-xs text-[#75808e]'},'Nenhuma sessão cadastrada.'))])
+        ]),
+        h('div',{key:'rosters',className:'space-y-4'},[roster('hero',heroes,onAddHero),roster('villain',villains,onAddVillain)])
+      ]),
+      h('div',{key:'actions',className:'sticky bottom-3 z-10 flex justify-end gap-2 rounded-2xl border border-white/10 bg-[#0b1017]/95 p-3 shadow-2xl backdrop-blur'},[h(Button,{key:'c',disabled:saving,onClick:onCancel},'CANCELAR'),h(Button,{key:'s',primary:true,disabled:saving,onClick:()=>onSave({...draft,players:heroes.length,documentMode:draft.campaignPdf?'pdf':'editor'})},saving?'SALVANDO…':'SALVAR CAMPANHA')])
+    ]);
+  }
+
   function CharacterStrip({items,selectedKey,onSelect,mode='villain'}){
     return h('div',{className:'scrollbar-thin flex gap-2 overflow-x-auto pb-2'},items.map(item=>h('button',{key:item.key,onClick:()=>onSelect(item.key),className:cx('min-w-[158px] rounded-xl border bg-[#111720] p-3 text-left transition',selectedKey===item.key?'border-[#ef3340] bg-[#2a1117]':'border-white/10 hover:border-white/20')},[
       h(Portrait,{key:'p',entity:item.entity,size:'strip'}),
@@ -250,83 +352,145 @@
     ]);
   }
 
-  function Board({scenario,heroes,villains,role,heroId,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode='run',onMoveMode,editor=false,editorTool='select',onEditCell,onRemovePiece,title=true}){
-    const current=normalizedScenario(scenario),width=current.width,height=current.height,pieces=current.pieces;
-    const chars=[...(heroes||[]),...(villains||[])];
-    const getChar=p=>chars.find(c=>c.id===(p.characterId||p.baseId))||MINIONS[p.baseId]||null;
+  function scenarioToolInfo(id,current){
+    if(id==='select')return{icon:'✥',label:'Selecionar / mover',help:'Clique em uma peça para ver o alcance e depois clique em uma casa verde.',group:'main'};
+    if(id==='erase')return{icon:'⌫',label:'Apagar',help:'Remove terreno especial, objeto, detalhe ou peça da casa.',group:'main'};
+    if(id==='base')return{icon:'▦',label:'Piso normal',help:`Volta a casa para ${TERRAIN_META[current?.baseTerrain]?.label||'o piso do ambiente'}.`,group:'terrain'};
+    if(TERRAIN_META[id])return{icon:TERRAIN_META[id].icon||'▦',label:TERRAIN_META[id].label,help:id==='water'?'Área de água: exige movimento compatível.':id==='gap'?'Vão/queda: não é piso normal.':'Altera a altura ou o tipo de terreno.',group:'terrain'};
+    if(OBSTACLE_META[id])return{icon:OBSTACLE_META[id].icon||'■',label:OBSTACLE_META[id].label,help:OBSTACLE_META[id].help||(OBSTACLE_META[id].block?'Bloqueia a passagem.':'Pode ser atravessado.'),group:OBSTACLE_META[id].group||'objects'};
+    if(String(id).startsWith('decor-')){const key=String(id).slice(6),meta=DECOR_META[key];return{icon:meta?.icon||'·',label:meta?.label||'Detalhe',help:'Detalhe visual. Não bloqueia o movimento.',group:'decor'};}
+    return{icon:'?',label:String(id||'Ferramenta'),help:'Clique no mapa para usar esta ferramenta.',group:'main'};
+  }
+
+  function ScenarioLegend({scenario}){
+    const current=normalizedScenario(scenario),terrainIds=[...new Set(Object.values(current.terrain||{}))],obstacleIds=[...new Set(Object.values(current.obstacles||{}))],decorIds=[...new Set(Object.values(current.decor||{}))];
+    const terrainRows=terrainIds.map(id=>({id,icon:TERRAIN_META[id]?.icon||'▦',label:TERRAIN_META[id]?.label||id,note:TERRAIN_META[id]?.water?'água':TERRAIN_META[id]?.gap?'não transitável como piso':TERRAIN_META[id]?.raised||TERRAIN_META[id]?.ramp?'altura diferente':'terreno'}));
+    const obstacleRows=obstacleIds.map(id=>({id,icon:OBSTACLE_META[id]?.icon||'■',label:OBSTACLE_META[id]?.label||id,note:OBSTACLE_META[id]?.block?'bloqueia':'transitável'}));
+    const decorRows=decorIds.map(id=>({id,icon:DECOR_META[id]?.icon||'·',label:DECOR_META[id]?.label||id,note:'visual'}));
+    const rows=[...terrainRows,...obstacleRows,...decorRows];
+    const shown=rows.length?rows:[{id:'piece',icon:'●',label:'Personagem',note:'peça no mapa'},{id:'move',icon:'🟩',label:'Casa verde',note:'destino disponível'}];
+    return h('div',{className:'scenario-legend border-t border-white/5 bg-[#0a0e14] px-4 py-3'},[
+      h('div',{key:'title',className:'mb-2 flex flex-wrap items-center justify-between gap-2'},[h(TinyLabel,{key:'l'},'LEGENDA DO MAPA'),h('span',{key:'h',className:'text-[10px] text-[#6f7b8b]'},'A legenda mostra os elementos usados neste mapa.')]),
+      h('div',{key:'rows',className:'flex flex-wrap gap-2'},shown.map(row=>h('span',{key:`${row.id}-${row.label}`,className:'legend-chip'},[h('span',{key:'i',className:'legend-icon'},row.icon),h('b',{key:'l'},row.label),h('small',{key:'n'},row.note)])))
+    ]);
+  }
+
+  function Board({scenario,heroes,villains,role,heroId,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode='run',onMoveMode,editor=false,editorTool='select',onEditCell,onRemovePiece,title=true,moving=false}){
+    // O board é a área mais quente da UI. Indexamos peças/personagens uma vez por render
+    // e evitamos buscas .find() repetidas para cada uma das centenas de casas.
+    const current=React.useMemo(()=>normalizedScenario(scenario),[scenario]);
+    const width=current.width,height=current.height,pieces=current.pieces;
+    const charById=React.useMemo(()=>{
+      const map=new Map();
+      for(const entity of [...(heroes||[]),...(villains||[])])map.set(String(entity.id),entity);
+      for(const entity of Object.values(MINIONS))map.set(String(entity.id),entity);
+      return map;
+    },[heroes,villains]);
+    const pieceByCell=React.useMemo(()=>{
+      const map=new Map();
+      for(const piece of pieces)map.set(scenarioKey(Number(piece.x),Number(piece.y)),piece);
+      return map;
+    },[pieces]);
+    const pieceById=React.useMemo(()=>{
+      const map=new Map();
+      for(const piece of pieces)map.set(piece.id,piece);
+      return map;
+    },[pieces]);
+    const getChar=p=>p?charById.get(String(p.characterId||p.baseId))||null:null;
     const canSelect=p=>role==='master'||(p.kind==='hero'&&String(p.characterId||p.baseId)===String(heroId||''));
     const ownPiece=role==='player'?pieces.find(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(heroId||'')):null;
-    const effectiveSelected=selected||(role==='player'?ownPiece?.id:null),selectedPiece=pieces.find(p=>p.id===effectiveSelected)||null,selectedEntity=selectedPiece?getChar(selectedPiece):null;
+    const effectiveSelected=selected||(role==='player'?ownPiece?.id:null),selectedPiece=pieceById.get(effectiveSelected)||null,selectedEntity=getChar(selectedPiece);
     const movement=selectedPiece&&canSelect(selectedPiece)?movementStatusUI(current,selectedPiece,selectedEntity,moveMode):null;
-    const reachable=movement&&editorTool==='select'?reachableScenarioCellsUI(current,selectedPiece,movement.mode,movement.remaining):new Map();
-    const cellSize=52,cells=[];
+    const reachable=React.useMemo(()=>movement&&editorTool==='select'?reachableScenarioCellsUI(current,selectedPiece,movement.mode,movement.remaining):new Map(),[current,selectedPiece,movement?.mode,movement?.remaining,editorTool]);
+    const cellSize=56,cells=[];
     for(let y=0;y<height;y++)for(let x=0;x<width;x++){
-      const key=scenarioKey(x,y),ob=scenarioObstacle(current,x,y),decor=current?.decor?.[key]||null,terrain=scenarioTerrain(current,x,y),piece=scenarioPieceAt(current,x,y),entity=piece?getChar(piece):null,isReachable=reachable.has(key),cost=reachable.get(key);
+      const key=scenarioKey(x,y),ob=scenarioObstacle(current,x,y),decor=current?.decor?.[key]||null,terrain=scenarioTerrain(current,x,y),piece=pieceByCell.get(key)||null,entity=getChar(piece),isReachable=reachable.has(key),terrainMeta=TERRAIN_META[terrain.type]||TERRAIN_META.floor,obMeta=ob?OBSTACLE_META[ob]:null,decorMeta=decor?DECOR_META[decor]:null;
+      const details=[`Casa ${x+1},${y+1}`,piece&&(piece.name||entity?.n),obMeta?.label,terrainMeta.label].filter(Boolean).join(' · ');
       const click=()=>{
+        if(moving)return;
         if(editor&&role==='master'&&editorTool!=='select'){onEditCell&&onEditCell(x,y,editorTool,piece);return;}
         if(piece&&canSelect(piece)){onSelect&&onSelect(piece.id);return;}
         if(!piece&&selectedPiece&&isReachable){onMove&&onMove(x,y,movement.mode,selectedPiece.id);}
       };
-      cells.push(h('button',{key,type:'button',onClick:click,className:cx('board-cell',`terrain-${terrain.type}`,ob&&`obstacle-${ob}`,ob&&'has-obstacle',piece&&'has-piece',effectiveSelected&&piece?.id===effectiveSelected&&'selected-piece',isReachable&&'reachable-cell',editor&&editorTool!=='select'&&'editor-cell'),'data-x':x,'data-y':y,title:isReachable?`${MOVE_META[movement?.mode]?.label||movement?.mode}: custo ${cost}`:terrain.label},[
-        decor?h('span',{key:'d',className:'decor-mark',title:DECOR_META[decor]?.label||decor},DECOR_META[decor]?.symbol||'·'):null,
-        ob?h('span',{key:'o',className:'obstacle-mark',title:OBSTACLE_META[ob]?.label||ob},OBSTACLE_META[ob]?.symbol||String(ob).slice(0,1).toUpperCase()):null,
-        isReachable?h('span',{key:'c',className:'move-cost'},cost):null,
+      cells.push(h('button',{key,type:'button',onClick:click,disabled:moving&&isReachable,className:cx('board-cell',`terrain-${terrain.type}`,ob&&`obstacle-${ob}`,ob&&'has-obstacle',piece&&'has-piece',effectiveSelected&&piece?.id===effectiveSelected&&'selected-piece',isReachable&&'reachable-cell',editor&&editorTool!=='select'&&'editor-cell'),'data-x':x,'data-y':y,'aria-label':isReachable?`${details} · destino disponível`:details},[
+        terrainMeta.badge?h('span',{key:'tb',className:'terrain-badge'},terrainMeta.badge):null,
+        decor?h('span',{key:'d',className:'decor-mark',title:decorMeta?.label||decor},decorMeta?.icon||'·'):null,
+        ob?h('span',{key:'o',className:'obstacle-mark',title:obMeta?.label||ob},obMeta?.icon||'■'):null,
         piece?h('span',{key:'p',className:cx('board-token',canSelect(piece)&&'movable'),title:piece.name||entity?.n||''},(entity?.image||piece.image)?h('img',{src:thumb(entity?.image||piece.image),alt:'',loading:'lazy',decoding:'async'}):h('b',null,piece.short||monogram(piece.name||entity?.n))):null
       ]));
     }
-    const movementPanel=selectedPiece&&movement?h('div',{className:'mx-4 mt-3 rounded-xl border border-white/10 bg-[#0b1017] p-3'},[
+    const movementPanel=selectedPiece&&movement?h('div',{className:'movement-panel mx-4 mt-3 rounded-2xl p-3 sm:p-4'},[
       h('div',{key:'top',className:'flex flex-wrap items-center justify-between gap-3'},[
-        h('div',{key:'name'},[h(TinyLabel,{key:'l'},role==='player'?'SEU MOVIMENTO':'PEÇA SELECIONADA'),h('b',{key:'n',className:'mt-1 block text-sm'},selectedPiece.name||selectedEntity?.n||'Personagem')]),
-        h('div',{key:'remaining',className:'text-right'},[h(TinyLabel,{key:'l'},'RESTANTE'),h('strong',{key:'v',className:'ml-2 text-xl'},`${movement.remaining}/${movement.max}`)])
+        h('div',{key:'actor',className:'flex min-w-0 items-center gap-3'},[h(Portrait,{key:'p',entity:selectedEntity||{n:selectedPiece.name,image:selectedPiece.image},size:'sm'}),h('div',{key:'n',className:'min-w-0'},[h(TinyLabel,{key:'l'},role==='player'?'SEU PERSONAGEM':'PEÇA SELECIONADA'),h('b',{key:'b',className:'mt-1 block truncate text-sm'},selectedPiece.name||selectedEntity?.n||'Personagem')])]),
+        h('div',{key:'remaining',className:'rounded-xl border border-emerald-500/20 bg-black/20 px-3 py-2 text-right'},[h(TinyLabel,{key:'l'},'MOVIMENTO RESTANTE'),h('strong',{key:'v',className:'mt-1 block text-xl text-emerald-300'},`${movement.remaining} / ${movement.max}`)])
       ]),
-      h('div',{key:'modes',className:'mt-3 flex flex-wrap gap-2'},movement.valid.map(([mode,value])=>h('button',{key:mode,type:'button',disabled:Boolean(movement.locked&&movement.locked.mode!==mode),onClick:()=>onMoveMode&&onMoveMode(mode),className:cx('rounded-lg border px-3 py-2 text-[10px] font-black',movement.mode===mode?'border-emerald-500/60 bg-emerald-500/10 text-emerald-300':'border-white/10 bg-white/[.02] text-[#8f99a8]','disabled:opacity-30')},`${MOVE_META[mode]?.abbr||mode.toUpperCase()} ${value}`))),
-      h('div',{key:'bar',className:'mt-3 h-1.5 overflow-hidden rounded-full bg-white/5'},h('i',{className:'block h-full rounded-full bg-emerald-500',style:{width:`${movement.max?Math.max(0,Math.min(100,movement.remaining/movement.max*100)):0}%`}})),
+      h('div',{key:'modes',className:'mt-3 flex flex-wrap gap-2'},movement.valid.map(([mode,value])=>h('button',{key:mode,type:'button',disabled:Boolean(movement.locked&&movement.locked.mode!==mode)||moving,onClick:()=>onMoveMode&&onMoveMode(mode),className:cx('movement-mode-btn',movement.mode===mode&&'active','disabled:opacity-30')},[h('b',{key:'l'},MOVE_META[mode]?.label||mode),h('span',{key:'v'},value)]))),
+      h('div',{key:'bar',className:'mt-3 h-2 overflow-hidden rounded-full bg-white/5'},h('i',{className:'block h-full rounded-full bg-emerald-500',style:{width:`${movement.max?Math.max(0,Math.min(100,movement.remaining/movement.max*100)):0}%`}})),
       h('div',{key:'actions',className:'mt-3 flex flex-wrap items-center justify-between gap-2'},[
-        h('span',{key:'hint',className:'text-[10px] text-[#778190]'},movement.remaining>0?'As casas verdes são os destinos disponíveis.':'Movimento esgotado para esta rodada.'),
-        h('div',{key:'buttons',className:'flex gap-2'},[
-          onResetPiece?h(Button,{key:'reset',onClick:()=>onResetPiece(selectedPiece.id),className:'min-h-9 py-1'},'REINICIAR MOVIMENTO'):null,
-          editor&&role==='master'&&onRemovePiece?h(Button,{key:'remove',danger:true,onClick:()=>onRemovePiece(selectedPiece.id),className:'min-h-9 py-1'},'REMOVER PEÇA'):null
-        ])
+        h('span',{key:'hint',className:'text-[11px] text-[#8f99a8]'},moving?'Movendo peça…':movement.remaining>0?'As casas verdes são os destinos disponíveis. Clique em uma delas para mover.':'O movimento desta peça acabou nesta rodada.'),
+        h('div',{key:'buttons',className:'flex gap-2'},[onResetPiece?h(Button,{key:'reset',disabled:moving,onClick:()=>onResetPiece(selectedPiece.id),className:'min-h-9 py-1'},'REINICIAR MOVIMENTO'):null,editor&&role==='master'&&onRemovePiece?h(Button,{key:'remove',danger:true,disabled:moving,onClick:()=>onRemovePiece(selectedPiece.id),className:'min-h-9 py-1'},'REMOVER PEÇA'):null])
       ])
-    ]):h('div',{className:'mx-4 mt-3 rounded-xl border border-dashed border-white/10 px-3 py-3 text-xs text-[#7c8695]'},role==='player'?(ownPiece?'Seu personagem está no cenário. As casas disponíveis aparecerão automaticamente.':'Seu personagem ainda não foi colocado no cenário.'):(editorTool==='select'?'Selecione uma peça para ver todas as casas que ela pode alcançar.':`Ferramenta ativa: ${editorTool}. Clique nas casas para editar o mapa.`));
-    return h(Card,{className:'overflow-hidden'},[
-      title?h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3 p-4'},[
-        h('div',{key:'t'},[h(TinyLabel,{key:'s'},editor?'MONTADOR TÁTICO':'CENÁRIO'),h('h2',{key:'h',className:'mt-1 text-xl font-black'},editor?'Mapa da cena':role==='master'?'Controle das peças':'Seu movimento')]),
-        h('div',{key:'c',className:'flex items-center gap-2'},[h(Button,{key:'m',onClick:()=>onZoom(Math.max(.35,zoom-.08)),className:'px-3'},'−'),h('span',{key:'z',className:'w-14 text-center text-xs font-black'},`${Math.round(zoom*100)}%`),h(Button,{key:'p',onClick:()=>onZoom(Math.min(1.4,zoom+.08)),className:'px-3'},'+'),onReset?h(Button,{key:'r',onClick:onReset},role==='master'?'NOVA RODADA':'REINICIAR'):null])
+    ]):h('div',{className:'mx-4 mt-3 rounded-xl border border-dashed border-white/10 bg-white/[.02] px-3 py-3 text-xs text-[#8792a1]'},role==='player'?(ownPiece?'Sua peça está no mapa. Selecione um modo de movimento para ver as casas disponíveis.':'Seu personagem ainda não foi colocado no cenário.'):(editorTool==='select'?'Clique em uma peça para selecioná-la. As casas verdes mostram o alcance disponível.':`Você está editando o mapa com “${scenarioToolInfo(editorTool,current).label}”. Clique nas casas para aplicar.`));
+    return h(Card,{className:'overflow-hidden scenario-board-card'},[
+      title?h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5'},[
+        h('div',{key:'t'},[h(TinyLabel,{key:'s'},editor?'MAPA DA CENA':'CENÁRIO'),h('h2',{key:'h',className:'mt-1 text-xl font-black'},editor?'Visualização do mapa':role==='master'?'Controle das peças':'Seu movimento'),h('div',{key:'chips',className:'mt-2 flex flex-wrap gap-2 text-[10px] text-[#7e8998]'},[h('span',{key:'a',className:'board-help-chip'},'🟩 área verde = alcance'),h('span',{key:'b',className:'board-help-chip'},'🔴 contorno = peça selecionada'),h('span',{key:'c',className:'board-help-chip'},'ícones = objetos')])]),
+        h('div',{key:'c',className:'flex items-center gap-2'},[h(Button,{key:'m',onClick:()=>onZoom(Math.max(.35,zoom-.08)),className:'px-3'},'−'),h('span',{key:'z',className:'w-14 text-center text-xs font-black'},`${Math.round(zoom*100)}%`),h(Button,{key:'p',onClick:()=>onZoom(Math.min(1.4,zoom+.08)),className:'px-3'},'+'),onReset?h(Button,{key:'r',disabled:moving,onClick:onReset},role==='master'?'NOVA RODADA':'REINICIAR'):null])
       ]):null,
       movementPanel,
-      h('div',{key:'scroll',className:'board-scroll mt-3 overflow-auto bg-[#070a0e] p-4'},h('div',{className:'board-grid',style:{gridTemplateColumns:`repeat(${width}, ${cellSize}px)`,gridTemplateRows:`repeat(${height}, ${cellSize}px)`,transform:`scale(${zoom})`,transformOrigin:'top left',width:`${width*cellSize}px`,height:`${height*cellSize}px`}},cells))
+      h('div',{key:'scroll',className:'board-scroll mt-3 overflow-auto bg-[#05080c] p-3 sm:p-4'},h('div',{className:'board-grid',style:{gridTemplateColumns:`repeat(${width}, ${cellSize}px)`,gridTemplateRows:`repeat(${height}, ${cellSize}px)`,transform:`scale(${zoom})`,transformOrigin:'top left',width:`${width*cellSize}px`,height:`${height*cellSize}px`}},cells)),
+      h(ScenarioLegend,{key:'legend',scenario:current})
     ]);
   }
 
-  function ScenarioBuilder({scenario,heroes,villains,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,tool,onTool,preset,onPreset,onApplyPreset,onGenerate,onClear,onResize,onEnvironment,pieceChoice,onPieceChoice,qty,onQty,onAddPieces,onEditCell,onRemovePiece}){
-    const current=normalizedScenario(scenario),actorOptions=[...(heroes||[]).map(e=>({key:`hero|${e.id}`,label:`Herói · ${e.n}`})),...(villains||[]).map(e=>({key:`villain|${e.id}`,label:`Vilão · ${e.n}`})),...Object.values(MINIONS).map(e=>({key:`other|${e.id}`,label:`Capanga · ${e.n.replace(/^Capanga · /,'')}`}))];
-    const toolButton=(id,label)=>h('button',{key:id,type:'button',onClick:()=>onTool(id),className:cx('min-h-10 rounded-lg border px-3 text-[10px] font-black',tool===id?'border-[#ef3340] bg-[#ef3340]/10 text-white':'border-white/10 bg-[#10161e] text-[#8e98a6]')},label);
+  const MemoBoard=React.memo(Board,(a,b)=>a.scenario===b.scenario&&a.heroes===b.heroes&&a.villains===b.villains&&a.role===b.role&&a.heroId===b.heroId&&a.selected===b.selected&&a.zoom===b.zoom&&a.moveMode===b.moveMode&&a.editor===b.editor&&a.editorTool===b.editorTool&&a.moving===b.moving);
+  function DeferredBoard(props){
+    const [ready,setReady]=React.useState(false);
+    React.useEffect(()=>{let cancelled=false;const frame=requestAnimationFrame(()=>{if(!cancelled)setReady(true);});return()=>{cancelled=true;cancelAnimationFrame(frame);};},[]);
+    if(!ready)return h(Card,{className:'grid min-h-[220px] place-items-center p-6 text-center'},h('div',null,[h('div',{key:'a',className:'mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-[#ef3340]'}),h('p',{key:'p',className:'mt-3 text-xs text-[#7f8998]'},'Abrindo o mapa…')]));
+    return h(MemoBoard,props);
+  }
+
+  function ScenarioBuilder({scenario,heroes,villains,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,tool,onTool,preset,onPreset,onApplyPreset,onGenerate,onClear,onResize,onEnvironment,pieceChoice,onPieceChoice,qty,onQty,onAddPieces,onEditCell,onRemovePiece,moving=false}){
+    const current=React.useMemo(()=>normalizedScenario(scenario),[scenario]);
+    const actorOptions=React.useMemo(()=>[...(heroes||[]).map(e=>({key:`hero|${e.id}`,label:`Herói · ${e.n}`})),...(villains||[]).map(e=>({key:`villain|${e.id}`,label:`Vilão · ${e.n}`})),...Object.values(MINIONS).map(e=>({key:`other|${e.id}`,label:`Capanga · ${e.n.replace(/^Capanga · /,'')}`}))],[heroes,villains]);
+    const initialGroup=scenarioToolInfo(tool,current).group==='main'?'terrain':scenarioToolInfo(tool,current).group;
+    const [group,setGroup]=React.useState(initialGroup||'terrain');
+    const groupDefs=[['terrain','▦','TERRENO'],['structure','🧱','ESTRUTURAS'],['objects','📦','OBJETOS'],['decor','✦','DETALHES']];
+    const groupItems=group==='terrain'?[['base',scenarioToolInfo('base',current)],...Array.from(TERRAIN_TOOLS).map(id=>[id,scenarioToolInfo(id,current)])]:group==='decor'?Object.keys(DECOR_META).map(id=>[`decor-${id}`,scenarioToolInfo(`decor-${id}`,current)]):Object.entries(OBSTACLE_META).filter(([,meta])=>(meta.group||'objects')===group).map(([id])=>[id,scenarioToolInfo(id,current)]);
+    const active=scenarioToolInfo(tool,current);
+    const toolTile=(id,meta)=>h('button',{key:id,type:'button',onClick:()=>onTool(id),className:cx('scenario-tool-tile',tool===id&&'active')},[h('span',{key:'i',className:'scenario-tool-icon'},meta.icon),h('span',{key:'c',className:'min-w-0'},[h('b',{key:'l'},meta.label),h('small',{key:'h'},meta.help)])]);
     return h('div',{className:'space-y-4'},[
-      h('section',{key:'head'},[h(TinyLabel,{key:'s'},'CENÁRIO'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},'Montador de cenário'),h('p',{key:'p',className:'mt-1 text-sm text-[#7f8997]'},'Monte o mapa, posicione as peças e use o mesmo grid durante a sessão.')]),
-      h(Card,{key:'setup',className:'p-4 sm:p-5'},[
+      h('section',{key:'head'},[h(TinyLabel,{key:'s'},'MONTADOR TÁTICO'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},'Montador de cenário'),h('p',{key:'p',className:'mt-1 max-w-3xl text-sm leading-6 text-[#8b95a3]'},'Crie um mapa simples para a sessão. Você não precisa decorar tudo: escolha um modelo, coloque paredes e objetos importantes e adicione as peças.')]),
+      h('div',{key:'steps',className:'grid gap-2 sm:grid-cols-3'},[
+        ['1','Escolha a base','Use um modelo pronto ou gere um mapa.'],['2','Desenhe o necessário','Paredes, portas, água e objetos importantes.'],['3','Coloque os personagens','Depois mova as peças diretamente no grid.']
+      ].map(x=>h('div',{key:x[0],className:'scenario-step'},[h('span',{key:'n'},x[0]),h('div',{key:'c'},[h('b',{key:'b'},x[1]),h('small',{key:'s'},x[2])])]))),
+      h(Card,{key:'quick',className:'p-4 sm:p-5'},[
+        h('div',{key:'title',className:'mb-4 flex items-center justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'COMECE RÁPIDO'),h('h2',{key:'h',className:'mt-1 text-lg font-black'},'Base do mapa')]),h('span',{key:'e',className:'rounded-full border border-white/10 px-3 py-1 text-[10px] text-[#7d8795]'},`${current.width} × ${current.height} casas`)]),
         h('div',{key:'row1',className:'grid gap-3 lg:grid-cols-[1.2fr_1fr_1fr_auto_auto]'},[
-          h('label',{key:'env',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'AMBIENTE'),h('select',{key:'s',value:current.environment,onChange:e=>onEnvironment(e.target.value),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-sm outline-none'},Object.entries(ENVIRONMENTS).map(([id,meta])=>h('option',{key:id,value:id},meta.label)))]),
-          h('label',{key:'size',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'TAMANHO'),h('select',{key:'s',value:`${current.width}x${current.height}`,onChange:e=>onResize(e.target.value),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-sm outline-none'},['10x8','12x9','16x12','18x12','18x14','20x14','22x14','22x16','24x16','24x18','30x20'].map(v=>h('option',{key:v,value:v},v.replace('x',' × '))))]),
-          h('label',{key:'preset',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'MODELO'),h('select',{key:'s',value:preset,onChange:e=>onPreset(e.target.value),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-sm outline-none'},Object.entries(SCENARIO_PRESETS).map(([id,meta])=>h('option',{key:id,value:id},meta.label)))]),
+          h('label',{key:'preset',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'MODELO PRONTO'),h('select',{key:'s',value:preset,onChange:e=>onPreset(e.target.value),className:'scenario-select'},Object.entries(SCENARIO_PRESETS).map(([id,meta])=>h('option',{key:id,value:id},meta.label)))]),
+          h('label',{key:'env',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'TIPO DE LOCAL'),h('select',{key:'s',value:current.environment,onChange:e=>onEnvironment(e.target.value),className:'scenario-select'},Object.entries(ENVIRONMENTS).map(([id,meta])=>h('option',{key:id,value:id},meta.label)))]),
+          h('label',{key:'size',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'TAMANHO'),h('select',{key:'s',value:`${current.width}x${current.height}`,onChange:e=>onResize(e.target.value),className:'scenario-select'},['10x8','12x9','16x12','18x12','18x14','20x14','22x14','22x16','24x16','24x18','30x20'].map(v=>h('option',{key:v,value:v},v.replace('x',' × '))))]),
           h(Button,{key:'apply',onClick:onApplyPreset,className:'self-end'},'APLICAR MODELO'),
           h(Button,{key:'gen',primary:true,onClick:onGenerate,className:'self-end'},'GERAR MAPA')
-        ]),
-        h('div',{key:'tools',className:'mt-5 grid gap-4 xl:grid-cols-[1fr_1.4fr]'},[
-          h('div',{key:'paint'},[h(TinyLabel,{key:'l'},'FERRAMENTAS'),h('div',{key:'g',className:'mt-2 flex flex-wrap gap-2'},[
-            toolButton('select','SELECIONAR / MOVER'),toolButton('erase','APAGAR'),toolButton('base','PISO BASE'),
-            ...Array.from(TERRAIN_TOOLS).map(id=>toolButton(id,TERRAIN_META[id].label.toUpperCase())),
-            ...Object.entries(OBSTACLE_META).map(([id,meta])=>toolButton(id,meta.label.toUpperCase())),
-            ...Object.entries(DECOR_META).map(([id,meta])=>toolButton(`decor-${id}`,`DECOR · ${meta.label.toUpperCase()}`))
-          ])]),
-          h('div',{key:'pieces'},[h(TinyLabel,{key:'l'},'ADICIONAR PEÇAS'),h('div',{key:'r',className:'mt-2 grid gap-2 sm:grid-cols-[1fr_90px_auto]'},[
-            h('select',{key:'a',value:pieceChoice||actorOptions[0]?.key||'',onChange:e=>onPieceChoice(e.target.value),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-sm outline-none'},actorOptions.map(o=>h('option',{key:o.key,value:o.key},o.label))),
-            h('input',{key:'q',type:'number',min:1,max:20,value:qty,onChange:e=>onQty(clamp(e.target.value,1,20)),className:'min-h-11 rounded-xl border border-white/10 bg-[#0b0f15] px-3 text-center text-sm outline-none'}),
-            h(Button,{key:'b',onClick:onAddPieces},'ADICIONAR')
-          ]),h('div',{key:'clear',className:'mt-2 flex justify-end'},h(Button,{danger:true,onClick:onClear},'LIMPAR MAPA'))])
         ])
       ]),
-      h(Board,{key:'board',scenario:current,heroes,villains,role:'master',selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,editor:true,editorTool:tool,onEditCell,onRemovePiece})
+      h('div',{key:'work',className:'scenario-work-grid grid gap-4'},[
+        h(Card,{key:'tools',className:'p-4 sm:p-5'},[
+          h('div',{key:'top',className:'flex flex-wrap items-center justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'EDITAR MAPA'),h('h2',{key:'h',className:'mt-1 text-lg font-black'},'O que você quer colocar?')]),h('div',{key:'main',className:'flex gap-2'},[toolTile('select',scenarioToolInfo('select',current)),toolTile('erase',scenarioToolInfo('erase',current))])]),
+          h('div',{key:'tabs',className:'mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4'},groupDefs.map(x=>h('button',{key:x[0],type:'button',onClick:()=>setGroup(x[0]),className:cx('scenario-tool-group',group===x[0]&&'active')},`${x[1]} ${x[2]}`))),
+          h('div',{key:'grid',className:'mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3'},groupItems.map(([id,meta])=>toolTile(id,meta))),
+          h('div',{key:'active',className:'active-tool-banner mt-4'},[h('span',{key:'i'},active.icon),h('div',{key:'c'},[h(TinyLabel,{key:'l'},'FERRAMENTA ATIVA'),h('b',{key:'b'},active.label),h('small',{key:'s'},active.help)])])
+        ]),
+        h(Card,{key:'pieces',className:'p-4 sm:p-5'},[
+          h(TinyLabel,{key:'l'},'ADICIONAR PEÇAS'),h('h2',{key:'h',className:'mt-1 text-lg font-black'},'Personagens da cena'),h('p',{key:'p',className:'mt-1 text-xs leading-5 text-[#7f8998]'},'Escolha quem entra na cena. As peças aparecem automaticamente em casas livres.'),
+          h('label',{key:'actor',className:'mt-4 grid gap-1'},[h(TinyLabel,{key:'l'},'PERSONAGEM'),h('select',{key:'a',value:pieceChoice||actorOptions[0]?.key||'',onChange:e=>onPieceChoice(e.target.value),className:'scenario-select'},actorOptions.map(o=>h('option',{key:o.key,value:o.key},o.label)))]),
+          h('label',{key:'qty',className:'mt-3 grid gap-1'},[h(TinyLabel,{key:'l'},'QUANTIDADE'),h('input',{key:'q',type:'number',min:1,max:20,value:qty,onChange:e=>onQty(clamp(e.target.value,1,20)),className:'scenario-input'})]),
+          h(Button,{key:'add',primary:true,onClick:onAddPieces,className:'mt-3 w-full'},'ADICIONAR AO MAPA'),
+          h('div',{key:'tips',className:'mt-4 rounded-xl border border-white/10 bg-black/20 p-3 text-[11px] leading-5 text-[#8a94a2]'},[h('b',{key:'b',className:'block text-white'},'Durante a sessão'),h('span',{key:'s'},'Use “Selecionar / mover”, clique numa peça e depois numa casa verde.')]),
+          h(Button,{key:'clear',danger:true,onClick:onClear,className:'mt-4 w-full'},'LIMPAR CENÁRIO')
+        ])
+      ]),
+      h(DeferredBoard,{key:'board',scenario:current,heroes,villains,role:'master',selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,editor:true,editorTool:tool,onEditCell,onRemovePiece,moving})
     ]);
   }
 
@@ -343,15 +507,15 @@
   class ArachneApp extends React.Component {
     constructor(props){
       super(props);
-      this.state={screen:'loading',campaigns:[],templates:[],characters:{heroes:[],villains:[]},selectedCampaign:null,accessMode:'',joinCode:'',masterPassword:'',createOpen:false,createTemplate:'',createName:'',createPassword:'',profile:null,data:{...DEFAULT_DATA},page:'central',navOpen:false,actorKey:'',category:'combat',power:'',roll:null,rollAnimating:false,initiativeRoll:null,initiativeAnimating:false,tn:14,edge:0,trouble:0,selectedPiece:null,zoom:.72,moveMode:'run',scenarioTool:'select',scenarioPreset:'empty',scenarioPieceChoice:'',scenarioQty:1,sheet:null,status:'offline',toast:'',error:''};
-      this.toastTimer=null; this.tnTimer=null;
+      this.state={screen:'loading',campaigns:[],templates:[],characters:{heroes:[],villains:[]},selectedCampaign:null,accessMode:'',joinCode:'',masterPassword:'',createOpen:false,createMode:'blank',createTemplate:'',createName:'',createPassword:'',createHeroIds:[],createVillainIds:[],createRosterKind:'',createRosterSearch:'',campaignEditOpen:false,campaignSaving:false,rosterPicker:'',characterEditor:null,profile:null,data:{...DEFAULT_DATA},page:'central',navOpen:false,actorKey:'',category:'combat',power:'',roll:null,rollAnimating:false,initiativeRoll:null,initiativeAnimating:false,tn:14,edge:0,trouble:0,selectedPiece:null,zoom:.72,moveMode:'run',scenarioTool:'select',scenarioPreset:'empty',scenarioPieceChoice:'',scenarioQty:1,scenarioMoveBusy:false,sheet:null,status:'offline',toast:'',error:''};
+      this.toastTimer=null; this.tnTimer=null; this.scenarioSaveTimer=null; this.scenarioSavePending=null;
     }
     componentDidMount(){ this.bootstrap(); }
     componentDidUpdate(prev){
       if(this.state.rollAnimating && this.state.roll!==prev.roll) this.animateCurrentRoll();
       if(this.state.initiativeAnimating && this.state.initiativeRoll!==prev.initiativeRoll) this.animateInitiativeRoll();
     }
-    componentWillUnmount(){ API.disconnectRealtime(); clearTimeout(this.toastTimer); clearTimeout(this.tnTimer); }
+    componentWillUnmount(){ API.disconnectRealtime(); clearTimeout(this.toastTimer); clearTimeout(this.tnTimer); clearTimeout(this.scenarioSaveTimer); }
     toast(message){ clearTimeout(this.toastTimer); this.setState({toast:String(message||'')}); this.toastTimer=setTimeout(()=>this.setState({toast:''}),2600); }
     async bootstrap(){
       try{
@@ -370,7 +534,7 @@
       const tn=clamp(merged.challenge?.tn||14,1,99); const campaign=profile.campaign; rememberCampaign(campaign);
       this.setState({screen:'app',profile,data:merged,templates,characters,selectedCampaign:campaign,tn,edge:0,trouble:0,page:'central',actorKey:'',roll:null,category:'combat',power:'',error:''},()=>{this.ensureActor();this.connectRealtime();});
     }
-    connectRealtime(){ API.connectRealtime({onStatus:status=>this.setState({status}),onState:event=>{if(!event?.key)return;const value=event.key==='scenario'?normalizedScenario(event.value||{}):event.value;this.setState(prev=>({data:{...prev.data,[event.key]:value},tn:event.key==='challenge'?clamp(value?.tn||prev.tn,1,99):prev.tn}),()=>this.ensureActor());}}); }
+    connectRealtime(){ API.connectRealtime({onStatus:status=>this.setState({status}),onState:event=>{if(!event?.key)return;if(event.key==='scenario'&&this.scenarioSavePending)return;const value=event.key==='scenario'?normalizedScenario(event.value||{}):event.value;this.setState(prev=>({data:{...prev.data,[event.key]:value},tn:event.key==='challenge'?clamp(value?.tn||prev.tn,1,99):prev.tn}),()=>this.ensureActor());}}); }
     ensureActor(){
       if(this.state.profile?.role!=='master')return;
       const list=this.masterActors(); if(!list.length)return;
@@ -397,9 +561,44 @@
         const data=await API.loadAll(); this.enterApp(profile,data);
       }catch(e){this.setState({error:e.message||'Não foi possível entrar.'});}
     }
+    creationLibrary(kind='hero'){return uniqueCharacterLibrary(this.state.characters,this.state.templates,kind);}
+    chooseCreationBase(templateId=''){
+      const template=this.state.templates.find(t=>t.id===templateId);
+      if(template)this.setState({createMode:'template',createTemplate:template.id,createName:template.name,createHeroIds:(template.heroes||[]).map(x=>x.id),createVillainIds:(template.villains||[]).map(x=>x.id),createRosterKind:'',createRosterSearch:''});
+      else this.setState({createMode:'blank',createTemplate:'',createName:'Nova Campanha',createHeroIds:[],createVillainIds:[],createRosterKind:'',createRosterSearch:''});
+    }
+    toggleCreationCharacter(kind,id){const key=kind==='hero'?'createHeroIds':'createVillainIds';this.setState(prev=>({[key]:prev[key].includes(id)?prev[key].filter(x=>x!==id):[...prev[key],id]}));}
     async createCampaign(){
-      const t=this.state.templates.find(x=>x.id===this.state.createTemplate); const name=(this.state.createName||t?.name||'').trim();
-      try{const c=await API.createCampaign({name,masterPassword:this.state.createPassword,mode:'template',templateId:t?.id||'',heroIds:(t?.heroes||[]).map(x=>x.id),villainIds:(t?.villains||[]).map(x=>x.id)});rememberCampaign(c);this.setState(prev=>({campaigns:[c,...prev.campaigns.filter(x=>x.code!==c.code)],selectedCampaign:c,createOpen:false,error:''}));this.toast(`Mesa criada: ${c.code}`);}catch(e){this.setState({error:e.message});}
+      const t=this.state.templates.find(x=>x.id===this.state.createTemplate),mode=this.state.createMode==='template'&&t?'template':'blank',name=(this.state.createName||(mode==='template'?t?.name:'')).trim();
+      if(this.state.createHeroIds.length<1){this.setState({error:'Selecione pelo menos um herói para a campanha.'});return;}
+      try{const c=await API.createCampaign({name,masterPassword:this.state.createPassword,mode,templateId:mode==='template'?t?.id||'':'',heroIds:[...new Set(this.state.createHeroIds)],villainIds:[...new Set(this.state.createVillainIds)]});rememberCampaign(c);this.setState(prev=>({campaigns:[c,...prev.campaigns.filter(x=>x.code!==c.code)],selectedCampaign:c,createOpen:false,createRosterKind:'',createRosterSearch:'',error:''}));this.toast(`Mesa criada: ${c.code}`);}catch(e){this.setState({error:e.message});}
+    }
+    async saveCampaignContent(content){
+      if(this.state.profile?.role!=='master')return;
+      const next={...(this.state.data.campaignContent||{}),...content,title:String(content?.title||'').trim()||this.state.selectedCampaign?.name||'Campanha',subtitle:String(content?.subtitle||'').trim(),summary:String(content?.summary||'').trim(),editorText:String(content?.editorText||''),rank:clamp(content?.rank||4,1,6),sessions:(content?.sessions||[]).map((row,i)=>({id:String(i+1).padStart(2,'0'),title:String(row?.title||`Sessão ${i+1}`).trim()||`Sessão ${i+1}`,text:String(row?.text||'')})),players:(this.state.data.heroes||[]).length,documentMode:content?.campaignPdf?'pdf':'editor'};
+      this.setState({campaignSaving:true});
+      try{
+        await Promise.all([API.saveState('campaignContent',next),API.updateCampaignMeta({name:next.title})]);
+        const selectedCampaign={...(this.state.selectedCampaign||{}),name:next.title,campaignContent:{...(this.state.selectedCampaign?.campaignContent||{}),title:next.title,subtitle:next.subtitle,rank:next.rank,players:next.players,mode:next.mode||'group'}};
+        this.setState(prev=>({campaignSaving:false,campaignEditOpen:false,selectedCampaign,data:{...prev.data,campaignContent:next}}));this.toast('Campanha atualizada.');
+      }catch(e){this.setState({campaignSaving:false});this.toast(e.message||'Não foi possível salvar a campanha.');}
+    }
+    async uploadCampaignPdf(file){try{const asset=await API.uploadAsset(file);this.toast('PDF enviado. Salve a campanha para concluir.');return asset?.url||'';}catch(e){this.toast(e.message||'Falha ao enviar PDF.');return'';}}
+    async addRosterCharacter(kind,id){
+      const library=this.creationLibrary(kind),source=library.find(item=>item.id===id);if(!source)return;
+      const key=kind==='hero'?'heroes':'villains';if((this.state.data[key]||[]).some(item=>item.id===id))return;
+      const entity=JSON.parse(JSON.stringify(source));
+      try{if(kind==='hero')await API.saveHero(entity);else await API.saveVillain(entity);this.setState(prev=>({rosterPicker:'',data:{...prev.data,[key]:[...(prev.data[key]||[]),entity],...(kind==='hero'?{playerNotes:{...(prev.data.playerNotes||{}),[entity.id]:''}}:{})}}));this.toast(`${entity.n} adicionado.`);}catch(e){this.toast(e.message||'Não foi possível adicionar o personagem.');}
+    }
+    openNewCharacter(kind){this.setState({rosterPicker:'',characterEditor:{kind,entity:blankCharacter(kind),isNew:true}});}
+    openCharacterEditor(kind,entity){this.setState({characterEditor:{kind,entity:JSON.parse(JSON.stringify(entity)),isNew:false}});}
+    async saveCharacterEditor(entity){
+      const modal=this.state.characterEditor;if(!modal)return;const kind=modal.kind,key=kind==='hero'?'heroes':'villains';
+      try{if(kind==='hero')await API.saveHero(entity);else await API.saveVillain(entity);this.setState(prev=>{const scenario=normalizedScenario(prev.data.scenario),pieces=scenario.pieces.map(piece=>String(piece.characterId||piece.baseId||'')===String(entity.id)?{...piece,name:entity.n||piece.name,image:entity.image||'',movement:{...(entity.movement||{})},maxHealth:entity.maxHealth??piece.maxHealth??null,currentHealth:entity.currentHealth??entity.maxHealth??piece.currentHealth??null,maxFocus:entity.maxFocus??piece.maxFocus??null,currentFocus:entity.currentFocus??entity.maxFocus??piece.currentFocus??null}:piece);return{characterEditor:null,data:{...prev.data,[key]:(prev.data[key]||[]).some(x=>x.id===entity.id)?(prev.data[key]||[]).map(x=>x.id===entity.id?entity:x):[...(prev.data[key]||[]),entity],scenario:{...scenario,pieces},...(kind==='hero'&&modal.isNew?{playerNotes:{...(prev.data.playerNotes||{}),[entity.id]:''}}:{})}};});this.toast('Ficha salva.');}catch(e){this.toast(e.message||'Não foi possível salvar a ficha.');}
+    }
+    async removeRosterCharacter(kind,entity){
+      if(!entity||!confirm(`Remover ${entity.n} desta campanha?`))return;const key=kind==='hero'?'heroes':'villains';
+      try{const result=kind==='hero'?await API.deleteHero(entity.id):await API.deleteVillain(entity.id);this.setState(prev=>({selectedPiece:null,data:{...prev.data,[key]:(prev.data[key]||[]).filter(x=>x.id!==entity.id),scenario:normalizedScenario(result?.scenario||prev.data.scenario),initiative:result?.initiative||prev.data.initiative,combat:result?.combat||prev.data.combat,...(kind==='hero'?{playerNotes:result?.playerNotes||prev.data.playerNotes}:{})}}),()=>this.ensureActor());this.toast(`${entity.n} removido.`);}catch(e){this.toast(e.message||'Não foi possível remover o personagem.');}
     }
     logout(){API.clearSession();this.setState({screen:'login',profile:null,data:{...DEFAULT_DATA},selectedCampaign:null,page:'central',roll:null});this.bootstrap();}
     setPage(page){this.setState({page});}
@@ -435,17 +634,43 @@
     async animateInitiativeRoll(){const root=document.getElementById('initiative-dice-stage'),roll=this.state.initiativeRoll;if(root&&roll)await animateDiceStage(root,roll.initialValues||roll.values);this.setState({initiativeAnimating:false});}
     async initRollAll(){const pending=(this.state.data.initiative||[]).filter(x=>x.result==null||x.result===''||!Number.isFinite(Number(x.result)));for(const item of pending){await this.initRoll(item.id);while(this.state.initiativeAnimating)await sleep(50);} }
     async movePiece(x,y,mode='run',pieceId=''){
-      const scenario=normalizedScenario(this.state.data.scenario),owned=this.state.profile.role==='player'?scenario.pieces.find(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(this.state.profile.heroId||'')):null,id=pieceId||this.state.selectedPiece||owned?.id;if(!id)return;
-      const piece=scenario.pieces.find(p=>p.id===id);if(!piece)return;
-      try{const result=await API.moveScenarioPiece({pieceId:id,x,y,mode,from:{x:piece.x,y:piece.y}});this.setState(prev=>({data:{...prev.data,scenario:normalizedScenario(result.scenario||prev.data.scenario)},selectedPiece:id,moveMode:mode}));}catch(e){this.toast(e.message);}
+      if(this.state.scenarioMoveBusy)return;
+      const previous=normalizedScenario(this.state.data.scenario),owned=this.state.profile.role==='player'?previous.pieces.find(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(this.state.profile.heroId||'')):null,id=pieceId||this.state.selectedPiece||owned?.id;if(!id)return;
+      const piece=previous.pieces.find(p=>p.id===id);if(!piece)return;
+      // Movimento otimista: a peça responde no clique, enquanto o servidor valida em segundo plano.
+      const optimistic=normalizedScenario(previous);
+      optimistic.pieces=optimistic.pieces.map(p=>p.id===id?{...p,x:Number(x),y:Number(y)}:p);
+      this.setState(prev=>({scenarioMoveBusy:true,data:{...prev.data,scenario:optimistic},selectedPiece:id,moveMode:mode}));
+      try{
+        const result=await API.moveScenarioPiece({pieceId:id,x,y,mode,from:{x:piece.x,y:piece.y}});
+        this.setState(prev=>({scenarioMoveBusy:false,data:{...prev.data,scenario:normalizedScenario(result.scenario||prev.data.scenario)},selectedPiece:id,moveMode:mode}));
+      }catch(e){
+        this.setState(prev=>({scenarioMoveBusy:false,data:{...prev.data,scenario:previous}}));
+        this.toast(e.message);
+      }
     }
     async resetMovement(pieceId='',all=false){
       try{const scenario=normalizedScenario(this.state.data.scenario),owned=this.state.profile.role==='player'?scenario.pieces.find(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(this.state.profile.heroId||'')):null;const values=this.state.profile.role==='master'?(all?{all:true}:{pieceId:pieceId||this.state.selectedPiece}):{pieceId:owned?.id||pieceId};const result=await API.resetScenarioMovement(values);this.setState(prev=>({data:{...prev.data,scenario:normalizedScenario(result.scenario||result?.data?.scenario||prev.data.scenario)}}));}catch(e){this.toast(e.message);}
     }
     async saveScenario(next,message=''){
       if(this.state.profile.role!=='master')return;
+      clearTimeout(this.scenarioSaveTimer);this.scenarioSavePending=null;
       const scenario=placePiecesSafely(next);this.setState(prev=>({data:{...prev.data,scenario}}));
       try{await API.saveState('scenario',scenario);if(message)this.toast(message);}catch(e){this.toast(e.message||'Não foi possível salvar o cenário.');}
+    }
+    queueScenarioSave(next){
+      if(this.state.profile.role!=='master')return;
+      // Pintura do mapa não recalcula/reposiciona todas as peças a cada clique.
+      // Reposicionamento seguro fica restrito a resize/modelos/geração e ações estruturais.
+      const scenario=normalizedScenario(next);
+      this.scenarioSavePending=scenario;
+      this.setState(prev=>({data:{...prev.data,scenario}}));
+      clearTimeout(this.scenarioSaveTimer);
+      this.scenarioSaveTimer=setTimeout(async()=>{
+        const pending=this.scenarioSavePending;if(!pending)return;
+        try{await API.saveState('scenario',pending);if(this.scenarioSavePending===pending)this.scenarioSavePending=null;}
+        catch(e){this.scenarioSavePending=null;this.toast(e.message||'Não foi possível salvar o cenário.');}
+      },180);
     }
     async setScenarioEnvironment(environment){const current=normalizedScenario(this.state.data.scenario);await this.saveScenario({...current,environment,baseTerrain:ENVIRONMENTS[environment]?.base||'floor'},'Ambiente atualizado.');}
     async resizeScenario(value){const parts=String(value).split('x').map(Number);if(parts.length!==2)return;const current=normalizedScenario(this.state.data.scenario);await this.saveScenario({...current,width:clamp(parts[0],8,30),height:clamp(parts[1],7,24)},'Tamanho atualizado.');}
@@ -466,16 +691,18 @@
       if(tool==='erase'){delete next.obstacles[key];delete next.terrain[key];delete next.decor[key];if(piece){next.pieces=next.pieces.filter(p=>p.id!==piece.id);delete next.turnMovement[piece.id];delete next.movementSpent[piece.id];if(this.state.selectedPiece===piece.id)this.setState({selectedPiece:null});}}
       else if(tool==='base'){delete next.terrain[key];}
       else if(TERRAIN_TOOLS.has(tool)){delete next.obstacles[key];delete next.decor[key];next.terrain[key]=tool;}
-      else if(OBSTACLE_META[tool]){delete next.decor[key];next.obstacles[key]=tool;}
+      else if(OBSTACLE_META[tool]){if(piece&&OBSTACLE_META[tool].block){this.toast('Mova a peça antes de colocar um obstáculo nessa casa.');return;}delete next.decor[key];next.obstacles[key]=tool;}
       else if(String(tool).startsWith('decor-')){const decor=String(tool).slice(6);if(DECOR_META[decor])next.decor[key]=decor;}
-      await this.saveScenario(next);
+      this.queueScenarioSave(next);
     }
     async addScenarioPieces(){
       const current=normalizedScenario(this.state.data.scenario),fallback=(this.state.data.heroes||[])[0]?`hero|${this.state.data.heroes[0].id}`:(this.state.data.villains||[])[0]?`villain|${this.state.data.villains[0].id}`:'other|minion-melee',choice=this.state.scenarioPieceChoice||fallback,[kind,id]=choice.split('|');let entity=null;if(kind==='hero')entity=(this.state.data.heroes||[]).find(e=>e.id===id);else if(kind==='villain')entity=(this.state.data.villains||[]).find(e=>e.id===id);else entity=MINIONS[id];if(!entity)return this.toast('Escolha um personagem.');
       const qty=clamp(this.state.scenarioQty,1,20),next=normalizedScenario(current);let added=0;
-      for(let i=0;i<qty;i++){
-        if(kind==='hero'&&next.pieces.some(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(entity.id))){if(i===0)this.toast(`${entity.n} já está no cenário.`);break;}
-        const temp=placePiecesSafely(next),spots=safePlacementCells(temp).filter(c=>!temp.pieces.some(p=>Number(p.x)===c.x&&Number(p.y)===c.y));if(!spots.length)break;const spot=spots[Math.min(spots.length-1,Math.max(0,Math.floor(spots.length*.12)+i))],pieceKind=kind==='hero'?'hero':'enemy';
+      if(kind==='hero'&&next.pieces.some(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(entity.id)))return this.toast(`${entity.n} já está no cenário.`);
+      const occupied=new Set(next.pieces.map(p=>scenarioKey(Number(p.x),Number(p.y)))),spots=safePlacementCells(next).filter(c=>!occupied.has(scenarioKey(c.x,c.y)));let cursor=Math.min(spots.length,Math.max(0,Math.floor(spots.length*.12)));
+      for(let i=0;i<qty&&spots.length;i++){
+        while(cursor<spots.length&&occupied.has(scenarioKey(spots[cursor].x,spots[cursor].y)))cursor++;
+        const spot=spots[cursor]||spots.find(c=>!occupied.has(scenarioKey(c.x,c.y)));if(!spot)break;cursor++;occupied.add(scenarioKey(spot.x,spot.y));const pieceKind=kind==='hero'?'hero':'enemy';
         next.pieces.push({id:`piece-${entity.id}-${Date.now()}-${i}-${Math.random().toString(36).slice(2,6)}`,kind:pieceKind,tier:kind==='other'?'minion':kind==='villain'?'main':undefined,baseId:entity.id,characterId:entity.id,name:qty>1?`${entity.n} ${i+1}`:entity.n,short:monogram(entity.n),image:entity.image||'',x:spot.x,y:spot.y,movement:{...(entity.movement||{})},maxHealth:entity.maxHealth??null,currentHealth:entity.currentHealth??entity.maxHealth??null,maxFocus:entity.maxFocus??null,currentFocus:entity.currentFocus??entity.maxFocus??null});added++;
       }
       await this.saveScenario(next,`${added} peça${added===1?'':'s'} adicionada${added===1?'':'s'}.`);
@@ -498,17 +725,33 @@
           ])
         ]));
       }
-      const selectedTemplate=s.templates.find(t=>t.id===s.createTemplate);
-      return h('div',{className:'min-h-screen bg-[radial-gradient(circle_at_70%_20%,rgba(239,51,64,.12),transparent_35%),#080b10] p-4 text-white'},h('div',{className:'mx-auto max-w-5xl py-8 sm:py-14'},[
-        h('div',{key:'head',className:'mb-8'},[h(TinyLabel,{key:'s',className:'text-[#ff6a75]'},'MARVEL MULTIVERSE RPG'),h('h1',{key:'t',className:'mt-2 text-4xl font-black tracking-tight sm:text-5xl'},'Projeto Arachne'),h('p',{key:'p',className:'mt-2 text-sm text-[#8b95a3]'},'Escolha a campanha e entre. O restante fica na mesa.')]),
+      const heroLibrary=this.creationLibrary('hero'),villainLibrary=this.creationLibrary('villain');
+      const rosterKind=s.createRosterKind||'',rosterLibrary=rosterKind==='hero'?heroLibrary:villainLibrary,selectedIds=rosterKind==='hero'?s.createHeroIds:s.createVillainIds;
+      const rosterTerm=(s.createRosterSearch||'').trim().toLocaleLowerCase('pt-BR');
+      const rosterFiltered=rosterLibrary.filter(item=>!rosterTerm||`${item.n||''} ${item.r||''} ${item.role||''}`.toLocaleLowerCase('pt-BR').includes(rosterTerm));
+      const selectedNames=(kind,ids)=>this.creationLibrary(kind).filter(item=>ids.includes(item.id));
+      return h('div',{className:'min-h-screen bg-[radial-gradient(circle_at_70%_20%,rgba(239,51,64,.12),transparent_35%),#080b10] p-4 text-white'},h('div',{className:'mx-auto max-w-6xl py-8 sm:py-14'},[
+        h('div',{key:'head',className:'mb-8'},[h(TinyLabel,{key:'s',className:'text-[#ff6a75]'},'MARVEL MULTIVERSE RPG'),h('h1',{key:'t',className:'mt-2 text-4xl font-black tracking-tight sm:text-5xl'},'Projeto Arachne'),h('p',{key:'p',className:'mt-2 text-sm text-[#8b95a3]'},'Escolha uma campanha existente ou monte uma nova mesa com os personagens que você quer usar.')]),
         s.error?h('div',{key:'err',className:'mb-4 rounded-xl border border-red-900/50 bg-red-950/20 p-3 text-sm text-red-300'},s.error):null,
-        h('div',{key:'campaigns',className:'grid gap-3 md:grid-cols-2'},s.campaigns.length?s.campaigns.map(c=>h('button',{key:c.code,onClick:()=>this.openCampaign(c.code),className:'flex items-center gap-4 rounded-2xl border border-white/10 bg-[#10151d] p-4 text-left transition hover:-translate-y-0.5 hover:border-[#ef3340]/50'},[h('span',{key:'a',className:'grid h-12 w-12 place-items-center rounded-xl border border-[#ef3340]/50 bg-[#ef3340]/10 font-black'},c.code.slice(0,2)),h('div',{key:'t',className:'min-w-0 flex-1'},[h('b',{key:'n',className:'block truncate'},c.name),h('small',{key:'c',className:'text-[10px] text-[#788291]'},`CÓDIGO ${c.code}`)]),h('span',{key:'x'},'→')])):h(Card,{className:'p-6 text-sm text-[#798392]'},'Nenhuma campanha encontrada. Crie uma a partir de um modelo abaixo.')),
-        h('div',{key:'actions',className:'mt-5 flex flex-wrap gap-2'},[h(Button,{key:'join',onClick:()=>this.setState({accessMode:s.accessMode==='join'?'':'join'})},'ENTRAR COM CÓDIGO'),h(Button,{key:'create',primary:true,onClick:()=>this.setState({createOpen:!s.createOpen})},'CRIAR CAMPANHA')]),
+        h('div',{key:'campaigns',className:'grid gap-3 md:grid-cols-2'},s.campaigns.length?s.campaigns.map(c=>h('button',{key:c.code,onClick:()=>this.openCampaign(c.code),className:'flex items-center gap-4 rounded-2xl border border-white/10 bg-[#10151d] p-4 text-left transition hover:-translate-y-0.5 hover:border-[#ef3340]/50'},[h('span',{key:'a',className:'grid h-12 w-12 place-items-center rounded-xl border border-[#ef3340]/50 bg-[#ef3340]/10 font-black'},c.code.slice(0,2)),h('div',{key:'t',className:'min-w-0 flex-1'},[h('b',{key:'n',className:'block truncate'},c.name),h('small',{key:'c',className:'text-[10px] text-[#788291]'},`CÓDIGO ${c.code}`)]),h('span',{key:'x'},'→')])):h(Card,{className:'p-6 text-sm text-[#798392]'},'Nenhuma campanha encontrada. Crie sua primeira mesa abaixo.')),
+        h('div',{key:'actions',className:'mt-5 flex flex-wrap gap-2'},[h(Button,{key:'join',onClick:()=>this.setState({accessMode:s.accessMode==='join'?'':'join'})},'ENTRAR COM CÓDIGO'),h(Button,{key:'create',primary:true,onClick:()=>this.setState(prev=>({createOpen:!prev.createOpen,createName:prev.createName||'Nova Campanha',createMode:prev.createMode||'blank'}))},s.createOpen?'FECHAR CRIAÇÃO':'CRIAR CAMPANHA')]),
         s.accessMode==='join'?h('div',{key:'join',className:'mt-3 flex gap-2'},[h('input',{key:'i',value:s.joinCode,onChange:e=>this.setState({joinCode:e.target.value.toUpperCase()}),placeholder:'CÓDIGO',className:'min-h-11 flex-1 rounded-xl border border-white/10 bg-[#0d1219] px-4 outline-none'},null),h(Button,{key:'b',onClick:()=>this.openCampaign(s.joinCode)},'ABRIR')]):null,
-        s.createOpen?h(Card,{key:'createbox',className:'mt-5 p-4 sm:p-5'},[
-          h(TinyLabel,{key:'l'},'CAMPANHAS PRONTAS'),
-          h('div',{key:'templates',className:'mt-3 grid gap-2 md:grid-cols-2'},s.templates.map(t=>h('button',{key:t.id,onClick:()=>this.setState({createTemplate:t.id,createName:t.name}),className:cx('rounded-xl border p-3 text-left',s.createTemplate===t.id?'border-[#ef3340] bg-[#ef3340]/10':'border-white/10 bg-[#10161e]')},[h('small',{key:'m',className:'text-[9px] font-black text-[#7e8795]'},`${t.mode==='solo'?'SOLO':`${t.players} JOGADORES`} · RANK ${t.rank}`),h('b',{key:'n',className:'mt-1 block text-sm'},t.name),h('span',{key:'s',className:'mt-1 block text-[10px] leading-4 text-[#7b8593]'},t.subtitle||t.summary)]))),
-          selectedTemplate?h('div',{key:'form',className:'mt-4 grid gap-3 sm:grid-cols-2'},[h('input',{key:'n',value:s.createName,onChange:e=>this.setState({createName:e.target.value}),placeholder:'Nome da campanha',className:'min-h-11 rounded-xl border border-white/10 bg-black/20 px-3 outline-none'}),h('input',{key:'p',type:'password',value:s.createPassword,onChange:e=>this.setState({createPassword:e.target.value}),placeholder:'Senha do Mestre',className:'min-h-11 rounded-xl border border-white/10 bg-black/20 px-3 outline-none'}),h(Button,{key:'b',primary:true,onClick:()=>this.createCampaign(),className:'sm:col-span-2'},'CRIAR MESA')]):null
+        s.createOpen?h(Card,{key:'createbox',className:'mt-5 overflow-hidden'},[
+          h('div',{key:'ch',className:'border-b border-white/10 p-4 sm:p-5'},[h(TinyLabel,{key:'l'},'NOVA CAMPANHA'),h('h2',{key:'h',className:'mt-1 text-xl font-black'},'Monte sua mesa'),h('p',{key:'p',className:'mt-1 text-xs leading-5 text-[#7e8997]'},'Comece vazia ou use um modelo. Depois escolha exatamente quais heróis e vilões farão parte da campanha.')]),
+          h('div',{key:'body',className:'space-y-5 p-4 sm:p-5'},[
+            h('div',{key:'base'},[h(TinyLabel,{key:'l'},'1 · BASE DA CAMPANHA'),h('div',{key:'g',className:'mt-2 grid gap-2 md:grid-cols-2 xl:grid-cols-3'},[
+              h('button',{key:'blank',type:'button',onClick:()=>this.chooseCreationBase(''),className:cx('rounded-xl border p-3 text-left',s.createMode==='blank'?'border-[#ef3340] bg-[#ef3340]/10':'border-white/10 bg-[#10161e]')},[h('small',{key:'m',className:'text-[9px] font-black text-[#7e8795]'},'DO ZERO'),h('b',{key:'n',className:'mt-1 block text-sm'},'Campanha vazia'),h('span',{key:'s',className:'mt-1 block text-[10px] leading-4 text-[#7b8593]'},'Você escolhe os personagens e configura o restante depois.')]),
+              ...s.templates.map(t=>h('button',{key:t.id,type:'button',onClick:()=>this.chooseCreationBase(t.id),className:cx('rounded-xl border p-3 text-left',s.createMode==='template'&&s.createTemplate===t.id?'border-[#ef3340] bg-[#ef3340]/10':'border-white/10 bg-[#10161e]')},[h('small',{key:'m',className:'text-[9px] font-black text-[#7e8795]'},`${t.mode==='solo'?'SOLO':`${t.players||0} JOGADORES`} · RANK ${t.rank||4}`),h('b',{key:'n',className:'mt-1 block text-sm'},t.name),h('span',{key:'s',className:'mt-1 block text-[10px] leading-4 text-[#7b8593]'},t.subtitle||t.summary||'Modelo de campanha')]))
+            ])]),
+            h('div',{key:'details',className:'grid gap-3 sm:grid-cols-2'},[h('label',{key:'n',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'2 · NOME'),h('input',{key:'i',value:s.createName,onChange:e=>this.setState({createName:e.target.value}),placeholder:'Nome da campanha',className:'min-h-11 rounded-xl border border-white/10 bg-black/20 px-3 outline-none focus:border-[#ef3340]/60'})]),h('label',{key:'p',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'SENHA DO MESTRE'),h('input',{key:'i',type:'password',value:s.createPassword,onChange:e=>this.setState({createPassword:e.target.value}),placeholder:'Senha do Mestre',className:'min-h-11 rounded-xl border border-white/10 bg-black/20 px-3 outline-none focus:border-[#ef3340]/60'})])]),
+            h('div',{key:'roster'},[h(TinyLabel,{key:'l'},'3 · PERSONAGENS'),h('div',{key:'cards',className:'mt-2 grid gap-3 md:grid-cols-2'},[
+              h('button',{key:'heroes',type:'button',onClick:()=>this.setState({createRosterKind:s.createRosterKind==='hero'?'':'hero',createRosterSearch:''}),className:cx('rounded-xl border p-4 text-left',s.createRosterKind==='hero'?'border-[#ef3340] bg-[#ef3340]/8':'border-white/10 bg-[#0e141c]')},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('b',{key:'n'},'Heróis'),h('span',{key:'c',className:'rounded-full border border-white/10 px-2 py-1 text-[10px] font-black'},s.createHeroIds.length)]),h('p',{key:'p',className:'mt-1 text-xs text-[#788392]'},'Clique para adicionar ou remover heróis.'),h('div',{key:'sel',className:'mt-3 flex flex-wrap gap-1'},selectedNames('hero',s.createHeroIds).slice(0,6).map(x=>h('span',{key:x.id,className:'rounded-md bg-white/[.05] px-2 py-1 text-[9px]'},x.n)).concat(s.createHeroIds.length>6?[h('span',{key:'more',className:'rounded-md bg-white/[.05] px-2 py-1 text-[9px]'},`+${s.createHeroIds.length-6}`)]:[]))]),
+              h('button',{key:'villains',type:'button',onClick:()=>this.setState({createRosterKind:s.createRosterKind==='villain'?'':'villain',createRosterSearch:''}),className:cx('rounded-xl border p-4 text-left',s.createRosterKind==='villain'?'border-[#ef3340] bg-[#ef3340]/8':'border-white/10 bg-[#0e141c]')},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('b',{key:'n'},'Vilões'),h('span',{key:'c',className:'rounded-full border border-white/10 px-2 py-1 text-[10px] font-black'},s.createVillainIds.length)]),h('p',{key:'p',className:'mt-1 text-xs text-[#788392]'},'Clique para definir as ameaças da campanha.'),h('div',{key:'sel',className:'mt-3 flex flex-wrap gap-1'},selectedNames('villain',s.createVillainIds).slice(0,6).map(x=>h('span',{key:x.id,className:'rounded-md bg-white/[.05] px-2 py-1 text-[9px]'},x.n)).concat(s.createVillainIds.length>6?[h('span',{key:'more',className:'rounded-md bg-white/[.05] px-2 py-1 text-[9px]'},`+${s.createVillainIds.length-6}`)]:[]))])
+            ]),
+            rosterKind?h('div',{key:'picker',className:'mt-3 rounded-xl border border-white/10 bg-black/15 p-3'},[h('div',{key:'head',className:'flex flex-wrap items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},rosterKind==='hero'?'ESCOLHER HERÓIS':'ESCOLHER VILÕES'),h('span',{key:'n',className:'mt-1 block text-xs text-[#7d8795]'},`${selectedIds.length} selecionado${selectedIds.length===1?'':'s'}`)]),h('input',{key:'search',value:s.createRosterSearch,onChange:e=>this.setState({createRosterSearch:e.target.value}),placeholder:'Buscar personagem...',className:'min-h-10 w-full rounded-lg border border-white/10 bg-[#0c1118] px-3 text-sm outline-none sm:w-72'})]),h('div',{key:'grid',className:'mt-3 grid max-h-[330px] gap-2 overflow-auto sm:grid-cols-2 lg:grid-cols-3'},rosterFiltered.map(item=>{const active=selectedIds.includes(item.id);return h('button',{key:item.id,type:'button',onClick:()=>this.toggleCreationCharacter(rosterKind,item.id),className:cx('flex items-center gap-3 rounded-xl border p-2 text-left',active?'border-emerald-700/60 bg-emerald-950/20':'border-white/10 bg-[#111720] hover:border-white/20')},[h(Portrait,{key:'p',entity:item,size:'sm'}),h('div',{key:'t',className:'min-w-0 flex-1'},[h('b',{key:'n',className:'block truncate text-xs'},item.n),h('small',{key:'r',className:'block truncate text-[9px] text-[#75808f]'},item.r||`Rank ${item.rank||4}`)]),h('span',{key:'c',className:cx('grid h-6 w-6 shrink-0 place-items-center rounded-full border text-[10px] font-black',active?'border-emerald-500 text-emerald-400':'border-white/15 text-[#667180]')},active?'✓':'+')]);}))]):null
+            ]),
+            h('div',{key:'finish',className:'flex flex-col gap-2 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between'},[h('p',{key:'p',className:'text-xs text-[#7d8795]'},`${s.createHeroIds.length} herói${s.createHeroIds.length===1?'':'s'} · ${s.createVillainIds.length} vilão${s.createVillainIds.length===1?'':'ões'}`),h(Button,{key:'b',primary:true,onClick:()=>this.createCampaign(),className:'sm:min-w-52'},'CRIAR MESA')])
+          ])
         ]):null
       ]));
     }
@@ -556,19 +799,39 @@
         isMaster?h(InitiativePanel,{key:'init',initiative:d.initiative||[],choices:[...(d.heroes||[]),...(d.villains||[]),...Object.values(MINIONS)],onAdd:id=>this.initAdd(id),onRemove:id=>this.initRemove(id),onRoll:id=>this.initRoll(id),onRollAll:()=>this.initRollAll(),lastRoll:s.initiativeRoll,animating:s.initiativeAnimating}):null,
         identityPanel,
         h(ActionCenter,{key:'act',entity:actorItem?.entity||entity,category:s.category,onCategory:category=>this.setState({category,power:'',roll:null}),onRoll:(a,c)=>this.runAction(a,c),roll:s.roll,animating:s.rollAnimating,onEdge:i=>this.useEdge(i),onFinalize:()=>this.finalizeRoll(),tn:s.tn,onTN:tn=>this.updateTN(tn),power:s.power,onPower:power=>this.setState({power,roll:null}),edge:s.edge,trouble:s.trouble,onEdgeChange:edge=>this.setState({edge}),onTroubleChange:trouble=>this.setState({trouble})}),
-        h('div',{key:'board'},h(Board,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:s.profile.role,heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',isMaster),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode})})),
+        h('div',{key:'board'},h(MemoBoard,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:s.profile.role,heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',isMaster),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),moving:s.scenarioMoveBusy})),
         isMaster?h(RollHistory,{key:'hist',rows:d.actionHistory||[]}):null
       ]);
     }
 
     renderRoster(kind){
-      const items=kind==='hero'?this.state.data.heroes:this.state.data.villains;
-      return h('div',null,[h(TinyLabel,{key:'s'},kind==='hero'?'DOSSIÊS':'AMEAÇAS'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},kind==='hero'?'Heróis':'Vilões'),h('div',{key:'g',className:'mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3'},items.map(entity=>h(Card,{key:entity.id,className:'overflow-hidden'},h('button',{onClick:()=>this.openSheet(entity,kind),className:'flex w-full items-center gap-4 p-4 text-left'},[h(Portrait,{key:'p',entity,size:'md'}),h('div',{key:'t',className:'min-w-0 flex-1'},[h(TinyLabel,{key:'l'},kind==='hero'?'HERÓI':entity.tier||'VILÃO'),h('b',{key:'n',className:'mt-1 block truncate text-base'},entity.n),h('span',{key:'r',className:'block truncate text-xs text-[#7c8694]'},entity.r||entity.role||''),h('small',{key:'v',className:'mt-2 block text-[10px] text-[#8c95a2]'},`HP ${entity.currentHealth??entity.maxHealth}/${entity.maxHealth} · FO ${entity.currentFocus??entity.maxFocus}/${entity.maxFocus}`)])]))))]);
+      const items=kind==='hero'?this.state.data.heroes:this.state.data.villains,isMaster=this.state.profile?.role==='master';
+      return h('div',{className:'space-y-5'},[
+        h('div',{key:'head',className:'flex flex-wrap items-end justify-between gap-3'},[
+          h('div',{key:'t'},[h(TinyLabel,{key:'s'},kind==='hero'?'DOSSIÊS':'AMEAÇAS'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},kind==='hero'?'Heróis':'Vilões'),h('p',{key:'p',className:'mt-1 text-sm text-[#7d8795]'},isMaster?'Gerencie os personagens que pertencem a esta campanha.':'Personagens disponíveis nesta campanha.')]),
+          isMaster?h(Button,{key:'add',primary:true,onClick:()=>this.setState({rosterPicker:kind})},`+ ADICIONAR ${kind==='hero'?'HERÓI':'VILÃO'}`):null
+        ]),
+        h('div',{key:'g',className:'grid gap-3 sm:grid-cols-2 xl:grid-cols-3'},items.length?items.map(entity=>h(Card,{key:entity.id,className:'overflow-hidden'},[
+          h('button',{key:'open',onClick:()=>this.openSheet(entity,kind),className:'flex w-full items-center gap-4 p-4 text-left'},[h(Portrait,{key:'p',entity,size:'md'}),h('div',{key:'t',className:'min-w-0 flex-1'},[h(TinyLabel,{key:'l'},kind==='hero'?'HERÓI':entity.tier||'VILÃO'),h('b',{key:'n',className:'mt-1 block truncate text-base'},entity.n),h('span',{key:'r',className:'block truncate text-xs text-[#7c8694]'},entity.r||entity.role||''),h('small',{key:'v',className:'mt-2 block text-[10px] text-[#8c95a2]'},`HP ${entity.currentHealth??entity.maxHealth}/${entity.maxHealth} · FO ${entity.currentFocus??entity.maxFocus}/${entity.maxFocus}`)])]),
+          isMaster?h('div',{key:'a',className:'flex gap-2 border-t border-white/5 p-2'},[h(Button,{key:'e',onClick:()=>this.openCharacterEditor(kind,entity),className:'min-h-9 flex-1 py-1'},'EDITAR'),h(Button,{key:'r',danger:true,onClick:()=>this.removeRosterCharacter(kind,entity),className:'min-h-9 px-3 py-1'},'REMOVER')]):null
+        ])):h(Card,{className:'p-8 text-center text-sm text-[#74808f]'},isMaster?`Nenhum ${kind==='hero'?'herói':'vilão'} nesta campanha. Use o botão Adicionar.`:'Nenhum personagem disponível.'))
+      ]);
     }
-    renderCampaign(){ const c=this.state.data.campaignContent||{};const sessions=c.sessions||[];return h('div',null,[h(TinyLabel,{key:'s'},'CAMPANHA'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},c.title||this.state.selectedCampaign?.name||'Campanha'),h('p',{key:'p',className:'mt-2 max-w-3xl text-sm leading-6 text-[#8b95a3]'},c.summary||c.subtitle||''),h('div',{key:'m',className:'mt-4 flex flex-wrap gap-2'},[c.rank&&h('span',{key:'r',className:'rounded-lg border border-white/10 px-3 py-2 text-xs'},`RANK ${c.rank}`),c.mode&&h('span',{key:'o',className:'rounded-lg border border-white/10 px-3 py-2 text-xs'},c.mode==='solo'?'SOLO':'GRUPO'),c.campaignPdf&&h('a',{key:'pdf',href:c.campaignPdf,target:'_blank',rel:'noopener',className:'rounded-lg border border-[#ef3340]/40 bg-[#ef3340]/10 px-3 py-2 text-xs font-black'},'ABRIR PDF')]),h('div',{key:'list',className:'mt-6 space-y-2'},sessions.map((session,i)=>h(Card,{key:session.id||i,className:'p-4'},[h(TinyLabel,{key:'i'},session.id||String(i+1).padStart(2,'0')),h('b',{key:'t',className:'mt-1 block'},session.title),h('p',{key:'p',className:'mt-2 text-sm leading-6 text-[#858f9d]'},session.text)]))) ]); }
+    renderCampaign(){
+      const s=this.state,d=s.data,c=d.campaignContent||{},sessions=c.sessions||[],isMaster=s.profile?.role==='master';
+      if(isMaster&&s.campaignEditOpen)return h(CampaignEditor,{content:c,campaign:s.selectedCampaign,heroes:d.heroes||[],villains:d.villains||[],saving:s.campaignSaving,onSave:content=>this.saveCampaignContent(content),onCancel:()=>this.setState({campaignEditOpen:false}),onAddHero:()=>this.setState({rosterPicker:'hero'}),onAddVillain:()=>this.setState({rosterPicker:'villain'}),onEditCharacter:(kind,entity)=>this.openCharacterEditor(kind,entity),onRemoveCharacter:(kind,entity)=>this.removeRosterCharacter(kind,entity),onUploadPdf:file=>this.uploadCampaignPdf(file)});
+      const rosterBlock=(kind,items)=>h(Card,{className:'p-4'},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},kind==='hero'?'HERÓIS':'VILÕES'),h('b',{key:'n',className:'mt-1 block text-sm'},`${items.length} na campanha`)]),isMaster?h(Button,{key:'a',onClick:()=>this.setState({campaignEditOpen:true}),className:'min-h-8 px-2 py-1'},'GERENCIAR'):null]),h('div',{key:'g',className:'mt-3 grid gap-2 sm:grid-cols-2'},items.length?items.map(entity=>h('button',{key:entity.id,onClick:()=>this.openSheet(entity,kind),className:'flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 p-2 text-left hover:border-white/20'},[h(Portrait,{key:'p',entity,size:'sm'}),h('div',{key:'t',className:'min-w-0'},[h('b',{key:'n',className:'block truncate text-xs'},entity.n),h('small',{key:'r',className:'block truncate text-[9px] text-[#74808f]'},entity.r||`Rank ${entity.rank||4}`)])])):h('p',{className:'py-4 text-center text-xs text-[#74808f]'},'Nenhum personagem.'))]);
+      return h('div',{className:'space-y-5'},[
+        h('div',{key:'head',className:'flex flex-wrap items-end justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'s'},'CAMPANHA'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},c.title||s.selectedCampaign?.name||'Campanha'),h('p',{key:'p',className:'mt-2 max-w-3xl text-sm leading-6 text-[#8b95a3]'},c.summary||c.subtitle||'')]),isMaster?h(Button,{key:'e',primary:true,onClick:()=>this.setState({campaignEditOpen:true})},'EDITAR CAMPANHA'):null]),
+        h('div',{key:'m',className:'flex flex-wrap gap-2'},[c.rank&&h('span',{key:'r',className:'rounded-lg border border-white/10 px-3 py-2 text-xs'},`RANK ${c.rank}`),c.mode&&h('span',{key:'o',className:'rounded-lg border border-white/10 px-3 py-2 text-xs'},c.mode==='solo'?'SOLO':'GRUPO'),s.selectedCampaign?.code&&h('span',{key:'c',className:'rounded-lg border border-white/10 px-3 py-2 text-xs'},`CÓDIGO ${s.selectedCampaign.code}`),c.campaignPdf&&h('a',{key:'pdf',href:c.campaignPdf,target:'_blank',rel:'noopener',className:'rounded-lg border border-[#ef3340]/40 bg-[#ef3340]/10 px-3 py-2 text-xs font-black'},'ABRIR PDF')]),
+        c.editorText?h(Card,{key:'txt',className:'p-4 sm:p-5'},[h(TinyLabel,{key:'l'},'NOTAS DA CAMPANHA'),h('p',{key:'p',className:'mt-2 whitespace-pre-wrap text-sm leading-6 text-[#a0a9b6]'},c.editorText)]):null,
+        h('div',{key:'roster',className:'grid gap-4 xl:grid-cols-2'},[rosterBlock('hero',d.heroes||[]),rosterBlock('villain',d.villains||[])]),
+        h('div',{key:'sessions'},[h('div',{key:'h',className:'flex items-center justify-between'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'SESSÕES'),h('b',{key:'b',className:'mt-1 block'},'Estrutura da campanha')])]),h('div',{key:'list',className:'mt-3 space-y-2'},sessions.length?sessions.map((session,i)=>h(Card,{key:session.id||i,className:'p-4'},[h(TinyLabel,{key:'i'},session.id||String(i+1).padStart(2,'0')),h('b',{key:'t',className:'mt-1 block'},session.title),h('p',{key:'p',className:'mt-2 whitespace-pre-wrap text-sm leading-6 text-[#858f9d]'},session.text)])):h(Card,{className:'p-6 text-center text-sm text-[#74808f]'},'Nenhuma sessão cadastrada.'))])
+      ]);
+    }
     renderScenarioPage(){
-      const s=this.state,d=s.data;if(s.profile.role!=='master')return h('div',{className:'space-y-4'},[h('section',{key:'h'},[h(TinyLabel,{key:'s'},'CENÁRIO'),h('h1',{key:'t',className:'mt-1 text-3xl font-black'},'Movimentação'),h('p',{key:'p',className:'mt-1 text-sm text-[#7f8997]'},'As casas verdes mostram exatamente onde seu personagem pode chegar.')]),h(Board,{key:'b',scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:'player',heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',false),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode})})]);
-      return h(ScenarioBuilder,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',true),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),tool:s.scenarioTool,onTool:scenarioTool=>this.setState({scenarioTool}),preset:s.scenarioPreset,onPreset:scenarioPreset=>this.setState({scenarioPreset}),onApplyPreset:()=>this.applyScenarioPreset(),onGenerate:()=>this.generateScenario(),onClear:()=>this.clearScenarioMap(),onResize:value=>this.resizeScenario(value),onEnvironment:value=>this.setScenarioEnvironment(value),pieceChoice:s.scenarioPieceChoice,onPieceChoice:scenarioPieceChoice=>this.setState({scenarioPieceChoice}),qty:s.scenarioQty,onQty:scenarioQty=>this.setState({scenarioQty}),onAddPieces:()=>this.addScenarioPieces(),onEditCell:(x,y,tool,piece)=>this.editScenarioCell(x,y,tool,piece),onRemovePiece:id=>this.removeScenarioPiece(id)});
+      const s=this.state,d=s.data;if(s.profile.role!=='master')return h('div',{className:'space-y-4'},[h('section',{key:'h'},[h(TinyLabel,{key:'s'},'CENÁRIO'),h('h1',{key:'t',className:'mt-1 text-3xl font-black'},'Movimentação'),h('p',{key:'p',className:'mt-1 text-sm text-[#7f8997]'},'As casas verdes mostram exatamente onde seu personagem pode chegar.')]),h(MemoBoard,{key:'b',scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:'player',heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',false),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),moving:s.scenarioMoveBusy})]);
+      return h(ScenarioBuilder,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',true),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),tool:s.scenarioTool,onTool:scenarioTool=>this.setState({scenarioTool}),preset:s.scenarioPreset,onPreset:scenarioPreset=>this.setState({scenarioPreset}),onApplyPreset:()=>this.applyScenarioPreset(),onGenerate:()=>this.generateScenario(),onClear:()=>this.clearScenarioMap(),onResize:value=>this.resizeScenario(value),onEnvironment:value=>this.setScenarioEnvironment(value),pieceChoice:s.scenarioPieceChoice,onPieceChoice:scenarioPieceChoice=>this.setState({scenarioPieceChoice}),qty:s.scenarioQty,onQty:scenarioQty=>this.setState({scenarioQty}),onAddPieces:()=>this.addScenarioPieces(),onEditCell:(x,y,tool,piece)=>this.editScenarioCell(x,y,tool,piece),onRemovePiece:id=>this.removeScenarioPiece(id),moving:s.scenarioMoveBusy});
     }
 
     renderRules(){return h('div',null,[h(TinyLabel,{key:'s'},'REFERÊNCIA RÁPIDA'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},'Regras'),h('div',{key:'g',className:'mt-5 grid gap-3 md:grid-cols-2'},[
@@ -584,6 +847,8 @@
         h('div',{key:'content',className:'mx-auto max-w-[1500px] p-4 sm:p-6'},this.renderPage())
       ]),
       s.sheet?h(SheetModal,{key:'sheet',entity:s.sheet.entity,kind:s.sheet.kind,onClose:()=>this.setState({sheet:null})}):null,
+      s.rosterPicker?h(CharacterPickerModal,{key:'picker',kind:s.rosterPicker,items:this.creationLibrary(s.rosterPicker),existing:new Set((s.rosterPicker==='hero'?s.data.heroes:s.data.villains).map(item=>item.id)),onAdd:id=>this.addRosterCharacter(s.rosterPicker,id),onCreate:()=>this.openNewCharacter(s.rosterPicker),onClose:()=>this.setState({rosterPicker:''})}):null,
+      s.characterEditor?h(CharacterEditorModal,{key:'editor',kind:s.characterEditor.kind,entity:s.characterEditor.entity,isNew:s.characterEditor.isNew,onSave:entity=>this.saveCharacterEditor(entity),onClose:()=>this.setState({characterEditor:null})}):null,
       s.toast?h('div',{key:'toast',className:'fixed bottom-5 right-5 z-[60] max-w-sm rounded-xl border border-white/10 bg-[#151b24] px-4 py-3 text-sm shadow-2xl'},s.toast):null
     ]);}
     render(){if(this.state.screen==='loading')return h('div',{className:'min-h-screen bg-[#080b10] text-white grid place-items-center'},h('div',{className:'text-center'},[h('div',{key:'a',className:'mx-auto grid h-14 w-14 place-items-center border border-[#ef3340] text-2xl font-black'},'A'),h('p',{key:'p',className:'mt-4 text-sm text-[#7d8795]'},'Carregando Arachne…')]));return this.state.screen==='login'?this.renderLogin():this.renderApp();}
