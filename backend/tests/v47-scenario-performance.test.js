@@ -14,7 +14,7 @@ test('v47 remove os números de custo das casas alcançáveis',()=>{
 });
 
 test('v47 usa índices O(1) para peças do grid e fila sem Array.shift',()=>{
-  assert.match(app,/const pieceByCell=React\.useMemo/);
+  assert.match(app,/const pieceByCell=\(\(\)=>\{/);
   assert.match(app,/pieceByCell\.get\(key\)/);
   assert.match(app,/let head=0/);
   assert.match(app,/queue\[head\+\+\]/);
@@ -29,7 +29,7 @@ test('v47 aplica movimento otimista e trava cliques concorrentes',()=>{
 });
 
 test('v47 edita cenário com persistência agrupada e carrega o mapa de forma diferida',()=>{
-  assert.match(app,/function DeferredBoard/);
+  assert.match(app,/class DeferredBoard extends React\.Component/);
   assert.match(app,/requestAnimationFrame/);
   assert.match(app,/queueScenarioSave/);
   assert.match(app,/setTimeout\(async\(\)=>\{/);

@@ -19,7 +19,7 @@ test('v48 restaura criação de campanha com seleção de heróis e vilões',()=
 });
 
 test('v48 restaura edição completa da campanha e gerenciamento de roster',()=>{
-  assert.match(app,/function CampaignEditor/);
+  assert.match(app,/class CampaignEditor extends React\.Component/);
   assert.match(app,/EDITAR CAMPANHA/);
   assert.match(app,/\+ ADICIONAR/);
   assert.match(app,/CharacterPickerModal/);
@@ -39,7 +39,8 @@ test('v48 edição e remoção de personagens mantém cenário coerente',()=>{
 });
 
 test('v48 cenário usa board memoizado, carga no próximo frame e edição agrupada',()=>{
-  assert.match(app,/const MemoBoard=React\.memo/);
+  assert.match(app,/class MemoBoard extends React\.Component/);
+  assert.match(app,/shouldComponentUpdate\(next\)/);
   assert.match(app,/requestAnimationFrame/);
   assert.match(app,/queueScenarioSave\(next\)/);
   assert.match(app,/const occupied=new Set/);
