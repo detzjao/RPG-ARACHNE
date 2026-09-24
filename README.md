@@ -186,21 +186,15 @@ RPG-ARACHNE/
 - **Node.js 22.5 ou superior**
 - npm
 
-### 1. Configurar o backend
+### 1. Configurar o projeto
 
-Entre na pasta:
-
-```bash
-cd backend
-```
-
-Copie o arquivo de exemplo:
+Os comandos principais agora podem ser executados diretamente na raiz do projeto. Primeiro, crie o arquivo de ambiente do backend:
 
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
 ```
 
-No Windows, você também pode simplesmente duplicar `.env.example` e renomear a cópia para `.env`.
+No Windows, você também pode simplesmente duplicar `backend/.env.example` e renomear a cópia para `backend/.env`.
 
 Para executar localmente com SQLite, a configuração básica é:
 
@@ -213,14 +207,14 @@ MASTER_PASSWORD=troque-esta-senha
 SESSION_SECRET=troque-por-uma-chave-longa-e-aleatoria
 ```
 
-Instale as dependências e inicie:
+Na raiz de `RPG-ARACHNE`, instale as dependências e inicie:
 
 ```bash
 npm install
 npm start
 ```
 
-Com `SERVE_FRONTEND=true`, o próprio backend serve a aplicação web.
+O `package.json` da raiz encaminha o comando para o backend. Com `SERVE_FRONTEND=true`, o próprio backend serve a aplicação web.
 
 Abra:
 

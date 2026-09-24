@@ -3,6 +3,10 @@
   const React = window.React;
   const ReactDOM = window.ReactDOM;
   const API = window.ArachneAPI2;
+  const showBootError=(message)=>{const root=document.getElementById('root');if(!root||root.dataset.arachneReady==='1')return;root.innerHTML=`<div style="min-height:100vh;background:#080b10;color:white;display:grid;place-items:center;font-family:system-ui;padding:24px;text-align:center"><div style="max-width:620px"><b style="font-size:22px">Arachne não conseguiu iniciar</b><p style="color:#9aa4b2;line-height:1.6">${String(message||'Erro inesperado ao carregar o frontend.').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</p><p style="color:#657080;font-size:13px">Reinicie com npm start e recarregue a página.</p></div></div>`;};
+  window.addEventListener('error',event=>showBootError(event?.error?.message||event?.message));
+  window.addEventListener('unhandledrejection',event=>showBootError(event?.reason?.message||event?.reason));
+  if(!React||!ReactDOM){const root=document.getElementById('root');if(root)root.innerHTML='<div style="min-height:100vh;background:#080b10;color:white;display:grid;place-items:center;font-family:system-ui;padding:24px;text-align:center"><div><b style="font-size:22px">Arachne não conseguiu iniciar</b><p style="color:#9aa4b2">Recarregue a página. Se continuar, reinicie o servidor com npm start.</p></div></div>';return;}
   const h = React.createElement;
   const ABILITIES = ['Melee','Agility','Resilience','Vigilance','Ego','Logic'];
   const COMBAT = {
@@ -208,68 +212,82 @@
     const id=`${kind}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
     return {id,n:kind==='hero'?'Novo Herói':'Novo Vilão',r:'',rank:4,tier:kind==='hero'?'HERÓI':'AMEAÇA',image:'',pdf:'',role:'',origin:'',initiative:'+0',maxHealth:90,currentHealth:90,maxFocus:90,currentFocus:90,movement:{run:5,climb:3,swim:3,jump:3},speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3',abilities:{Melee:0,Agility:0,Resilience:0,Vigilance:0,Ego:0,Logic:0},traits:[],tags:kind==='hero'?['Heroic']:['Villainous'],powers:[]};
   }
-  function CharacterPickerModal({kind,items,existing,onAdd,onCreate,onClose}){
-    const [search,setSearch]=React.useState('');
-    const term=search.trim().toLocaleLowerCase('pt-BR');
+  function CharacterPickerModal({kind,items,existing,onAdd,onCreate,onClose,search='',onSearch}){
+    const term=String(search||'').trim().toLocaleLowerCase('pt-BR');
     const filtered=items.filter(item=>!term||`${item.n||''} ${item.r||''} ${item.role||''}`.toLocaleLowerCase('pt-BR').includes(term));
     return h('div',{className:'fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-[#0d1118] shadow-2xl'},[
       h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3 border-b border-white/10 p-4 sm:p-5'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'BIBLIOTECA'),h('h2',{key:'n',className:'mt-1 text-xl font-black'},`Adicionar ${kind==='hero'?'herói':'vilão'}`),h('p',{key:'p',className:'mt-1 text-xs text-[#7e8997]'},'Escolha um personagem já cadastrado ou crie uma ficha nova.')]),h(Button,{key:'x',onClick:onClose,className:'px-3'},'×')]),
-      h('div',{key:'search',className:'flex flex-wrap gap-2 border-b border-white/5 p-4'},[h('input',{key:'i',value:search,onChange:e=>setSearch(e.target.value),placeholder:'Buscar por nome...',autoFocus:true,className:'min-h-11 min-w-[220px] flex-1 rounded-xl border border-white/10 bg-black/30 px-4 text-sm outline-none focus:border-[#ef3340]/60'}),h(Button,{key:'new',primary:true,onClick:onCreate},'CRIAR DO ZERO')]),
+      h('div',{key:'search',className:'flex flex-wrap gap-2 border-b border-white/5 p-4'},[h('input',{key:'i',value:search,onChange:e=>onSearch&&onSearch(e.target.value),placeholder:'Buscar por nome...',autoFocus:true,className:'min-h-11 min-w-[220px] flex-1 rounded-xl border border-white/10 bg-black/30 px-4 text-sm outline-none focus:border-[#ef3340]/60'}),h(Button,{key:'new',primary:true,onClick:onCreate},'CRIAR DO ZERO')]),
       h('div',{key:'g',className:'grid max-h-[62vh] gap-2 overflow-auto p-4 sm:grid-cols-2 lg:grid-cols-3'},filtered.length?filtered.map(item=>{const used=existing.has(item.id);return h('button',{key:item.id,type:'button',disabled:used,onClick:()=>onAdd(item.id),className:cx('flex items-center gap-3 rounded-xl border p-3 text-left',used?'cursor-not-allowed border-white/5 bg-white/[.02] opacity-45':'border-white/10 bg-[#111720] hover:border-[#ef3340]/55')},[h(Portrait,{key:'p',entity:item,size:'sm'}),h('div',{key:'c',className:'min-w-0 flex-1'},[h('b',{key:'n',className:'block truncate text-xs'},item.n),h('small',{key:'r',className:'mt-1 block truncate text-[9px] text-[#778291]'},item.r||item.role||`Rank ${item.rank||4}`),used?h('span',{key:'u',className:'mt-1 block text-[8px] font-black text-emerald-400'},'JÁ NA CAMPANHA'):null])]);}):h('div',{className:'col-span-full py-10 text-center text-sm text-[#74808f]'},'Nenhum personagem encontrado.'))
     ]));
   }
-  function CharacterEditorModal({kind,entity,isNew,onSave,onClose}){
-    const [draft,setDraft]=React.useState(()=>JSON.parse(JSON.stringify(entity||blankCharacter(kind))));
-    const set=(key,value)=>setDraft(prev=>({...prev,[key]:value}));
-    const setAbility=(ability,value)=>setDraft(prev=>({...prev,abilities:{...(prev.abilities||{}),[ability]:clamp(value,-10,20)}}));
-    const setMove=(mode,value)=>setDraft(prev=>({...prev,movement:{...(prev.movement||{}),[mode]:clamp(value,0,99)}}));
-    const submit=()=>{const maxHealth=Math.max(0,Number(draft.maxHealth||0)),maxFocus=Math.max(0,Number(draft.maxFocus||0)),movement={...(draft.movement||{})};const speed=Object.entries(movement).filter(([,v])=>Number(v)>0).map(([k,v])=>`${MOVE_META[k]?.label||k} ${v}`).join(' · ');onSave({...draft,n:String(draft.n||'').trim()|| (kind==='hero'?'Novo Herói':'Novo Vilão'),r:String(draft.r||'').trim(),rank:clamp(draft.rank,1,6),tier:kind==='hero'?'HERÓI':(draft.tier||'AMEAÇA'),maxHealth,currentHealth:clamp(draft.currentHealth??maxHealth,0,maxHealth),maxFocus,currentFocus:clamp(draft.currentFocus??maxFocus,0,maxFocus),movement,speed,abilities:Object.fromEntries(ABILITIES.map(a=>[a,Number(draft.abilities?.[a]||0)])),powers:Array.isArray(draft.powers)?draft.powers:String(draft.powers||'').split(/\n/).map(x=>x.trim()).filter(Boolean),traits:Array.isArray(draft.traits)?draft.traits:String(draft.traits||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean),tags:Array.isArray(draft.tags)?draft.tags:String(draft.tags||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean)});};
-    const inputClass='min-h-10 w-full rounded-lg border border-white/10 bg-black/25 px-3 text-sm outline-none focus:border-[#ef3340]/60';
-    const listText=value=>Array.isArray(value)?value.join('\n'):String(value||'');
-    return h('div',{className:'fixed inset-0 z-[55] flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[94vh] w-full max-w-5xl overflow-auto rounded-2xl border border-white/10 bg-[#0d1118] p-4 shadow-2xl sm:p-6'},[
-      h('div',{key:'h',className:'flex items-start justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},isNew?'NOVA FICHA':'EDITAR FICHA'),h('h2',{key:'n',className:'mt-1 text-2xl font-black'},draft.n||'Personagem'),h('p',{key:'p',className:'mt-1 text-xs text-[#7c8796]'},'Campos essenciais usados pela Central, iniciativa e cenário.')]),h(Button,{key:'x',onClick:onClose,className:'px-3'},'×')]),
-      h('div',{key:'base',className:'mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[
-        ['Nome','n',draft.n,'text'],['Nome civil / descrição','r',draft.r,'text'],['Rank','rank',draft.rank,'number'],[kind==='hero'?'Função':'Tipo','tier',draft.tier||'', 'text']
-      ].map(([label,key,value,type])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',type,value,onChange:e=>set(key,type==='number'?Number(e.target.value):e.target.value),className:inputClass})]))),
-      h('div',{key:'meta',className:'mt-3 grid gap-3 sm:grid-cols-2'},[['Origem','origin',draft.origin||''],['Imagem (URL ou caminho)','image',draft.image||'']].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',value,onChange:e=>set(key,e.target.value),className:inputClass})]))),
-      h('div',{key:'vitals',className:'mt-5'},[h(TinyLabel,{key:'l'},'RECURSOS'),h('div',{key:'g',className:'mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[['Health máximo','maxHealth',draft.maxHealth],['Health atual','currentHealth',draft.currentHealth],['Focus máximo','maxFocus',draft.maxFocus],['Focus atual','currentFocus',draft.currentFocus]].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h('span',{key:'l',className:'text-[10px] text-[#8792a1]'},label),h('input',{key:'i',type:'number',min:0,value:value??0,onChange:e=>set(key,Number(e.target.value)),className:inputClass})])))]),
-      h('div',{key:'abilities',className:'mt-5'},[h(TinyLabel,{key:'l'},'ABILITIES'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'},ABILITIES.map(a=>h('label',{key:a,className:'rounded-xl border border-white/10 bg-[#111720] p-2'},[h('span',{key:'l',className:'block text-[9px] font-black text-[#8e98a6]'},a.toUpperCase()),h('input',{key:'i',type:'number',value:draft.abilities?.[a]??0,onChange:e=>setAbility(a,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
-      h('div',{key:'movement',className:'mt-5'},[h(TinyLabel,{key:'l'},'MOVIMENTO'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7'},['run','climb','swim','jump','flight','glide','swingline'].map(mode=>h('label',{key:mode,className:'rounded-xl border border-white/10 p-2'},[h('span',{key:'l',className:'block text-[9px] text-[#8d97a5]'},MOVE_META[mode]?.label||mode),h('input',{key:'i',type:'number',min:0,value:draft.movement?.[mode]??0,onChange:e=>setMove(mode,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
-      h('div',{key:'text',className:'mt-5 grid gap-3 lg:grid-cols-3'},[
-        ['Poderes (um por linha)','powers',listText(draft.powers)],['Traits (separados por vírgula)','traits',Array.isArray(draft.traits)?draft.traits.join(', '):String(draft.traits||'')],['Tags (separadas por vírgula)','tags',Array.isArray(draft.tags)?draft.tags.join(', '):String(draft.tags||'')]
-      ].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('textarea',{key:'i',rows:5,value,onChange:e=>set(key,e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none focus:border-[#ef3340]/60'})]))),
-      h('div',{key:'actions',className:'mt-5 flex justify-end gap-2'},[h(Button,{key:'c',onClick:onClose},'CANCELAR'),h(Button,{key:'s',primary:true,onClick:submit},'SALVAR FICHA')])
-    ]));
+  class CharacterEditorModal extends React.Component {
+    constructor(props){
+      super(props);
+      this.state={draft:JSON.parse(JSON.stringify(props.entity||blankCharacter(props.kind)))};
+    }
+    setField(key,value){this.setState(prev=>({draft:{...prev.draft,[key]:value}}));}
+    setAbility(ability,value){this.setState(prev=>({draft:{...prev.draft,abilities:{...(prev.draft.abilities||{}),[ability]:clamp(value,-10,20)}}}));}
+    setMove(mode,value){this.setState(prev=>({draft:{...prev.draft,movement:{...(prev.draft.movement||{}),[mode]:clamp(value,0,99)}}}));}
+    submit(){
+      const {kind,onSave}=this.props,draft=this.state.draft;
+      const maxHealth=Math.max(0,Number(draft.maxHealth||0)),maxFocus=Math.max(0,Number(draft.maxFocus||0)),movement={...(draft.movement||{})};
+      const speed=Object.entries(movement).filter(([,v])=>Number(v)>0).map(([k,v])=>`${MOVE_META[k]?.label||k} ${v}`).join(' · ');
+      onSave({...draft,n:String(draft.n||'').trim()||(kind==='hero'?'Novo Herói':'Novo Vilão'),r:String(draft.r||'').trim(),rank:clamp(draft.rank,1,6),tier:kind==='hero'?'HERÓI':(draft.tier||'AMEAÇA'),maxHealth,currentHealth:clamp(draft.currentHealth??maxHealth,0,maxHealth),maxFocus,currentFocus:clamp(draft.currentFocus??maxFocus,0,maxFocus),movement,speed,abilities:Object.fromEntries(ABILITIES.map(a=>[a,Number(draft.abilities?.[a]||0)])),powers:Array.isArray(draft.powers)?draft.powers:String(draft.powers||'').split(/\n/).map(x=>x.trim()).filter(Boolean),traits:Array.isArray(draft.traits)?draft.traits:String(draft.traits||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean),tags:Array.isArray(draft.tags)?draft.tags:String(draft.tags||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean)});
+    }
+    render(){
+      const {kind,isNew,onClose}=this.props,draft=this.state.draft;
+      const set=(key,value)=>this.setField(key,value),setAbility=(ability,value)=>this.setAbility(ability,value),setMove=(mode,value)=>this.setMove(mode,value);
+      const inputClass='min-h-10 w-full rounded-lg border border-white/10 bg-black/25 px-3 text-sm outline-none focus:border-[#ef3340]/60';
+      const listText=value=>Array.isArray(value)?value.join('\n'):String(value||'');
+      return h('div',{className:'fixed inset-0 z-[55] flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[94vh] w-full max-w-5xl overflow-auto rounded-2xl border border-white/10 bg-[#0d1118] p-4 shadow-2xl sm:p-6'},[
+        h('div',{key:'h',className:'flex items-start justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},isNew?'NOVA FICHA':'EDITAR FICHA'),h('h2',{key:'n',className:'mt-1 text-2xl font-black'},draft.n||'Personagem'),h('p',{key:'p',className:'mt-1 text-xs text-[#7c8796]'},'Campos essenciais usados pela Central, iniciativa e cenário.')]),h(Button,{key:'x',onClick:onClose,className:'px-3'},'×')]),
+        h('div',{key:'base',className:'mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[
+          ['Nome','n',draft.n,'text'],['Nome civil / descrição','r',draft.r,'text'],['Rank','rank',draft.rank,'number'],[kind==='hero'?'Função':'Tipo','tier',draft.tier||'','text']
+        ].map(([label,key,value,type])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',type,value,onChange:e=>set(key,type==='number'?Number(e.target.value):e.target.value),className:inputClass})]))),
+        h('div',{key:'meta',className:'mt-3 grid gap-3 sm:grid-cols-2'},[['Origem','origin',draft.origin||''],['Imagem (URL ou caminho)','image',draft.image||'']].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',value,onChange:e=>set(key,e.target.value),className:inputClass})]))),
+        h('div',{key:'vitals',className:'mt-5'},[h(TinyLabel,{key:'l'},'RECURSOS'),h('div',{key:'g',className:'mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[['Health máximo','maxHealth',draft.maxHealth],['Health atual','currentHealth',draft.currentHealth],['Focus máximo','maxFocus',draft.maxFocus],['Focus atual','currentFocus',draft.currentFocus]].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h('span',{key:'l',className:'text-[10px] text-[#8792a1]'},label),h('input',{key:'i',type:'number',min:0,value:value??0,onChange:e=>set(key,Number(e.target.value)),className:inputClass})])))]),
+        h('div',{key:'abilities',className:'mt-5'},[h(TinyLabel,{key:'l'},'ABILITIES'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'},ABILITIES.map(a=>h('label',{key:a,className:'rounded-xl border border-white/10 bg-[#111720] p-2'},[h('span',{key:'l',className:'block text-[9px] font-black text-[#8e98a6]'},a.toUpperCase()),h('input',{key:'i',type:'number',value:draft.abilities?.[a]??0,onChange:e=>setAbility(a,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
+        h('div',{key:'movement',className:'mt-5'},[h(TinyLabel,{key:'l'},'MOVIMENTO'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7'},['run','climb','swim','jump','flight','glide','swingline'].map(mode=>h('label',{key:mode,className:'rounded-xl border border-white/10 p-2'},[h('span',{key:'l',className:'block text-[9px] text-[#8d97a5]'},MOVE_META[mode]?.label||mode),h('input',{key:'i',type:'number',min:0,value:draft.movement?.[mode]??0,onChange:e=>setMove(mode,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
+        h('div',{key:'text',className:'mt-5 grid gap-3 lg:grid-cols-3'},[
+          ['Poderes (um por linha)','powers',listText(draft.powers)],['Traits (separados por vírgula)','traits',Array.isArray(draft.traits)?draft.traits.join(', '):String(draft.traits||'')],['Tags (separadas por vírgula)','tags',Array.isArray(draft.tags)?draft.tags.join(', '):String(draft.tags||'')]
+        ].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('textarea',{key:'i',rows:5,value,onChange:e=>set(key,e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none focus:border-[#ef3340]/60'})]))),
+        h('div',{key:'actions',className:'mt-5 flex justify-end gap-2'},[h(Button,{key:'c',onClick:onClose},'CANCELAR'),h(Button,{key:'s',primary:true,onClick:()=>this.submit()},'SALVAR FICHA')])
+      ]));
+    }
   }
-  function CampaignEditor({content,campaign,heroes,villains,onSave,onCancel,onAddHero,onAddVillain,onEditCharacter,onRemoveCharacter,onUploadPdf,saving=false}){
-    const [draft,setDraft]=React.useState(()=>({...content,sessions:(content?.sessions||[]).map(s=>({...s}))}));
-    const set=(key,value)=>setDraft(prev=>({...prev,[key]:value}));
-    const updateSession=(index,key,value)=>setDraft(prev=>({...prev,sessions:(prev.sessions||[]).map((row,i)=>i===index?{...row,[key]:value}:row)}));
-    const addSession=()=>setDraft(prev=>({...prev,sessions:[...(prev.sessions||[]),{id:String((prev.sessions?.length||0)+1).padStart(2,'0'),title:`Sessão ${(prev.sessions?.length||0)+1}`,text:''}]}));
-    const removeSession=index=>setDraft(prev=>({...prev,sessions:(prev.sessions||[]).filter((_,i)=>i!==index).map((row,i)=>({...row,id:String(i+1).padStart(2,'0')}))}));
-    const field='min-h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-sm outline-none focus:border-[#ef3340]/60';
-    const roster=(kind,items,onAdd)=>h(Card,{className:'p-4'},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},kind==='hero'?'HERÓIS':'VILÕES'),h('b',{key:'n',className:'mt-1 block text-sm'},`${items.length} na campanha`)]),h(Button,{key:'a',onClick:onAdd,className:'min-h-9 py-1'},'+ ADICIONAR')]),h('div',{key:'l',className:'mt-3 space-y-2'},items.length?items.map(entity=>h('div',{key:entity.id,className:'flex items-center gap-3 rounded-xl border border-white/8 bg-black/15 p-2'},[h(Portrait,{key:'p',entity,size:'sm'}),h('div',{key:'n',className:'min-w-0 flex-1'},[h('b',{key:'b',className:'block truncate text-xs'},entity.n),h('small',{key:'s',className:'block truncate text-[9px] text-[#7c8795]'},entity.r||`Rank ${entity.rank||4}`)]),h(Button,{key:'e',onClick:()=>onEditCharacter(kind,entity),className:'min-h-8 px-2 py-1'},'EDITAR'),h(Button,{key:'r',danger:true,onClick:()=>onRemoveCharacter(kind,entity),className:'min-h-8 px-2 py-1'},'×')])):h('div',{className:'rounded-xl border border-dashed border-white/10 p-5 text-center text-xs text-[#75808e]'},`Nenhum ${kind==='hero'?'herói':'vilão'} adicionado.`))]);
-    return h('div',{className:'space-y-4'},[
-      h(Card,{key:'head',className:'p-4 sm:p-5'},[h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},`CÓDIGO ${campaign?.code||'—'}`),h('h1',{key:'n',className:'mt-1 text-2xl font-black'},'Editar campanha'),h('p',{key:'p',className:'mt-1 text-xs text-[#7d8795]'},'Conteúdo, sessões e personagens ficam salvos na mesma campanha.')]),h(Button,{key:'x',onClick:onCancel},'VOLTAR')])]),
-      h('div',{key:'grid',className:'grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(340px,.8fr)]'},[
-        h(Card,{key:'content',className:'p-4 sm:p-5'},[
-          h(TinyLabel,{key:'l'},'CONTEÚDO'),
-          h('div',{key:'fields',className:'mt-3 grid gap-3 sm:grid-cols-2'},[
-            h('label',{key:'title',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'TÍTULO'),h('input',{key:'i',value:draft.title||'',onChange:e=>set('title',e.target.value),className:field})]),
-            h('label',{key:'sub',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'SUBTÍTULO'),h('input',{key:'i',value:draft.subtitle||'',onChange:e=>set('subtitle',e.target.value),className:field})]),
-            h('label',{key:'rank',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'RANK RECOMENDADO'),h('input',{key:'i',type:'number',min:1,max:6,value:draft.rank||4,onChange:e=>set('rank',clamp(e.target.value,1,6)),className:field})]),
-            h('label',{key:'sum',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'RESUMO'),h('textarea',{key:'i',rows:3,value:draft.summary||'',onChange:e=>set('summary',e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none focus:border-[#ef3340]/60'})]),
-            h('label',{key:'txt',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'TEXTO / NOTAS DA CAMPANHA'),h('textarea',{key:'i',rows:8,value:draft.editorText||'',onChange:e=>set('editorText',e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm leading-6 outline-none focus:border-[#ef3340]/60'})])
+  class CampaignEditor extends React.Component {
+    constructor(props){super(props);this.state={draft:{...(props.content||{}),sessions:(props.content?.sessions||[]).map(s=>({...s}))}};}
+    setField(key,value){this.setState(prev=>({draft:{...prev.draft,[key]:value}}));}
+    updateSession(index,key,value){this.setState(prev=>({draft:{...prev.draft,sessions:(prev.draft.sessions||[]).map((row,i)=>i===index?{...row,[key]:value}:row)}}));}
+    addSession(){this.setState(prev=>({draft:{...prev.draft,sessions:[...(prev.draft.sessions||[]),{id:String((prev.draft.sessions?.length||0)+1).padStart(2,'0'),title:`Sessão ${(prev.draft.sessions?.length||0)+1}`,text:''}]}}));}
+    removeSession(index){this.setState(prev=>({draft:{...prev.draft,sessions:(prev.draft.sessions||[]).filter((_,i)=>i!==index).map((row,i)=>({...row,id:String(i+1).padStart(2,'0')}))}}));}
+    render(){
+      const {campaign,heroes,villains,onSave,onCancel,onAddHero,onAddVillain,onEditCharacter,onRemoveCharacter,onUploadPdf,saving=false}=this.props,draft=this.state.draft;
+      const set=(key,value)=>this.setField(key,value),updateSession=(index,key,value)=>this.updateSession(index,key,value),addSession=()=>this.addSession(),removeSession=index=>this.removeSession(index);
+      const field='min-h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-sm outline-none focus:border-[#ef3340]/60';
+      const roster=(kind,items,onAdd)=>h(Card,{className:'p-4'},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},kind==='hero'?'HERÓIS':'VILÕES'),h('b',{key:'n',className:'mt-1 block text-sm'},`${items.length} na campanha`)]),h(Button,{key:'a',onClick:onAdd,className:'min-h-9 py-1'},'+ ADICIONAR')]),h('div',{key:'l',className:'mt-3 space-y-2'},items.length?items.map(entity=>h('div',{key:entity.id,className:'flex items-center gap-3 rounded-xl border border-white/8 bg-black/15 p-2'},[h(Portrait,{key:'p',entity,size:'sm'}),h('div',{key:'n',className:'min-w-0 flex-1'},[h('b',{key:'b',className:'block truncate text-xs'},entity.n),h('small',{key:'s',className:'block truncate text-[9px] text-[#7c8795]'},entity.r||`Rank ${entity.rank||4}`)]),h(Button,{key:'e',onClick:()=>onEditCharacter(kind,entity),className:'min-h-8 px-2 py-1'},'EDITAR'),h(Button,{key:'r',danger:true,onClick:()=>onRemoveCharacter(kind,entity),className:'min-h-8 px-2 py-1'},'×')])):h('div',{className:'rounded-xl border border-dashed border-white/10 p-5 text-center text-xs text-[#75808e]'},`Nenhum ${kind==='hero'?'herói':'vilão'} adicionado.`))]);
+      return h('div',{className:'space-y-4'},[
+        h(Card,{key:'head',className:'p-4 sm:p-5'},[h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},`CÓDIGO ${campaign?.code||'—'}`),h('h1',{key:'n',className:'mt-1 text-2xl font-black'},'Editar campanha'),h('p',{key:'p',className:'mt-1 text-xs text-[#7d8795]'},'Conteúdo, sessões e personagens ficam salvos na mesma campanha.')]),h(Button,{key:'x',onClick:onCancel},'VOLTAR')])]),
+        h('div',{key:'grid',className:'grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(340px,.8fr)]'},[
+          h(Card,{key:'content',className:'p-4 sm:p-5'},[
+            h(TinyLabel,{key:'l'},'CONTEÚDO'),
+            h('div',{key:'fields',className:'mt-3 grid gap-3 sm:grid-cols-2'},[
+              h('label',{key:'title',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'TÍTULO'),h('input',{key:'i',value:draft.title||'',onChange:e=>set('title',e.target.value),className:field})]),
+              h('label',{key:'sub',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'SUBTÍTULO'),h('input',{key:'i',value:draft.subtitle||'',onChange:e=>set('subtitle',e.target.value),className:field})]),
+              h('label',{key:'rank',className:'grid gap-1'},[h(TinyLabel,{key:'l'},'RANK RECOMENDADO'),h('input',{key:'i',type:'number',min:1,max:6,value:draft.rank||4,onChange:e=>set('rank',clamp(e.target.value,1,6)),className:field})]),
+              h('label',{key:'sum',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'RESUMO'),h('textarea',{key:'i',rows:3,value:draft.summary||'',onChange:e=>set('summary',e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none focus:border-[#ef3340]/60'})]),
+              h('label',{key:'txt',className:'grid gap-1 sm:col-span-2'},[h(TinyLabel,{key:'l'},'TEXTO / NOTAS DA CAMPANHA'),h('textarea',{key:'i',rows:8,value:draft.editorText||'',onChange:e=>set('editorText',e.target.value),className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm leading-6 outline-none focus:border-[#ef3340]/60'})])
+            ]),
+            h('div',{key:'pdf',className:'mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-black/15 p-3'},[h('label',{key:'u',className:'inline-flex min-h-10 cursor-pointer items-center rounded-xl border border-white/10 bg-[#171d27] px-3 text-xs font-black'},['ENVIAR PDF',h('input',{key:'i',type:'file',accept:'application/pdf',className:'hidden',onChange:async e=>{const file=e.target.files?.[0];if(file){const url=await onUploadPdf(file);if(url)set('campaignPdf',url);}e.target.value='';}})]),draft.campaignPdf?h('a',{key:'a',href:draft.campaignPdf,target:'_blank',rel:'noopener',className:'text-xs font-bold text-[#ff737d]'},'ABRIR PDF ATUAL'):h('span',{key:'e',className:'text-xs text-[#75808e]'},'Nenhum PDF vinculado.')]),
+            h('div',{key:'sessions',className:'mt-5'},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'SESSÕES'),h('b',{key:'b',className:'mt-1 block text-sm'},'Estrutura da campanha')]),h(Button,{key:'a',onClick:addSession,className:'min-h-9 py-1'},'+ SESSÃO')]),h('div',{key:'rows',className:'mt-3 space-y-2'},(draft.sessions||[]).length?(draft.sessions||[]).map((session,index)=>h('div',{key:session.id||index,className:'grid gap-2 rounded-xl border border-white/10 bg-black/15 p-3 lg:grid-cols-[180px_1fr_auto]'},[h('input',{key:'t',value:session.title||'',onChange:e=>updateSession(index,'title',e.target.value),placeholder:'Título da sessão',className:field}),h('textarea',{key:'x',rows:2,value:session.text||'',onChange:e=>updateSession(index,'text',e.target.value),placeholder:'Resumo, objetivo e acontecimentos',className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none'}),h(Button,{key:'r',danger:true,onClick:()=>removeSession(index),className:'px-3'},'×')])):h('div',{className:'rounded-xl border border-dashed border-white/10 p-5 text-center text-xs text-[#75808e]'},'Nenhuma sessão cadastrada.'))])
           ]),
-          h('div',{key:'pdf',className:'mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-black/15 p-3'},[h('label',{key:'u',className:'inline-flex min-h-10 cursor-pointer items-center rounded-xl border border-white/10 bg-[#171d27] px-3 text-xs font-black'},['ENVIAR PDF',h('input',{key:'i',type:'file',accept:'application/pdf',className:'hidden',onChange:async e=>{const file=e.target.files?.[0];if(file){const url=await onUploadPdf(file);if(url)set('campaignPdf',url);}e.target.value='';}})]),draft.campaignPdf?h('a',{key:'a',href:draft.campaignPdf,target:'_blank',rel:'noopener',className:'text-xs font-bold text-[#ff737d]'},'ABRIR PDF ATUAL'):h('span',{key:'e',className:'text-xs text-[#75808e]'},'Nenhum PDF vinculado.')]),
-          h('div',{key:'sessions',className:'mt-5'},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'SESSÕES'),h('b',{key:'b',className:'mt-1 block text-sm'},'Estrutura da campanha')]),h(Button,{key:'a',onClick:addSession,className:'min-h-9 py-1'},'+ SESSÃO')]),h('div',{key:'rows',className:'mt-3 space-y-2'},(draft.sessions||[]).length?(draft.sessions||[]).map((session,index)=>h('div',{key:session.id||index,className:'grid gap-2 rounded-xl border border-white/10 bg-black/15 p-3 lg:grid-cols-[180px_1fr_auto]'},[h('input',{key:'t',value:session.title||'',onChange:e=>updateSession(index,'title',e.target.value),placeholder:'Título da sessão',className:field}),h('textarea',{key:'x',rows:2,value:session.text||'',onChange:e=>updateSession(index,'text',e.target.value),placeholder:'Resumo, objetivo e acontecimentos',className:'w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm outline-none'}),h(Button,{key:'r',danger:true,onClick:()=>removeSession(index),className:'px-3'},'×')])):h('div',{className:'rounded-xl border border-dashed border-white/10 p-5 text-center text-xs text-[#75808e]'},'Nenhuma sessão cadastrada.'))])
+          h('div',{key:'rosters',className:'space-y-4'},[roster('hero',heroes,onAddHero),roster('villain',villains,onAddVillain)])
         ]),
-        h('div',{key:'rosters',className:'space-y-4'},[roster('hero',heroes,onAddHero),roster('villain',villains,onAddVillain)])
-      ]),
-      h('div',{key:'actions',className:'sticky bottom-3 z-10 flex justify-end gap-2 rounded-2xl border border-white/10 bg-[#0b1017]/95 p-3 shadow-2xl backdrop-blur'},[h(Button,{key:'c',disabled:saving,onClick:onCancel},'CANCELAR'),h(Button,{key:'s',primary:true,disabled:saving,onClick:()=>onSave({...draft,players:heroes.length,documentMode:draft.campaignPdf?'pdf':'editor'})},saving?'SALVANDO…':'SALVAR CAMPANHA')])
-    ]);
+        h('div',{key:'actions',className:'sticky bottom-3 z-10 flex justify-end gap-2 rounded-2xl border border-white/10 bg-[#0b1017]/95 p-3 shadow-2xl backdrop-blur'},[h(Button,{key:'c',disabled:saving,onClick:onCancel},'CANCELAR'),h(Button,{key:'s',primary:true,disabled:saving,onClick:()=>onSave({...draft,players:heroes.length,documentMode:draft.campaignPdf?'pdf':'editor'})},saving?'SALVANDO…':'SALVAR CAMPANHA')])
+      ]);
+    }
   }
-
   function CharacterStrip({items,selectedKey,onSelect,mode='villain'}){
     return h('div',{className:'scrollbar-thin flex gap-2 overflow-x-auto pb-2'},items.map(item=>h('button',{key:item.key,onClick:()=>onSelect(item.key),className:cx('min-w-[158px] rounded-xl border bg-[#111720] p-3 text-left transition',selectedKey===item.key?'border-[#ef3340] bg-[#2a1117]':'border-white/10 hover:border-white/20')},[
       h(Portrait,{key:'p',entity:item.entity,size:'strip'}),
@@ -378,30 +396,30 @@
   function Board({scenario,heroes,villains,role,heroId,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode='run',onMoveMode,editor=false,editorTool='select',onEditCell,onRemovePiece,title=true,moving=false}){
     // O board é a área mais quente da UI. Indexamos peças/personagens uma vez por render
     // e evitamos buscas .find() repetidas para cada uma das centenas de casas.
-    const current=React.useMemo(()=>normalizedScenario(scenario),[scenario]);
+    const current=normalizedScenario(scenario);
     const width=current.width,height=current.height,pieces=current.pieces;
-    const charById=React.useMemo(()=>{
+    const charById=(()=>{
       const map=new Map();
       for(const entity of [...(heroes||[]),...(villains||[])])map.set(String(entity.id),entity);
       for(const entity of Object.values(MINIONS))map.set(String(entity.id),entity);
       return map;
-    },[heroes,villains]);
-    const pieceByCell=React.useMemo(()=>{
+    })();
+    const pieceByCell=(()=>{
       const map=new Map();
       for(const piece of pieces)map.set(scenarioKey(Number(piece.x),Number(piece.y)),piece);
       return map;
-    },[pieces]);
-    const pieceById=React.useMemo(()=>{
+    })();
+    const pieceById=(()=>{
       const map=new Map();
       for(const piece of pieces)map.set(piece.id,piece);
       return map;
-    },[pieces]);
+    })();
     const getChar=p=>p?charById.get(String(p.characterId||p.baseId))||null:null;
     const canSelect=p=>role==='master'||(p.kind==='hero'&&String(p.characterId||p.baseId)===String(heroId||''));
     const ownPiece=role==='player'?pieces.find(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(heroId||'')):null;
     const effectiveSelected=selected||(role==='player'?ownPiece?.id:null),selectedPiece=pieceById.get(effectiveSelected)||null,selectedEntity=getChar(selectedPiece);
     const movement=selectedPiece&&canSelect(selectedPiece)?movementStatusUI(current,selectedPiece,selectedEntity,moveMode):null;
-    const reachable=React.useMemo(()=>movement&&editorTool==='select'?reachableScenarioCellsUI(current,selectedPiece,movement.mode,movement.remaining):new Map(),[current,selectedPiece,movement?.mode,movement?.remaining,editorTool]);
+    const reachable=movement&&editorTool==='select'?reachableScenarioCellsUI(current,selectedPiece,movement.mode,movement.remaining):new Map();
     const cellSize=56,cells=[];
     for(let y=0;y<height;y++)for(let x=0;x<width;x++){
       const key=scenarioKey(x,y),ob=scenarioObstacle(current,x,y),decor=current?.decor?.[key]||null,terrain=scenarioTerrain(current,x,y),piece=pieceByCell.get(key)||null,entity=getChar(piece),isReachable=reachable.has(key),terrainMeta=TERRAIN_META[terrain.type]||TERRAIN_META.floor,obMeta=ob?OBSTACLE_META[ob]:null,decorMeta=decor?DECOR_META[decor]:null;
@@ -442,19 +460,20 @@
     ]);
   }
 
-  const MemoBoard=React.memo(Board,(a,b)=>a.scenario===b.scenario&&a.heroes===b.heroes&&a.villains===b.villains&&a.role===b.role&&a.heroId===b.heroId&&a.selected===b.selected&&a.zoom===b.zoom&&a.moveMode===b.moveMode&&a.editor===b.editor&&a.editorTool===b.editorTool&&a.moving===b.moving);
-  function DeferredBoard(props){
-    const [ready,setReady]=React.useState(false);
-    React.useEffect(()=>{let cancelled=false;const frame=requestAnimationFrame(()=>{if(!cancelled)setReady(true);});return()=>{cancelled=true;cancelAnimationFrame(frame);};},[]);
-    if(!ready)return h(Card,{className:'grid min-h-[220px] place-items-center p-6 text-center'},h('div',null,[h('div',{key:'a',className:'mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-[#ef3340]'}),h('p',{key:'p',className:'mt-3 text-xs text-[#7f8998]'},'Abrindo o mapa…')]));
-    return h(MemoBoard,props);
+  class MemoBoard extends React.Component {
+    shouldComponentUpdate(next){const a=this.props,b=next;return !(a.scenario===b.scenario&&a.heroes===b.heroes&&a.villains===b.villains&&a.role===b.role&&a.heroId===b.heroId&&a.selected===b.selected&&a.zoom===b.zoom&&a.moveMode===b.moveMode&&a.editor===b.editor&&a.editorTool===b.editorTool&&a.moving===b.moving);}
+    render(){return h(Board,this.props);}
+  }
+  class DeferredBoard extends React.Component {
+    constructor(props){super(props);this.state={ready:false};this.frame=null;}
+    componentDidMount(){this.frame=requestAnimationFrame(()=>this.setState({ready:true}));}
+    componentWillUnmount(){if(this.frame!=null)cancelAnimationFrame(this.frame);}
+    render(){if(!this.state.ready)return h(Card,{className:'grid min-h-[220px] place-items-center p-6 text-center'},h('div',null,[h('div',{key:'a',className:'mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-[#ef3340]'}),h('p',{key:'p',className:'mt-3 text-xs text-[#7f8998]'},'Abrindo o mapa…')]));return h(MemoBoard,this.props);}
   }
 
-  function ScenarioBuilder({scenario,heroes,villains,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,tool,onTool,preset,onPreset,onApplyPreset,onGenerate,onClear,onResize,onEnvironment,pieceChoice,onPieceChoice,qty,onQty,onAddPieces,onEditCell,onRemovePiece,moving=false}){
-    const current=React.useMemo(()=>normalizedScenario(scenario),[scenario]);
-    const actorOptions=React.useMemo(()=>[...(heroes||[]).map(e=>({key:`hero|${e.id}`,label:`Herói · ${e.n}`})),...(villains||[]).map(e=>({key:`villain|${e.id}`,label:`Vilão · ${e.n}`})),...Object.values(MINIONS).map(e=>({key:`other|${e.id}`,label:`Capanga · ${e.n.replace(/^Capanga · /,'')}`}))],[heroes,villains]);
-    const initialGroup=scenarioToolInfo(tool,current).group==='main'?'terrain':scenarioToolInfo(tool,current).group;
-    const [group,setGroup]=React.useState(initialGroup||'terrain');
+  function ScenarioBuilder({scenario,heroes,villains,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,tool,onTool,preset,onPreset,onApplyPreset,onGenerate,onClear,onResize,onEnvironment,pieceChoice,onPieceChoice,qty,onQty,onAddPieces,onEditCell,onRemovePiece,group='terrain',onGroup,moving=false}){
+    const current=normalizedScenario(scenario);
+    const actorOptions=[...(heroes||[]).map(e=>({key:`hero|${e.id}`,label:`Herói · ${e.n}`})),...(villains||[]).map(e=>({key:`villain|${e.id}`,label:`Vilão · ${e.n}`})),...Object.values(MINIONS).map(e=>({key:`other|${e.id}`,label:`Capanga · ${e.n.replace(/^Capanga · /,'')}`}))];
     const groupDefs=[['terrain','▦','TERRENO'],['structure','🧱','ESTRUTURAS'],['objects','📦','OBJETOS'],['decor','✦','DETALHES']];
     const groupItems=group==='terrain'?[['base',scenarioToolInfo('base',current)],...Array.from(TERRAIN_TOOLS).map(id=>[id,scenarioToolInfo(id,current)])]:group==='decor'?Object.keys(DECOR_META).map(id=>[`decor-${id}`,scenarioToolInfo(`decor-${id}`,current)]):Object.entries(OBSTACLE_META).filter(([,meta])=>(meta.group||'objects')===group).map(([id])=>[id,scenarioToolInfo(id,current)]);
     const active=scenarioToolInfo(tool,current);
@@ -477,7 +496,7 @@
       h('div',{key:'work',className:'scenario-work-grid grid gap-4'},[
         h(Card,{key:'tools',className:'p-4 sm:p-5'},[
           h('div',{key:'top',className:'flex flex-wrap items-center justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'EDITAR MAPA'),h('h2',{key:'h',className:'mt-1 text-lg font-black'},'O que você quer colocar?')]),h('div',{key:'main',className:'flex gap-2'},[toolTile('select',scenarioToolInfo('select',current)),toolTile('erase',scenarioToolInfo('erase',current))])]),
-          h('div',{key:'tabs',className:'mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4'},groupDefs.map(x=>h('button',{key:x[0],type:'button',onClick:()=>setGroup(x[0]),className:cx('scenario-tool-group',group===x[0]&&'active')},`${x[1]} ${x[2]}`))),
+          h('div',{key:'tabs',className:'mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4'},groupDefs.map(x=>h('button',{key:x[0],type:'button',onClick:()=>onGroup&&onGroup(x[0]),className:cx('scenario-tool-group',group===x[0]&&'active')},`${x[1]} ${x[2]}`))),
           h('div',{key:'grid',className:'mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3'},groupItems.map(([id,meta])=>toolTile(id,meta))),
           h('div',{key:'active',className:'active-tool-banner mt-4'},[h('span',{key:'i'},active.icon),h('div',{key:'c'},[h(TinyLabel,{key:'l'},'FERRAMENTA ATIVA'),h('b',{key:'b'},active.label),h('small',{key:'s'},active.help)])])
         ]),
@@ -507,7 +526,7 @@
   class ArachneApp extends React.Component {
     constructor(props){
       super(props);
-      this.state={screen:'loading',campaigns:[],templates:[],characters:{heroes:[],villains:[]},selectedCampaign:null,accessMode:'',joinCode:'',masterPassword:'',createOpen:false,createMode:'blank',createTemplate:'',createName:'',createPassword:'',createHeroIds:[],createVillainIds:[],createRosterKind:'',createRosterSearch:'',campaignEditOpen:false,campaignSaving:false,rosterPicker:'',characterEditor:null,profile:null,data:{...DEFAULT_DATA},page:'central',navOpen:false,actorKey:'',category:'combat',power:'',roll:null,rollAnimating:false,initiativeRoll:null,initiativeAnimating:false,tn:14,edge:0,trouble:0,selectedPiece:null,zoom:.72,moveMode:'run',scenarioTool:'select',scenarioPreset:'empty',scenarioPieceChoice:'',scenarioQty:1,scenarioMoveBusy:false,sheet:null,status:'offline',toast:'',error:''};
+      this.state={screen:'loading',campaigns:[],templates:[],characters:{heroes:[],villains:[]},selectedCampaign:null,accessMode:'',joinCode:'',masterPassword:'',createOpen:false,createMode:'blank',createTemplate:'',createName:'',createPassword:'',createHeroIds:[],createVillainIds:[],createRosterKind:'',createRosterSearch:'',campaignEditOpen:false,campaignSaving:false,rosterPicker:'',rosterSearch:'',characterEditor:null,profile:null,data:{...DEFAULT_DATA},page:'central',navOpen:false,actorKey:'',category:'combat',power:'',roll:null,rollAnimating:false,initiativeRoll:null,initiativeAnimating:false,tn:14,edge:0,trouble:0,selectedPiece:null,zoom:.72,moveMode:'run',scenarioTool:'select',scenarioGroup:'terrain',scenarioPreset:'empty',scenarioPieceChoice:'',scenarioQty:1,scenarioMoveBusy:false,sheet:null,status:'offline',toast:'',error:''};
       this.toastTimer=null; this.tnTimer=null; this.scenarioSaveTimer=null; this.scenarioSavePending=null;
     }
     componentDidMount(){ this.bootstrap(); }
@@ -590,7 +609,7 @@
       const entity=JSON.parse(JSON.stringify(source));
       try{if(kind==='hero')await API.saveHero(entity);else await API.saveVillain(entity);this.setState(prev=>({rosterPicker:'',data:{...prev.data,[key]:[...(prev.data[key]||[]),entity],...(kind==='hero'?{playerNotes:{...(prev.data.playerNotes||{}),[entity.id]:''}}:{})}}));this.toast(`${entity.n} adicionado.`);}catch(e){this.toast(e.message||'Não foi possível adicionar o personagem.');}
     }
-    openNewCharacter(kind){this.setState({rosterPicker:'',characterEditor:{kind,entity:blankCharacter(kind),isNew:true}});}
+    openNewCharacter(kind){this.setState({rosterPicker:'',rosterSearch:'',characterEditor:{kind,entity:blankCharacter(kind),isNew:true}});}
     openCharacterEditor(kind,entity){this.setState({characterEditor:{kind,entity:JSON.parse(JSON.stringify(entity)),isNew:false}});}
     async saveCharacterEditor(entity){
       const modal=this.state.characterEditor;if(!modal)return;const kind=modal.kind,key=kind==='hero'?'heroes':'villains';
@@ -819,7 +838,7 @@
     }
     renderCampaign(){
       const s=this.state,d=s.data,c=d.campaignContent||{},sessions=c.sessions||[],isMaster=s.profile?.role==='master';
-      if(isMaster&&s.campaignEditOpen)return h(CampaignEditor,{content:c,campaign:s.selectedCampaign,heroes:d.heroes||[],villains:d.villains||[],saving:s.campaignSaving,onSave:content=>this.saveCampaignContent(content),onCancel:()=>this.setState({campaignEditOpen:false}),onAddHero:()=>this.setState({rosterPicker:'hero'}),onAddVillain:()=>this.setState({rosterPicker:'villain'}),onEditCharacter:(kind,entity)=>this.openCharacterEditor(kind,entity),onRemoveCharacter:(kind,entity)=>this.removeRosterCharacter(kind,entity),onUploadPdf:file=>this.uploadCampaignPdf(file)});
+      if(isMaster&&s.campaignEditOpen)return h(CampaignEditor,{content:c,campaign:s.selectedCampaign,heroes:d.heroes||[],villains:d.villains||[],saving:s.campaignSaving,onSave:content=>this.saveCampaignContent(content),onCancel:()=>this.setState({campaignEditOpen:false}),onAddHero:()=>this.setState({rosterPicker:'hero',rosterSearch:''}),onAddVillain:()=>this.setState({rosterPicker:'villain',rosterSearch:''}),onEditCharacter:(kind,entity)=>this.openCharacterEditor(kind,entity),onRemoveCharacter:(kind,entity)=>this.removeRosterCharacter(kind,entity),onUploadPdf:file=>this.uploadCampaignPdf(file)});
       const rosterBlock=(kind,items)=>h(Card,{className:'p-4'},[h('div',{key:'h',className:'flex items-center justify-between gap-2'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},kind==='hero'?'HERÓIS':'VILÕES'),h('b',{key:'n',className:'mt-1 block text-sm'},`${items.length} na campanha`)]),isMaster?h(Button,{key:'a',onClick:()=>this.setState({campaignEditOpen:true}),className:'min-h-8 px-2 py-1'},'GERENCIAR'):null]),h('div',{key:'g',className:'mt-3 grid gap-2 sm:grid-cols-2'},items.length?items.map(entity=>h('button',{key:entity.id,onClick:()=>this.openSheet(entity,kind),className:'flex items-center gap-3 rounded-xl border border-white/10 bg-black/15 p-2 text-left hover:border-white/20'},[h(Portrait,{key:'p',entity,size:'sm'}),h('div',{key:'t',className:'min-w-0'},[h('b',{key:'n',className:'block truncate text-xs'},entity.n),h('small',{key:'r',className:'block truncate text-[9px] text-[#74808f]'},entity.r||`Rank ${entity.rank||4}`)])])):h('p',{className:'py-4 text-center text-xs text-[#74808f]'},'Nenhum personagem.'))]);
       return h('div',{className:'space-y-5'},[
         h('div',{key:'head',className:'flex flex-wrap items-end justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'s'},'CAMPANHA'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},c.title||s.selectedCampaign?.name||'Campanha'),h('p',{key:'p',className:'mt-2 max-w-3xl text-sm leading-6 text-[#8b95a3]'},c.summary||c.subtitle||'')]),isMaster?h(Button,{key:'e',primary:true,onClick:()=>this.setState({campaignEditOpen:true})},'EDITAR CAMPANHA'):null]),
@@ -831,7 +850,7 @@
     }
     renderScenarioPage(){
       const s=this.state,d=s.data;if(s.profile.role!=='master')return h('div',{className:'space-y-4'},[h('section',{key:'h'},[h(TinyLabel,{key:'s'},'CENÁRIO'),h('h1',{key:'t',className:'mt-1 text-3xl font-black'},'Movimentação'),h('p',{key:'p',className:'mt-1 text-sm text-[#7f8997]'},'As casas verdes mostram exatamente onde seu personagem pode chegar.')]),h(MemoBoard,{key:'b',scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:'player',heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',false),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),moving:s.scenarioMoveBusy})]);
-      return h(ScenarioBuilder,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',true),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),tool:s.scenarioTool,onTool:scenarioTool=>this.setState({scenarioTool}),preset:s.scenarioPreset,onPreset:scenarioPreset=>this.setState({scenarioPreset}),onApplyPreset:()=>this.applyScenarioPreset(),onGenerate:()=>this.generateScenario(),onClear:()=>this.clearScenarioMap(),onResize:value=>this.resizeScenario(value),onEnvironment:value=>this.setScenarioEnvironment(value),pieceChoice:s.scenarioPieceChoice,onPieceChoice:scenarioPieceChoice=>this.setState({scenarioPieceChoice}),qty:s.scenarioQty,onQty:scenarioQty=>this.setState({scenarioQty}),onAddPieces:()=>this.addScenarioPieces(),onEditCell:(x,y,tool,piece)=>this.editScenarioCell(x,y,tool,piece),onRemovePiece:id=>this.removeScenarioPiece(id),moving:s.scenarioMoveBusy});
+      return h(ScenarioBuilder,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',true),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),tool:s.scenarioTool,onTool:scenarioTool=>this.setState({scenarioTool}),group:s.scenarioGroup,onGroup:scenarioGroup=>this.setState({scenarioGroup}),preset:s.scenarioPreset,onPreset:scenarioPreset=>this.setState({scenarioPreset}),onApplyPreset:()=>this.applyScenarioPreset(),onGenerate:()=>this.generateScenario(),onClear:()=>this.clearScenarioMap(),onResize:value=>this.resizeScenario(value),onEnvironment:value=>this.setScenarioEnvironment(value),pieceChoice:s.scenarioPieceChoice,onPieceChoice:scenarioPieceChoice=>this.setState({scenarioPieceChoice}),qty:s.scenarioQty,onQty:scenarioQty=>this.setState({scenarioQty}),onAddPieces:()=>this.addScenarioPieces(),onEditCell:(x,y,tool,piece)=>this.editScenarioCell(x,y,tool,piece),onRemovePiece:id=>this.removeScenarioPiece(id),moving:s.scenarioMoveBusy});
     }
 
     renderRules(){return h('div',null,[h(TinyLabel,{key:'s'},'REFERÊNCIA RÁPIDA'),h('h1',{key:'h',className:'mt-1 text-3xl font-black'},'Regras'),h('div',{key:'g',className:'mt-5 grid gap-3 md:grid-cols-2'},[
@@ -847,12 +866,14 @@
         h('div',{key:'content',className:'mx-auto max-w-[1500px] p-4 sm:p-6'},this.renderPage())
       ]),
       s.sheet?h(SheetModal,{key:'sheet',entity:s.sheet.entity,kind:s.sheet.kind,onClose:()=>this.setState({sheet:null})}):null,
-      s.rosterPicker?h(CharacterPickerModal,{key:'picker',kind:s.rosterPicker,items:this.creationLibrary(s.rosterPicker),existing:new Set((s.rosterPicker==='hero'?s.data.heroes:s.data.villains).map(item=>item.id)),onAdd:id=>this.addRosterCharacter(s.rosterPicker,id),onCreate:()=>this.openNewCharacter(s.rosterPicker),onClose:()=>this.setState({rosterPicker:''})}):null,
+      s.rosterPicker?h(CharacterPickerModal,{key:'picker',kind:s.rosterPicker,items:this.creationLibrary(s.rosterPicker),existing:new Set((s.rosterPicker==='hero'?s.data.heroes:s.data.villains).map(item=>item.id)),search:s.rosterSearch,onSearch:rosterSearch=>this.setState({rosterSearch}),onAdd:id=>this.addRosterCharacter(s.rosterPicker,id),onCreate:()=>this.openNewCharacter(s.rosterPicker),onClose:()=>this.setState({rosterPicker:'',rosterSearch:''})}):null,
       s.characterEditor?h(CharacterEditorModal,{key:'editor',kind:s.characterEditor.kind,entity:s.characterEditor.entity,isNew:s.characterEditor.isNew,onSave:entity=>this.saveCharacterEditor(entity),onClose:()=>this.setState({characterEditor:null})}):null,
       s.toast?h('div',{key:'toast',className:'fixed bottom-5 right-5 z-[60] max-w-sm rounded-xl border border-white/10 bg-[#151b24] px-4 py-3 text-sm shadow-2xl'},s.toast):null
     ]);}
     render(){if(this.state.screen==='loading')return h('div',{className:'min-h-screen bg-[#080b10] text-white grid place-items-center'},h('div',{className:'text-center'},[h('div',{key:'a',className:'mx-auto grid h-14 w-14 place-items-center border border-[#ef3340] text-2xl font-black'},'A'),h('p',{key:'p',className:'mt-4 text-sm text-[#7d8795]'},'Carregando Arachne…')]));return this.state.screen==='login'?this.renderLogin():this.renderApp();}
   }
 
-  ReactDOM.render(h(ArachneApp),document.getElementById('root'));
+  const root=document.getElementById('root');
+  ReactDOM.render(h(ArachneApp),root);
+  requestAnimationFrame(()=>{if(root)root.dataset.arachneReady='1';});
 })();
