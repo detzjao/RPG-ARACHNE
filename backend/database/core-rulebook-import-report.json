@@ -1,0 +1,16 @@
+{
+  "total_found": 128,
+  "total_imported": 128,
+  "heroes": 70,
+  "villains": 29,
+  "minions": 8,
+  "antiheroes": 5,
+  "neutral": 16,
+  "individual_pdfs": 128,
+  "images_extracted": 128,
+  "multi_page_profiles": [],
+  "characters_with_problems": [],
+  "first_pdf_page": 3,
+  "last_pdf_page": 130,
+  "book_page_offset": 131
+}

@@ -1,0 +1,697 @@
+{
+  "version": "49.1",
+  "totalSourceProfiles": 128,
+  "preservedLegacyPortraits": 46,
+  "sourceExtractedPortraitsUsed": 82,
+  "policy": "Existing curated assets/portraits image wins; source-book crop is used only when no legacy portrait exists.",
+  "preserved": [
+    {
+      "id": "spider",
+      "name": "Homem-Aranha",
+      "image": "assets/portraits/hero-spider.webp",
+      "source_image_url": "assets/characters/heroes/spider/image.webp"
+    },
+    {
+      "id": "wolverine",
+      "name": "Wolverine",
+      "image": "assets/portraits/hero-wolverine.webp",
+      "source_image_url": "assets/characters/heroes/wolverine/image.webp"
+    },
+    {
+      "id": "cap",
+      "name": "Capitão América",
+      "image": "assets/portraits/hero-cap.webp",
+      "source_image_url": "assets/characters/heroes/cap/image.webp"
+    },
+    {
+      "id": "iron-man",
+      "name": "Homem de Ferro",
+      "image": "assets/portraits/hero-iron-man.webp",
+      "source_image_url": "assets/characters/heroes/iron-man/image.webp"
+    },
+    {
+      "id": "thor",
+      "name": "Thor",
+      "image": "assets/portraits/hero-thor.webp",
+      "source_image_url": "assets/characters/heroes/thor/image.webp"
+    },
+    {
+      "id": "cyclops",
+      "name": "Ciclope",
+      "image": "assets/portraits/hero-cyclops.webp",
+      "source_image_url": "assets/characters/heroes/cyclops/image.webp"
+    },
+    {
+      "id": "storm",
+      "name": "Tempestade",
+      "image": "assets/portraits/hero-storm.webp",
+      "source_image_url": "assets/characters/heroes/storm/image.webp"
+    },
+    {
+      "id": "iceman",
+      "name": "Homem de Gelo",
+      "image": "assets/portraits/hero-iceman.webp",
+      "source_image_url": "assets/characters/heroes/iceman/image.webp"
+    },
+    {
+      "id": "mr-fantastic",
+      "name": "Senhor Fantástico",
+      "image": "assets/portraits/hero-mr-fantastic.webp",
+      "source_image_url": "assets/characters/heroes/mr-fantastic/image.webp"
+    },
+    {
+      "id": "invisible-woman",
+      "name": "Mulher-Invisível",
+      "image": "assets/portraits/hero-invisible-woman.webp",
+      "source_image_url": "assets/characters/heroes/invisible-woman/image.webp"
+    },
+    {
+      "id": "human-torch",
+      "name": "Tocha Humana",
+      "image": "assets/portraits/hero-human-torch.webp",
+      "source_image_url": "assets/characters/heroes/human-torch/image.webp"
+    },
+    {
+      "id": "thing",
+      "name": "Coisa",
+      "image": "assets/portraits/hero-thing.webp",
+      "source_image_url": "assets/characters/heroes/thing/image.webp"
+    },
+    {
+      "id": "daredevil",
+      "name": "Demolidor",
+      "image": "assets/portraits/hero-daredevil-v2.webp",
+      "source_image_url": "assets/characters/heroes/daredevil/image.webp"
+    },
+    {
+      "id": "luke-cage",
+      "name": "Luke Cage",
+      "image": "assets/portraits/hero-luke-cage.webp",
+      "source_image_url": "assets/characters/heroes/luke-cage/image.webp"
+    },
+    {
+      "id": "deadpool",
+      "name": "Deadpool",
+      "image": "assets/portraits/hero-deadpool.webp",
+      "source_image_url": "assets/characters/heroes/deadpool/image.webp"
+    },
+    {
+      "id": "venom",
+      "name": "Venom",
+      "image": "assets/portraits/hero-venom.webp",
+      "source_image_url": "assets/characters/heroes/venom/image.webp"
+    },
+    {
+      "id": "shield-agent",
+      "name": "Agente da S.H.I.E.L.D.",
+      "image": "assets/portraits/hero-shield-agent.webp",
+      "source_image_url": "assets/characters/minions/shield-agent/image.webp"
+    },
+    {
+      "id": "black-panther",
+      "name": "Pantera Negra",
+      "image": "assets/portraits/hero-black-panther.webp",
+      "source_image_url": "assets/characters/heroes/black-panther/image.webp"
+    },
+    {
+      "id": "captain-marvel",
+      "name": "Capitã Marvel",
+      "image": "assets/portraits/hero-captain-marvel.webp",
+      "source_image_url": "assets/characters/heroes/captain-marvel/image.webp"
+    },
+    {
+      "id": "doctor-strange",
+      "name": "Doutor Estranho",
+      "image": "assets/portraits/hero-doctor-strange.webp",
+      "source_image_url": "assets/characters/heroes/doctor-strange/image.webp"
+    },
+    {
+      "id": "hulk",
+      "name": "Hulk",
+      "image": "assets/portraits/hero-hulk.webp",
+      "source_image_url": "assets/characters/heroes/hulk/image.webp"
+    },
+    {
+      "id": "hawkeye",
+      "name": "Gavião Arqueiro",
+      "image": "assets/portraits/hero-hawkeye.webp",
+      "source_image_url": "assets/characters/heroes/hawkeye/image.webp"
+    },
+    {
+      "id": "scarlet-witch",
+      "name": "Feiticeira Escarlate",
+      "image": "assets/portraits/hero-scarlet-witch.webp",
+      "source_image_url": "assets/characters/heroes/scarlet-witch/image.webp"
+    },
+    {
+      "id": "shang-chi",
+      "name": "Shang-Chi",
+      "image": "assets/portraits/hero-shang-chi.webp",
+      "source_image_url": "assets/characters/heroes/shang-chi/image.webp"
+    },
+    {
+      "id": "she-hulk",
+      "name": "Mulher-Hulk",
+      "image": "assets/portraits/hero-she-hulk.webp",
+      "source_image_url": "assets/characters/heroes/she-hulk/image.webp"
+    },
+    {
+      "id": "vision",
+      "name": "Visão",
+      "image": "assets/portraits/hero-vision.webp",
+      "source_image_url": "assets/characters/heroes/vision/image.webp"
+    },
+    {
+      "id": "ghost-rider",
+      "name": "Motoqueiro Fantasma",
+      "image": "assets/portraits/hero-ghost-rider.webp",
+      "source_image_url": "assets/characters/heroes/ghost-rider/image.webp"
+    },
+    {
+      "id": "war-machine",
+      "name": "Máquina de Combate",
+      "image": "assets/portraits/hero-war-machine.webp",
+      "source_image_url": "assets/characters/heroes/war-machine/image.webp"
+    },
+    {
+      "id": "elektra",
+      "name": "Elektra",
+      "image": "assets/portraits/villain-elektra.webp",
+      "source_image_url": "assets/characters/heroes/elektra/image.webp"
+    },
+    {
+      "id": "juggernaut",
+      "name": "Juggernaut",
+      "image": "assets/portraits/villain-juggernaut.webp",
+      "source_image_url": "assets/characters/heroes/juggernaut/image.webp"
+    },
+    {
+      "id": "loki",
+      "name": "Loki",
+      "image": "assets/portraits/villain-loki.webp",
+      "source_image_url": "assets/characters/heroes/loki/image.webp"
+    },
+    {
+      "id": "magneto",
+      "name": "Magneto",
+      "image": "assets/portraits/villain-magneto.webp",
+      "source_image_url": "assets/characters/heroes/magneto/image.webp"
+    },
+    {
+      "id": "mystique",
+      "name": "Mística",
+      "image": "assets/portraits/villain-mystique.webp",
+      "source_image_url": "assets/characters/heroes/mystique/image.webp"
+    },
+    {
+      "id": "octopus",
+      "name": "Doutor Octopus",
+      "image": "assets/portraits/villain-octopus.webp",
+      "source_image_url": "assets/characters/villains/octopus/image.webp"
+    },
+    {
+      "id": "sabretooth",
+      "name": "Dentes-de-Sabre",
+      "image": "assets/portraits/villain-sabretooth.webp",
+      "source_image_url": "assets/characters/villains/sabretooth/image.webp"
+    },
+    {
+      "id": "crossbones",
+      "name": "Ossos Cruzados",
+      "image": "assets/portraits/villain-crossbones.webp",
+      "source_image_url": "assets/characters/villains/crossbones/image.webp"
+    },
+    {
+      "id": "goblin",
+      "name": "Duende Verde",
+      "image": "assets/portraits/villain-goblin.webp",
+      "source_image_url": "assets/characters/villains/goblin/image.webp"
+    },
+    {
+      "id": "doom",
+      "name": "Doutor Destino",
+      "image": "assets/portraits/villain-doom.webp",
+      "source_image_url": "assets/characters/villains/doom/image.webp"
+    },
+    {
+      "id": "zemo",
+      "name": "Barão Zemo",
+      "image": "assets/portraits/villain-zemo.webp",
+      "source_image_url": "assets/characters/villains/zemo/image.webp"
+    },
+    {
+      "id": "abomination",
+      "name": "Abominável",
+      "image": "assets/portraits/villain-abomination.webp",
+      "source_image_url": "assets/characters/villains/abomination/image.webp"
+    },
+    {
+      "id": "enchantress",
+      "name": "Encantadora",
+      "image": "assets/portraits/villain-enchantress.webp",
+      "source_image_url": "assets/characters/villains/enchantress/image.webp"
+    },
+    {
+      "id": "kingpin",
+      "name": "Wilson Fisk — Rei do Crime",
+      "image": "assets/portraits/villain-kingpin.webp",
+      "source_image_url": "assets/characters/villains/kingpin/image.webp"
+    },
+    {
+      "id": "bullseye",
+      "name": "Mercenário / Bullseye",
+      "image": "assets/portraits/villain-bullseye.webp",
+      "source_image_url": "assets/characters/villains/bullseye/image.webp"
+    },
+    {
+      "id": "hand-ninja",
+      "name": "Ninja da Mão",
+      "image": "assets/portraits/villain-hand-ninja.webp",
+      "source_image_url": "assets/characters/minions/hand-ninja/image.webp"
+    },
+    {
+      "id": "hydra-agent",
+      "name": "Agente da Hydra",
+      "image": "assets/portraits/villain-hydra-agent.webp",
+      "source_image_url": "assets/characters/minions/hydra-agent/image.webp"
+    },
+    {
+      "id": "aim-agent",
+      "name": "Agente da I.M.A.",
+      "image": "assets/portraits/villain-aim-agent.webp",
+      "source_image_url": "assets/characters/minions/aim-agent/image.webp"
+    }
+  ],
+  "extracted": [
+    {
+      "id": "agatha-harkness",
+      "name": "Agatha Harkness",
+      "image": "assets/characters/heroes/agatha-harkness/image.webp"
+    },
+    {
+      "id": "agent-phil-coulson",
+      "name": "Agent Phil Coulson",
+      "image": "assets/characters/heroes/agent-phil-coulson/image.webp"
+    },
+    {
+      "id": "america-chavez",
+      "name": "America Chavez",
+      "image": "assets/characters/heroes/america-chavez/image.webp"
+    },
+    {
+      "id": "ant-man",
+      "name": "Ant-Man",
+      "image": "assets/characters/heroes/ant-man/image.webp"
+    },
+    {
+      "id": "beast",
+      "name": "Beast (Hank Mccoy)",
+      "image": "assets/characters/heroes/beast/image.webp"
+    },
+    {
+      "id": "black-bolt",
+      "name": "Black Bolt",
+      "image": "assets/characters/heroes/black-bolt/image.webp"
+    },
+    {
+      "id": "black-widow",
+      "name": "Black Widow (Natasha Romanoff)",
+      "image": "assets/characters/heroes/black-widow/image.webp"
+    },
+    {
+      "id": "blade",
+      "name": "Blade",
+      "image": "assets/characters/heroes/blade/image.webp"
+    },
+    {
+      "id": "blue-marvel",
+      "name": "Blue Marvel",
+      "image": "assets/characters/heroes/blue-marvel/image.webp"
+    },
+    {
+      "id": "brawn",
+      "name": "Brawn (Amadeus Cho)",
+      "image": "assets/characters/heroes/brawn/image.webp"
+    },
+    {
+      "id": "clea",
+      "name": "Clea",
+      "image": "assets/characters/heroes/clea/image.webp"
+    },
+    {
+      "id": "colossus",
+      "name": "Colossus",
+      "image": "assets/characters/heroes/colossus/image.webp"
+    },
+    {
+      "id": "devil-dinosaur",
+      "name": "Devil Dinosaur",
+      "image": "assets/characters/heroes/devil-dinosaur/image.webp"
+    },
+    {
+      "id": "dora-milaje-warrior",
+      "name": "Dora Milaje Warrior",
+      "image": "assets/characters/minions/dora-milaje-warrior/image.webp"
+    },
+    {
+      "id": "drax",
+      "name": "Drax",
+      "image": "assets/characters/heroes/drax/image.webp"
+    },
+    {
+      "id": "echo",
+      "name": "Echo",
+      "image": "assets/characters/heroes/echo/image.webp"
+    },
+    {
+      "id": "forge",
+      "name": "Forge",
+      "image": "assets/characters/heroes/forge/image.webp"
+    },
+    {
+      "id": "gamora",
+      "name": "Gamora",
+      "image": "assets/characters/heroes/gamora/image.webp"
+    },
+    {
+      "id": "ghost-spider",
+      "name": "Ghost-Spider",
+      "image": "assets/characters/heroes/ghost-spider/image.webp"
+    },
+    {
+      "id": "giant-man",
+      "name": "Giant-Man (Raz Malhotra)",
+      "image": "assets/characters/heroes/giant-man/image.webp"
+    },
+    {
+      "id": "groot",
+      "name": "Groot",
+      "image": "assets/characters/heroes/groot/image.webp"
+    },
+    {
+      "id": "hellcat",
+      "name": "Hellcat",
+      "image": "assets/characters/heroes/hellcat/image.webp"
+    },
+    {
+      "id": "ikaris",
+      "name": "Ikaris",
+      "image": "assets/characters/heroes/ikaris/image.webp"
+    },
+    {
+      "id": "iron-fist",
+      "name": "Iron Fist (Danny Rand)",
+      "image": "assets/characters/heroes/iron-fist/image.webp"
+    },
+    {
+      "id": "jessica-jones",
+      "name": "Jessica Jones",
+      "image": "assets/characters/heroes/jessica-jones/image.webp"
+    },
+    {
+      "id": "kate-pryde",
+      "name": "Kate Pryde",
+      "image": "assets/characters/heroes/kate-pryde/image.webp"
+    },
+    {
+      "id": "killmonger",
+      "name": "Killmonger",
+      "image": "assets/characters/heroes/killmonger/image.webp"
+    },
+    {
+      "id": "mirage",
+      "name": "Mirage (Dani Moonstar)",
+      "image": "assets/characters/heroes/mirage/image.webp"
+    },
+    {
+      "id": "misty-knight",
+      "name": "Misty Knight",
+      "image": "assets/characters/heroes/misty-knight/image.webp"
+    },
+    {
+      "id": "moon-girl",
+      "name": "Moon Girl",
+      "image": "assets/characters/heroes/moon-girl/image.webp"
+    },
+    {
+      "id": "moon-knight",
+      "name": "Moon Knight",
+      "image": "assets/characters/heroes/moon-knight/image.webp"
+    },
+    {
+      "id": "morbius",
+      "name": "Morbius",
+      "image": "assets/characters/heroes/morbius/image.webp"
+    },
+    {
+      "id": "ms-marvel",
+      "name": "Ms. Marvel (Kamala Khan)",
+      "image": "assets/characters/heroes/ms-marvel/image.webp"
+    },
+    {
+      "id": "nebula",
+      "name": "Nebula",
+      "image": "assets/characters/heroes/nebula/image.webp"
+    },
+    {
+      "id": "nick-fury-jr",
+      "name": "Nick Fury Jr.",
+      "image": "assets/characters/heroes/nick-fury-jr/image.webp"
+    },
+    {
+      "id": "night-nurse",
+      "name": "Night Nurse",
+      "image": "assets/characters/heroes/night-nurse/image.webp"
+    },
+    {
+      "id": "nightcrawler",
+      "name": "Nightcrawler",
+      "image": "assets/characters/heroes/nightcrawler/image.webp"
+    },
+    {
+      "id": "okoye",
+      "name": "Okoye",
+      "image": "assets/characters/heroes/okoye/image.webp"
+    },
+    {
+      "id": "photon",
+      "name": "Photon (Monica Rambeau)",
+      "image": "assets/characters/heroes/photon/image.webp"
+    },
+    {
+      "id": "professor-x",
+      "name": "Professor X",
+      "image": "assets/characters/heroes/professor-x/image.webp"
+    },
+    {
+      "id": "psylocke",
+      "name": "Psylocke (Kwannon)",
+      "image": "assets/characters/heroes/psylocke/image.webp"
+    },
+    {
+      "id": "quicksilver",
+      "name": "Quicksilver",
+      "image": "assets/characters/heroes/quicksilver/image.webp"
+    },
+    {
+      "id": "red-wolf",
+      "name": "Red Wolf",
+      "image": "assets/characters/heroes/red-wolf/image.webp"
+    },
+    {
+      "id": "reptil",
+      "name": "Reptil",
+      "image": "assets/characters/heroes/reptil/image.webp"
+    },
+    {
+      "id": "rocket-raccoon",
+      "name": "Rocket Raccoon",
+      "image": "assets/characters/heroes/rocket-raccoon/image.webp"
+    },
+    {
+      "id": "shuri",
+      "name": "Shuri",
+      "image": "assets/characters/heroes/shuri/image.webp"
+    },
+    {
+      "id": "silk",
+      "name": "Silk",
+      "image": "assets/characters/heroes/silk/image.webp"
+    },
+    {
+      "id": "spider-man",
+      "name": "Spider-Man (Miles Morales)",
+      "image": "assets/characters/heroes/spider-man/image.webp"
+    },
+    {
+      "id": "spider-man-2099",
+      "name": "Spider-Man 2099",
+      "image": "assets/characters/heroes/spider-man-2099/image.webp"
+    },
+    {
+      "id": "squirrel-girl",
+      "name": "Squirrel Girl",
+      "image": "assets/characters/heroes/squirrel-girl/image.webp"
+    },
+    {
+      "id": "star-lord",
+      "name": "Star-Lord",
+      "image": "assets/characters/heroes/star-lord/image.webp"
+    },
+    {
+      "id": "sub-mariner",
+      "name": "Sub-Mariner (Namor)",
+      "image": "assets/characters/heroes/sub-mariner/image.webp"
+    },
+    {
+      "id": "sunspot",
+      "name": "Sunspot",
+      "image": "assets/characters/heroes/sunspot/image.webp"
+    },
+    {
+      "id": "thor-jane-foster",
+      "name": "Thor (Jane Foster)",
+      "image": "assets/characters/heroes/thor-jane-foster/image.webp"
+    },
+    {
+      "id": "titania",
+      "name": "Titania",
+      "image": "assets/characters/heroes/titania/image.webp"
+    },
+    {
+      "id": "wasp",
+      "name": "Wasp",
+      "image": "assets/characters/heroes/wasp/image.webp"
+    },
+    {
+      "id": "white-tiger",
+      "name": "White Tiger",
+      "image": "assets/characters/heroes/white-tiger/image.webp"
+    },
+    {
+      "id": "winter-soldier",
+      "name": "Winter Soldier (Bucky Barnes)",
+      "image": "assets/characters/heroes/winter-soldier/image.webp"
+    },
+    {
+      "id": "wolverine-laura-kinney",
+      "name": "Wolverine (Laura Kinney)",
+      "image": "assets/characters/heroes/wolverine-laura-kinney/image.webp"
+    },
+    {
+      "id": "wong",
+      "name": "Wong",
+      "image": "assets/characters/heroes/wong/image.webp"
+    },
+    {
+      "id": "average-civilian",
+      "name": "Average Civilian",
+      "image": "assets/characters/minions/average-civilian/image.webp"
+    },
+    {
+      "id": "baron-mordo",
+      "name": "Baron Mordo",
+      "image": "assets/characters/villains/baron-mordo/image.webp"
+    },
+    {
+      "id": "dormammu",
+      "name": "Dormammu",
+      "image": "assets/characters/villains/dormammu/image.webp"
+    },
+    {
+      "id": "emma-frost",
+      "name": "Emma Frost",
+      "image": "assets/characters/villains/emma-frost/image.webp"
+    },
+    {
+      "id": "gorr-the-god-butcher",
+      "name": "Gorr The God Butcher",
+      "image": "assets/characters/villains/gorr-the-god-butcher/image.webp"
+    },
+    {
+      "id": "hela",
+      "name": "Hela",
+      "image": "assets/characters/villains/hela/image.webp"
+    },
+    {
+      "id": "kraven-the-hunter",
+      "name": "Kraven The Hunter",
+      "image": "assets/characters/villains/kraven-the-hunter/image.webp"
+    },
+    {
+      "id": "leader",
+      "name": "Leader",
+      "image": "assets/characters/villains/leader/image.webp"
+    },
+    {
+      "id": "magnitron",
+      "name": "Magnitron",
+      "image": "assets/characters/villains/magnitron/image.webp"
+    },
+    {
+      "id": "malekith",
+      "name": "Malekith",
+      "image": "assets/characters/villains/malekith/image.webp"
+    },
+    {
+      "id": "mandarin",
+      "name": "Mandarin",
+      "image": "assets/characters/villains/mandarin/image.webp"
+    },
+    {
+      "id": "maximus",
+      "name": "Maximus",
+      "image": "assets/characters/villains/maximus/image.webp"
+    },
+    {
+      "id": "m-o-d-o-k",
+      "name": "M.O.D.O.K.",
+      "image": "assets/characters/villains/m-o-d-o-k/image.webp"
+    },
+    {
+      "id": "mysterio",
+      "name": "Mysterio",
+      "image": "assets/characters/villains/mysterio/image.webp"
+    },
+    {
+      "id": "red-skull",
+      "name": "Red Skull",
+      "image": "assets/characters/villains/red-skull/image.webp"
+    },
+    {
+      "id": "ronan-the-accuser",
+      "name": "Ronan The Accuser",
+      "image": "assets/characters/villains/ronan-the-accuser/image.webp"
+    },
+    {
+      "id": "skrull",
+      "name": "Skrull",
+      "image": "assets/characters/minions/skrull/image.webp"
+    },
+    {
+      "id": "taskmaster",
+      "name": "Taskmaster",
+      "image": "assets/characters/villains/taskmaster/image.webp"
+    },
+    {
+      "id": "thanos",
+      "name": "Thanos",
+      "image": "assets/characters/villains/thanos/image.webp"
+    },
+    {
+      "id": "ultron",
+      "name": "Ultron",
+      "image": "assets/characters/villains/ultron/image.webp"
+    },
+    {
+      "id": "vampire",
+      "name": "Vampire",
+      "image": "assets/characters/minions/vampire/image.webp"
+    },
+    {
+      "id": "vulture",
+      "name": "Vulture (Adrian Toomes)",
+      "image": "assets/characters/villains/vulture/image.webp"
+    }
+  ]
+}

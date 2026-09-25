@@ -1,0 +1,129 @@
+id,name,type,library_kind,pdf_page_start,pdf_page_end,book_page_start,book_page_end,image_url,sheet_pdf_url
+abomination,Abomination (Emil Blonsky),villain,villain,3,3,134,134,assets/characters/villains/abomination/image.webp,assets/characters/villains/abomination/character-sheet.pdf
+agatha-harkness,Agatha Harkness,neutral,hero,4,4,135,135,assets/characters/heroes/agatha-harkness/image.webp,assets/characters/heroes/agatha-harkness/character-sheet.pdf
+agent-phil-coulson,Agent Phil Coulson,neutral,hero,5,5,136,136,assets/characters/heroes/agent-phil-coulson/image.webp,assets/characters/heroes/agent-phil-coulson/character-sheet.pdf
+america-chavez,America Chavez,hero,hero,6,6,137,137,assets/characters/heroes/america-chavez/image.webp,assets/characters/heroes/america-chavez/character-sheet.pdf
+aim-agent,A.I.M. Agent,minion,villain,7,7,138,138,assets/characters/minions/aim-agent/image.webp,assets/characters/minions/aim-agent/character-sheet.pdf
+ant-man,Ant-Man,hero,hero,8,8,139,139,assets/characters/heroes/ant-man/image.webp,assets/characters/heroes/ant-man/character-sheet.pdf
+average-civilian,Average Civilian,minion,villain,9,9,140,140,assets/characters/minions/average-civilian/image.webp,assets/characters/minions/average-civilian/character-sheet.pdf
+baron-mordo,Baron Mordo,villain,villain,10,10,141,141,assets/characters/villains/baron-mordo/image.webp,assets/characters/villains/baron-mordo/character-sheet.pdf
+zemo,Baron Zemo (Helmut Zemo),villain,villain,11,11,142,142,assets/characters/villains/zemo/image.webp,assets/characters/villains/zemo/character-sheet.pdf
+beast,Beast (Hank Mccoy),hero,hero,12,12,143,143,assets/characters/heroes/beast/image.webp,assets/characters/heroes/beast/character-sheet.pdf
+black-bolt,Black Bolt,hero,hero,13,13,144,144,assets/characters/heroes/black-bolt/image.webp,assets/characters/heroes/black-bolt/character-sheet.pdf
+black-panther,Black Panther (T'Challa),hero,hero,14,14,145,145,assets/characters/heroes/black-panther/image.webp,assets/characters/heroes/black-panther/character-sheet.pdf
+black-widow,Black Widow (Natasha Romanoff),hero,hero,15,15,146,146,assets/characters/heroes/black-widow/image.webp,assets/characters/heroes/black-widow/character-sheet.pdf
+blade,Blade,neutral,hero,16,16,147,147,assets/characters/heroes/blade/image.webp,assets/characters/heroes/blade/character-sheet.pdf
+blue-marvel,Blue Marvel,hero,hero,17,17,148,148,assets/characters/heroes/blue-marvel/image.webp,assets/characters/heroes/blue-marvel/character-sheet.pdf
+brawn,Brawn (Amadeus Cho),hero,hero,18,18,149,149,assets/characters/heroes/brawn/image.webp,assets/characters/heroes/brawn/character-sheet.pdf
+bullseye,Bullseye,villain,villain,19,19,150,150,assets/characters/villains/bullseye/image.webp,assets/characters/villains/bullseye/character-sheet.pdf
+cap,Captain America (Steve Rogers),hero,hero,20,20,151,151,assets/characters/heroes/cap/image.webp,assets/characters/heroes/cap/character-sheet.pdf
+captain-marvel,Captain Marvel (Carol Danvers),hero,hero,21,21,152,152,assets/characters/heroes/captain-marvel/image.webp,assets/characters/heroes/captain-marvel/character-sheet.pdf
+clea,Clea,neutral,hero,22,22,153,153,assets/characters/heroes/clea/image.webp,assets/characters/heroes/clea/character-sheet.pdf
+colossus,Colossus,hero,hero,23,23,154,154,assets/characters/heroes/colossus/image.webp,assets/characters/heroes/colossus/character-sheet.pdf
+crossbones,Crossbones,villain,villain,24,24,155,155,assets/characters/villains/crossbones/image.webp,assets/characters/villains/crossbones/character-sheet.pdf
+cyclops,Cyclops,hero,hero,25,25,156,156,assets/characters/heroes/cyclops/image.webp,assets/characters/heroes/cyclops/character-sheet.pdf
+daredevil,Daredevil,hero,hero,26,26,157,157,assets/characters/heroes/daredevil/image.webp,assets/characters/heroes/daredevil/character-sheet.pdf
+deadpool,Deadpool,antihero,hero,27,27,158,158,assets/characters/heroes/deadpool/image.webp,assets/characters/heroes/deadpool/character-sheet.pdf
+devil-dinosaur,Devil Dinosaur,hero,hero,28,28,159,159,assets/characters/heroes/devil-dinosaur/image.webp,assets/characters/heroes/devil-dinosaur/character-sheet.pdf
+doom,Doctor Doom,villain,villain,29,29,160,160,assets/characters/villains/doom/image.webp,assets/characters/villains/doom/character-sheet.pdf
+octopus,Doctor Octopus (Otto Octavius),villain,villain,30,30,161,161,assets/characters/villains/octopus/image.webp,assets/characters/villains/octopus/character-sheet.pdf
+doctor-strange,Doctor Strange,hero,hero,31,31,162,162,assets/characters/heroes/doctor-strange/image.webp,assets/characters/heroes/doctor-strange/character-sheet.pdf
+dora-milaje-warrior,Dora Milaje Warrior,minion,hero,32,32,163,163,assets/characters/minions/dora-milaje-warrior/image.webp,assets/characters/minions/dora-milaje-warrior/character-sheet.pdf
+dormammu,Dormammu,villain,villain,33,33,164,164,assets/characters/villains/dormammu/image.webp,assets/characters/villains/dormammu/character-sheet.pdf
+drax,Drax,hero,hero,34,34,165,165,assets/characters/heroes/drax/image.webp,assets/characters/heroes/drax/character-sheet.pdf
+echo,Echo,hero,hero,35,35,166,166,assets/characters/heroes/echo/image.webp,assets/characters/heroes/echo/character-sheet.pdf
+elektra,Elektra,antihero,hero,36,36,167,167,assets/characters/heroes/elektra/image.webp,assets/characters/heroes/elektra/character-sheet.pdf
+emma-frost,Emma Frost,villain,villain,37,37,168,168,assets/characters/villains/emma-frost/image.webp,assets/characters/villains/emma-frost/character-sheet.pdf
+enchantress,Enchantress,villain,villain,38,38,169,169,assets/characters/villains/enchantress/image.webp,assets/characters/villains/enchantress/character-sheet.pdf
+forge,Forge,hero,hero,39,39,170,170,assets/characters/heroes/forge/image.webp,assets/characters/heroes/forge/character-sheet.pdf
+gamora,Gamora,hero,hero,40,40,171,171,assets/characters/heroes/gamora/image.webp,assets/characters/heroes/gamora/character-sheet.pdf
+ghost-rider-robbie-reyes,Ghost Rider (Robbie Reyes),neutral,hero,41,41,172,172,assets/characters/heroes/ghost-rider-robbie-reyes/image.webp,assets/characters/heroes/ghost-rider-robbie-reyes/character-sheet.pdf
+ghost-spider,Ghost-Spider,hero,hero,42,42,173,173,assets/characters/heroes/ghost-spider/image.webp,assets/characters/heroes/ghost-spider/character-sheet.pdf
+giant-man,Giant-Man (Raz Malhotra),hero,hero,43,43,174,174,assets/characters/heroes/giant-man/image.webp,assets/characters/heroes/giant-man/character-sheet.pdf
+gorr-the-god-butcher,Gorr The God Butcher,villain,villain,44,44,175,175,assets/characters/villains/gorr-the-god-butcher/image.webp,assets/characters/villains/gorr-the-god-butcher/character-sheet.pdf
+goblin,Green Goblin (Norman Osborn),villain,villain,45,45,176,176,assets/characters/villains/goblin/image.webp,assets/characters/villains/goblin/character-sheet.pdf
+groot,Groot,hero,hero,46,46,177,177,assets/characters/heroes/groot/image.webp,assets/characters/heroes/groot/character-sheet.pdf
+hand-ninja,Hand Ninja,minion,villain,47,47,178,178,assets/characters/minions/hand-ninja/image.webp,assets/characters/minions/hand-ninja/character-sheet.pdf
+hawkeye,Hawkeye (Clint Barton),hero,hero,48,48,179,179,assets/characters/heroes/hawkeye/image.webp,assets/characters/heroes/hawkeye/character-sheet.pdf
+hela,Hela,villain,villain,49,49,180,180,assets/characters/villains/hela/image.webp,assets/characters/villains/hela/character-sheet.pdf
+hellcat,Hellcat,hero,hero,50,50,181,181,assets/characters/heroes/hellcat/image.webp,assets/characters/heroes/hellcat/character-sheet.pdf
+hulk,Hulk (Bruce Banner),neutral,hero,51,51,182,182,assets/characters/heroes/hulk/image.webp,assets/characters/heroes/hulk/character-sheet.pdf
+human-torch,Human Torch (Johnny Storm),hero,hero,52,52,183,183,assets/characters/heroes/human-torch/image.webp,assets/characters/heroes/human-torch/character-sheet.pdf
+hydra-agent,Hydra Agent,minion,villain,53,53,184,184,assets/characters/minions/hydra-agent/image.webp,assets/characters/minions/hydra-agent/character-sheet.pdf
+iceman,Iceman,hero,hero,54,54,185,185,assets/characters/heroes/iceman/image.webp,assets/characters/heroes/iceman/character-sheet.pdf
+ikaris,Ikaris,hero,hero,55,55,186,186,assets/characters/heroes/ikaris/image.webp,assets/characters/heroes/ikaris/character-sheet.pdf
+invisible-woman,Invisible Woman,hero,hero,56,56,187,187,assets/characters/heroes/invisible-woman/image.webp,assets/characters/heroes/invisible-woman/character-sheet.pdf
+iron-fist,Iron Fist (Danny Rand),hero,hero,57,57,188,188,assets/characters/heroes/iron-fist/image.webp,assets/characters/heroes/iron-fist/character-sheet.pdf
+iron-man,Iron Man (Tony Stark),hero,hero,58,58,189,189,assets/characters/heroes/iron-man/image.webp,assets/characters/heroes/iron-man/character-sheet.pdf
+jessica-jones,Jessica Jones,hero,hero,59,59,190,190,assets/characters/heroes/jessica-jones/image.webp,assets/characters/heroes/jessica-jones/character-sheet.pdf
+juggernaut,Juggernaut,neutral,hero,60,60,191,191,assets/characters/heroes/juggernaut/image.webp,assets/characters/heroes/juggernaut/character-sheet.pdf
+kate-pryde,Kate Pryde,hero,hero,61,61,192,192,assets/characters/heroes/kate-pryde/image.webp,assets/characters/heroes/kate-pryde/character-sheet.pdf
+killmonger,Killmonger,neutral,hero,62,62,193,193,assets/characters/heroes/killmonger/image.webp,assets/characters/heroes/killmonger/character-sheet.pdf
+kingpin,Kingpin (Wilson Fisk),villain,villain,63,63,194,194,assets/characters/villains/kingpin/image.webp,assets/characters/villains/kingpin/character-sheet.pdf
+kraven-the-hunter,Kraven The Hunter,villain,villain,64,64,195,195,assets/characters/villains/kraven-the-hunter/image.webp,assets/characters/villains/kraven-the-hunter/character-sheet.pdf
+leader,Leader,villain,villain,65,65,196,196,assets/characters/villains/leader/image.webp,assets/characters/villains/leader/character-sheet.pdf
+loki,Loki,neutral,hero,66,66,197,197,assets/characters/heroes/loki/image.webp,assets/characters/heroes/loki/character-sheet.pdf
+luke-cage,Luke Cage,hero,hero,67,67,198,198,assets/characters/heroes/luke-cage/image.webp,assets/characters/heroes/luke-cage/character-sheet.pdf
+magneto,Magneto,neutral,hero,68,68,199,199,assets/characters/heroes/magneto/image.webp,assets/characters/heroes/magneto/character-sheet.pdf
+magnitron,Magnitron,villain,villain,69,69,200,200,assets/characters/villains/magnitron/image.webp,assets/characters/villains/magnitron/character-sheet.pdf
+malekith,Malekith,villain,villain,70,70,201,201,assets/characters/villains/malekith/image.webp,assets/characters/villains/malekith/character-sheet.pdf
+mandarin,Mandarin,villain,villain,71,71,202,202,assets/characters/villains/mandarin/image.webp,assets/characters/villains/mandarin/character-sheet.pdf
+maximus,Maximus,villain,villain,72,72,203,203,assets/characters/villains/maximus/image.webp,assets/characters/villains/maximus/character-sheet.pdf
+mirage,Mirage (Dani Moonstar),hero,hero,73,73,204,204,assets/characters/heroes/mirage/image.webp,assets/characters/heroes/mirage/character-sheet.pdf
+mr-fantastic,Mister Fantastic,hero,hero,74,74,205,205,assets/characters/heroes/mr-fantastic/image.webp,assets/characters/heroes/mr-fantastic/character-sheet.pdf
+misty-knight,Misty Knight,hero,hero,75,75,206,206,assets/characters/heroes/misty-knight/image.webp,assets/characters/heroes/misty-knight/character-sheet.pdf
+m-o-d-o-k,M.O.D.O.K.,villain,villain,76,76,207,207,assets/characters/villains/m-o-d-o-k/image.webp,assets/characters/villains/m-o-d-o-k/character-sheet.pdf
+moon-girl,Moon Girl,hero,hero,77,77,208,208,assets/characters/heroes/moon-girl/image.webp,assets/characters/heroes/moon-girl/character-sheet.pdf
+moon-knight,Moon Knight,hero,hero,78,78,209,209,assets/characters/heroes/moon-knight/image.webp,assets/characters/heroes/moon-knight/character-sheet.pdf
+morbius,Morbius,antihero,hero,79,79,210,210,assets/characters/heroes/morbius/image.webp,assets/characters/heroes/morbius/character-sheet.pdf
+ms-marvel,Ms. Marvel (Kamala Khan),hero,hero,80,80,211,211,assets/characters/heroes/ms-marvel/image.webp,assets/characters/heroes/ms-marvel/character-sheet.pdf
+mysterio,Mysterio,villain,villain,81,81,212,212,assets/characters/villains/mysterio/image.webp,assets/characters/villains/mysterio/character-sheet.pdf
+mystique,Mystique,neutral,hero,82,82,213,213,assets/characters/heroes/mystique/image.webp,assets/characters/heroes/mystique/character-sheet.pdf
+nebula,Nebula,neutral,hero,83,83,214,214,assets/characters/heroes/nebula/image.webp,assets/characters/heroes/nebula/character-sheet.pdf
+nick-fury-jr,Nick Fury Jr.,hero,hero,84,84,215,215,assets/characters/heroes/nick-fury-jr/image.webp,assets/characters/heroes/nick-fury-jr/character-sheet.pdf
+night-nurse,Night Nurse,neutral,hero,85,85,216,216,assets/characters/heroes/night-nurse/image.webp,assets/characters/heroes/night-nurse/character-sheet.pdf
+nightcrawler,Nightcrawler,hero,hero,86,86,217,217,assets/characters/heroes/nightcrawler/image.webp,assets/characters/heroes/nightcrawler/character-sheet.pdf
+okoye,Okoye,hero,hero,87,87,218,218,assets/characters/heroes/okoye/image.webp,assets/characters/heroes/okoye/character-sheet.pdf
+photon,Photon (Monica Rambeau),hero,hero,88,88,219,219,assets/characters/heroes/photon/image.webp,assets/characters/heroes/photon/character-sheet.pdf
+professor-x,Professor X,hero,hero,89,89,220,220,assets/characters/heroes/professor-x/image.webp,assets/characters/heroes/professor-x/character-sheet.pdf
+psylocke,Psylocke (Kwannon),neutral,hero,90,90,221,221,assets/characters/heroes/psylocke/image.webp,assets/characters/heroes/psylocke/character-sheet.pdf
+quicksilver,Quicksilver,hero,hero,91,91,222,222,assets/characters/heroes/quicksilver/image.webp,assets/characters/heroes/quicksilver/character-sheet.pdf
+red-skull,Red Skull,villain,villain,92,92,223,223,assets/characters/villains/red-skull/image.webp,assets/characters/villains/red-skull/character-sheet.pdf
+red-wolf,Red Wolf,hero,hero,93,93,224,224,assets/characters/heroes/red-wolf/image.webp,assets/characters/heroes/red-wolf/character-sheet.pdf
+reptil,Reptil,hero,hero,94,94,225,225,assets/characters/heroes/reptil/image.webp,assets/characters/heroes/reptil/character-sheet.pdf
+rocket-raccoon,Rocket Raccoon,hero,hero,95,95,226,226,assets/characters/heroes/rocket-raccoon/image.webp,assets/characters/heroes/rocket-raccoon/character-sheet.pdf
+ronan-the-accuser,Ronan The Accuser,villain,villain,96,96,227,227,assets/characters/villains/ronan-the-accuser/image.webp,assets/characters/villains/ronan-the-accuser/character-sheet.pdf
+sabretooth,Sabretooth,villain,villain,97,97,228,228,assets/characters/villains/sabretooth/image.webp,assets/characters/villains/sabretooth/character-sheet.pdf
+scarlet-witch,Scarlet Witch,hero,hero,98,98,229,229,assets/characters/heroes/scarlet-witch/image.webp,assets/characters/heroes/scarlet-witch/character-sheet.pdf
+shang-chi,Shang-Chi,hero,hero,99,99,230,230,assets/characters/heroes/shang-chi/image.webp,assets/characters/heroes/shang-chi/character-sheet.pdf
+she-hulk,She-Hulk,neutral,hero,100,100,231,231,assets/characters/heroes/she-hulk/image.webp,assets/characters/heroes/she-hulk/character-sheet.pdf
+shield-agent,S.H.I.E.L.D. Agent,minion,hero,101,101,232,232,assets/characters/minions/shield-agent/image.webp,assets/characters/minions/shield-agent/character-sheet.pdf
+shuri,Shuri,hero,hero,102,102,233,233,assets/characters/heroes/shuri/image.webp,assets/characters/heroes/shuri/character-sheet.pdf
+silk,Silk,hero,hero,103,103,234,234,assets/characters/heroes/silk/image.webp,assets/characters/heroes/silk/character-sheet.pdf
+skrull,Skrull,minion,villain,104,104,235,235,assets/characters/minions/skrull/image.webp,assets/characters/minions/skrull/character-sheet.pdf
+spider-man,Spider-Man (Miles Morales),hero,hero,105,105,236,236,assets/characters/heroes/spider-man/image.webp,assets/characters/heroes/spider-man/character-sheet.pdf
+spider,Spider-Man (Peter Parker),hero,hero,106,106,237,237,assets/characters/heroes/spider/image.webp,assets/characters/heroes/spider/character-sheet.pdf
+spider-man-2099,Spider-Man 2099,hero,hero,107,107,238,238,assets/characters/heroes/spider-man-2099/image.webp,assets/characters/heroes/spider-man-2099/character-sheet.pdf
+squirrel-girl,Squirrel Girl,hero,hero,108,108,239,239,assets/characters/heroes/squirrel-girl/image.webp,assets/characters/heroes/squirrel-girl/character-sheet.pdf
+star-lord,Star-Lord,hero,hero,109,109,240,240,assets/characters/heroes/star-lord/image.webp,assets/characters/heroes/star-lord/character-sheet.pdf
+storm,Storm,hero,hero,110,110,241,241,assets/characters/heroes/storm/image.webp,assets/characters/heroes/storm/character-sheet.pdf
+sub-mariner,Sub-Mariner (Namor),antihero,hero,111,111,242,242,assets/characters/heroes/sub-mariner/image.webp,assets/characters/heroes/sub-mariner/character-sheet.pdf
+sunspot,Sunspot,hero,hero,112,112,243,243,assets/characters/heroes/sunspot/image.webp,assets/characters/heroes/sunspot/character-sheet.pdf
+taskmaster,Taskmaster,villain,villain,113,113,244,244,assets/characters/villains/taskmaster/image.webp,assets/characters/villains/taskmaster/character-sheet.pdf
+thanos,Thanos,villain,villain,114,114,245,245,assets/characters/villains/thanos/image.webp,assets/characters/villains/thanos/character-sheet.pdf
+thing,Thing,hero,hero,115,115,246,246,assets/characters/heroes/thing/image.webp,assets/characters/heroes/thing/character-sheet.pdf
+thor-jane-foster,Thor (Jane Foster),hero,hero,116,116,247,247,assets/characters/heroes/thor-jane-foster/image.webp,assets/characters/heroes/thor-jane-foster/character-sheet.pdf
+thor,Thor,hero,hero,117,117,248,248,assets/characters/heroes/thor/image.webp,assets/characters/heroes/thor/character-sheet.pdf
+titania,Titania,neutral,hero,118,118,249,249,assets/characters/heroes/titania/image.webp,assets/characters/heroes/titania/character-sheet.pdf
+ultron,Ultron,villain,villain,119,119,250,250,assets/characters/villains/ultron/image.webp,assets/characters/villains/ultron/character-sheet.pdf
+vampire,Vampire,minion,villain,120,120,251,251,assets/characters/minions/vampire/image.webp,assets/characters/minions/vampire/character-sheet.pdf
+venom,Venom (Eddie Brock),antihero,hero,121,121,252,252,assets/characters/heroes/venom/image.webp,assets/characters/heroes/venom/character-sheet.pdf
+vision,Vision,hero,hero,122,122,253,253,assets/characters/heroes/vision/image.webp,assets/characters/heroes/vision/character-sheet.pdf
+vulture,Vulture (Adrian Toomes),villain,villain,123,123,254,254,assets/characters/villains/vulture/image.webp,assets/characters/villains/vulture/character-sheet.pdf
+war-machine,War Machine,hero,hero,124,124,255,255,assets/characters/heroes/war-machine/image.webp,assets/characters/heroes/war-machine/character-sheet.pdf
+wasp,Wasp,hero,hero,125,125,256,256,assets/characters/heroes/wasp/image.webp,assets/characters/heroes/wasp/character-sheet.pdf
+white-tiger,White Tiger,hero,hero,126,126,257,257,assets/characters/heroes/white-tiger/image.webp,assets/characters/heroes/white-tiger/character-sheet.pdf
+winter-soldier,Winter Soldier (Bucky Barnes),hero,hero,127,127,258,258,assets/characters/heroes/winter-soldier/image.webp,assets/characters/heroes/winter-soldier/character-sheet.pdf
+wolverine-laura-kinney,Wolverine (Laura Kinney),hero,hero,128,128,259,259,assets/characters/heroes/wolverine-laura-kinney/image.webp,assets/characters/heroes/wolverine-laura-kinney/character-sheet.pdf
+wolverine,Wolverine,hero,hero,129,129,260,260,assets/characters/heroes/wolverine/image.webp,assets/characters/heroes/wolverine/character-sheet.pdf
+wong,Wong,hero,hero,130,130,261,261,assets/characters/heroes/wong/image.webp,assets/characters/heroes/wong/character-sheet.pdf

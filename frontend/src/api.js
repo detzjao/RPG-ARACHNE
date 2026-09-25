@@ -82,6 +82,7 @@
   async function startActionRoll(values) { return (await request('/actions/d616/start', {method:'POST', body:JSON.stringify(values || {})})).data; }
   async function useActionEdge(id,index) { return (await request(`/actions/d616/${encodeURIComponent(id)}/edge`, {method:'POST', body:JSON.stringify({index})})).data; }
   async function finalizeActionRoll(id) { return (await request(`/actions/d616/${encodeURIComponent(id)}/finalize`, {method:'POST', body:'{}'})).data; }
+  async function applyAttackDamage(id) { return (await request(`/actions/d616/${encodeURIComponent(id)}/apply-damage`, {method:'POST', body:'{}'})).data; }
   async function addInitiativeParticipant(baseId) { return (await request('/initiative/participants', {method:'POST', body:JSON.stringify({baseId})})).data; }
   async function removeInitiativeParticipant(id) { return (await request(`/initiative/participants/${encodeURIComponent(id)}`, {method:'DELETE'})).data; }
   async function clearInitiativeParticipants() { return (await request('/initiative/participants', {method:'DELETE'})).data; }
@@ -109,7 +110,7 @@
   window.ArachneAPI2 = {
     CLIENT_ID, health, lookupCampaigns, lookupCampaign, getTemplates, getCharacters, createCampaign, updateCampaignMeta, join, profileSession, loadAll,
     saveMany, saveState, setChallengeTN, adjustResources, saveHero, deleteHero, saveVillain, deleteVillain, uploadAsset,
-    startActionRoll, useActionEdge, finalizeActionRoll,
+    startActionRoll, useActionEdge, finalizeActionRoll, applyAttackDamage,
     addInitiativeParticipant, removeInitiativeParticipant, clearInitiativeParticipants, rollInitiativeParticipant,
     moveScenarioPiece, resetScenarioMovement, savePlayerNote,
     connectRealtime, disconnectRealtime, clearSession, setSession, setApiBase,

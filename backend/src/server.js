@@ -42,7 +42,26 @@ function requireMaster(session,res){if(session?.role!=='master'){send(res,403,{o
 function canAdjustCharacterResources(session,kind,id){if(session?.role==='master')return true;return session?.role==='player'&&kind==='hero'&&String(session.heroId||'')===String(id||'');}
 const PLAYER_RESOURCE_FIELDS=new Set(['currentHealth','healthDelta','currentFocus','focusDelta']);
 
-async function ensureDefaultCampaign(){const row=await repo.ensureCampaign({id:'main',code:'ARACHNE',name:'Projeto Arachne',passwordHash:hashPassword(config.masterPassword),template:'arachne'});const existing=await repo.get('main','campaignContent');if(!existing){const seed=templateSeed('arachne');if(seed)await repo.setMany('main',seed);}else{const all=await repo.getAll('main'),missing={};if(!Object.hasOwn(all,'combat'))missing.combat={active:false,round:0,turnIndex:-1,order:[]};if(!Object.hasOwn(all,'actionHistory'))missing.actionHistory=[];if(Object.keys(missing).length)await repo.setMany('main',missing);}return row;}
+async function ensureDefaultCampaign(){
+  const row=await repo.ensureCampaign({id:'main',code:'ARACHNE',name:'Projeto Arachne',passwordHash:hashPassword(config.masterPassword),template:'arachne'});
+  const seed=templateSeed('arachne');
+  const existing=await repo.get('main','campaignContent');
+  if(!existing){
+    if(seed)await repo.setMany('main',seed);
+  }else{
+    const all=await repo.getAll('main'),updates={};
+    if(!Object.hasOwn(all,'combat'))updates.combat={active:false,round:0,turnIndex:-1,order:[]};
+    if(!Object.hasOwn(all,'actionHistory'))updates.actionHistory=[];
+    if(seed&&Array.isArray(seed.villains)){
+      const current=Array.isArray(all.villains)?all.villains:[];
+      const known=new Set(current.map(item=>item?.id).filter(Boolean));
+      const missing=seed.villains.filter(item=>item?.id&&!known.has(item.id));
+      if(missing.length)updates.villains=[...current,...missing];
+    }
+    if(Object.keys(updates).length)await repo.setMany('main',updates);
+  }
+  return row;
+}
 await ensureDefaultCampaign();
 
 function sanitizeDiceHistoryForPlayer(history){if(!Array.isArray(history))return[];return history.map(entry=>{const source=entry&&typeof entry==='object'?entry:{};if(source.visibility==='public')return source;return{type:source.type||'ROLL',label:source.type==='DMG'?'Dano do Mestre':source.type==='INIT'?'Iniciativa do Mestre':source.type==='D616'?'D616 do Mestre':'Rolagem do Mestre',action:'',detail:'',total:source.total??'—',outcome:source.outcome||'',outcomeKey:source.outcomeKey||'',dice:source.dice&&typeof source.dice==='object'?source.dice:null,at:source.at||Date.now(),visibility:'masked'};});}
@@ -96,7 +115,7 @@ const INITIATIVE_NPCS={
 function initiativeModifierFromEntity(entity){const raw=String(entity?.initiative??entity?.abilities?.Vigilance??0),match=raw.match(/[+-]?\d+/);return match?Math.max(-30,Math.min(30,Number(match[0]))):Math.max(-30,Math.min(30,Number(entity?.abilities?.Vigilance||0)));}
 function initiativeEntity(all,baseId){const id=String(baseId||'').slice(0,80),{heroes,villains}=characterCollections(all),hero=heroes.find(item=>item?.id===id);if(hero)return{kind:'hero',entity:hero};const villain=villains.find(item=>item?.id===id);if(villain)return{kind:'villain',entity:villain};const npc=INITIATIVE_NPCS[id];return npc?{kind:'other',entity:npc}:null;}
 function sortInitiative(list){return [...list].sort((a,b)=>{const ar=Number.isFinite(Number(a?.result)),br=Number.isFinite(Number(b?.result));if(ar!==br)return ar?-1:1;if(ar&&br){const byResult=Number(b.result)-Number(a.result);if(byResult)return byResult;const byModifier=Number(b.modifier||0)-Number(a.modifier||0);if(byModifier)return byModifier;}return String(a?.name||'').localeCompare(String(b?.name||''));});}
-function isRepeatableInitiativeResolved(resolved){return Boolean(resolved&&(resolved.kind==='other'||String(resolved.entity?.tier||'').trim().toUpperCase()==='LACAIO'));}
+function isRepeatableInitiativeResolved(resolved){const tier=String(resolved?.entity?.tier||'').trim().toUpperCase();return Boolean(resolved&&(resolved.kind==='other'||resolved.entity?.generic===true||tier==='LACAIO'||tier==='CAPANGA'));}
 function isRepeatableInitiativeParticipant(item){return Boolean(item?.repeatable===true||INITIATIVE_NPCS[String(item?.baseId||'')]);}
 function hasInitiativeDuplicates(list){if(!Array.isArray(list))return false;const seen=new Set();for(const item of list){const id=String(item?.baseId||'');if(!id||isRepeatableInitiativeParticipant(item))continue;if(seen.has(id))return true;seen.add(id);}return false;}
 function nextInitiativeInstanceNumber(list,baseId){let max=0;for(const item of Array.isArray(list)?list:[]){if(String(item?.baseId||'')!==String(baseId||''))continue;const n=Number(item?.instanceNumber||0);if(Number.isFinite(n))max=Math.max(max,n);}return max+1;}

@@ -27,7 +27,7 @@ test('banco armazena estado/referências, não blobs ou colunas binárias de ima
 
 test('cada retrato local possui thumbnail web otimizada',()=>{
   const full=webps(portraits),small=webps(thumbs);
-  assert.equal(full.length,57);
+  assert.equal(full.length,86);
   assert.equal(small.length,full.length);
   for(const name of full){
     const a=fs.statSync(path.join(portraits,name)).size;

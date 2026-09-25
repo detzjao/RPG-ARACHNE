@@ -1,5 +1,6 @@
+import { CORE_RULEBOOK_CHARACTERS } from './core-rulebook-library.js';
 const baseAbilities = { Melee:0, Agility:0, Resilience:0, Vigilance:0, Ego:0, Logic:0 };
-const LIBRARY_REVISION = 5;
+const LIBRARY_REVISION = 8;
 const baseDamage = rank => ({ Melee:Number(rank)||1, Agility:Number(rank)||1, Ego:Number(rank)||1, Logic:Number(rank)||1 });
 const clone = value => JSON.parse(JSON.stringify(value));
 const session = (id, title, text) => ({ id:String(id).padStart(2,'0'), title, text });
@@ -22,6 +23,28 @@ function villain(id,n,r='',rank=4,tier='AMEAÇA',extra={}){
     ...extra
   };
 }
+
+function minion(id,n,rank=1,{description='',health=10,defense=10,speed=6,melee=0,agility=0,resilience=0,vigilance=0,plannedImage='',attacks=[],skills=[]}={}){
+  return villain(id,n,'',rank,'CAPANGA',{
+    generic:true,
+    image:plannedImage,
+    role:'Capanga / ameaça',
+    hook:description,
+    maxHealth:health,maxFocus:0,currentHealth:health,currentFocus:0,
+    defense,
+    initiative:'+0',
+    speed:'Correr '+speed,
+    movement:{run:speed,climb:Math.min(3,speed),swim:3,jump:3},
+    abilities:{Melee:melee,Agility:agility,Resilience:resilience,Vigilance:vigilance,Ego:0,Logic:0},
+    attacks:[...attacks],
+    specialAbilities:[...skills],
+    plannedImage,
+    traits:skills.map(item=>String(item).split(':')[0]),
+    tags:['Villainous','Capanga','Defesa '+defense],
+    powers:[...attacks.map(item=>'Ataque — '+item),...skills.map(item=>'Habilidade — '+item)]
+  });
+}
+
 
 const CHARACTER_LIBRARY = {
   heroes: {
@@ -56,6 +79,34 @@ const CHARACTER_LIBRARY = {
     "war-machine": hero("war-machine","Máquina de Combate","James Rupert \"Jim\" Rhodes",4,{"maxHealth":90,"maxFocus":120,"currentHealth":90,"currentFocus":120,"karma":4,"healthDR":"-2","focusDR":"—","initiative":"+3E","speed":"Correr 6 · Escalar 3 · Nadar 3 · Pular 3 · Voo 24","movement":{"run":6,"climb":3,"swim":3,"jump":3,"flight":24},"occupation":"Militar","origin":"Alta Tecnologia: Traje de Combate","teams":"Avengers, S.H.I.E.L.D.","base":"Nova York","role":"Artilharia pesada / suporte aéreo","hook":"Combina rajadas de energia e arsenal tático de longo alcance.","abilities":{"Melee":2,"Agility":6,"Resilience":3,"Vigilance":3,"Ego":2,"Logic":4},"traits":["Battle Ready","Combat Expert","Connections: Military","Gearhead","Glibness","Piloting","Situational Awareness","Tech Reliance"],"tags":["Extreme Appearance (in battle suit)","Headquarters: Stark Tower","Heroic","Lab Access","Public Identity"],"powers":["Accuracy 2","Flight 2","Sturdy 2","Elemental Blast","Elemental Burst","Elemental Push","Covering Fire","Double Tap","Headshot","Kill Zone","Return Fire","Snap Shooting","Stopping Power","Suppressive Fire","Weapons Blazing"],"image":"assets/portraits/hero-war-machine.webp","pdf":"assets/pdfs/hero-war-machine.pdf","source":"Core Rulebook","stats":[["Health",90],["Focus",120],["Karma",4]]}),
   },
   villains: {
+    "kingpin-henchman": minion("kingpin-henchman","Capanga do Rei do Crime",1,{description:"Criminoso treinado, geralmente armado e trabalhando para Wilson Fisk.",health:10,defense:11,speed:6,melee:2,agility:1,resilience:2,vigilance:1,plannedImage:"assets/portraits/minion-01-kingpin-henchman.webp",attacks:["Pistola: alcance 5, dano 3","Bastão: corpo a corpo, dano 4"],skills:["Trabalho em equipe: recebe +1 em ataques quando estiver adjacente a outro capanga.","Atirador: não sofre penalidade básica por atacar a curta distância com pistola."]}),
+    "mercenary": minion("mercenary","Mercenário",1,{description:"Soldado profissional contratado para missões criminosas.",health:12,defense:12,speed:6,melee:2,agility:2,resilience:2,vigilance:2,plannedImage:"assets/portraits/minion-02-mercenary.webp",attacks:["Rifle: alcance 8, dano 4","Faca: corpo a corpo, dano 3"],skills:["Treinamento militar: +1 em testes relacionados a combate.","Cobertura: recebe +1 Defesa enquanto estiver protegido por cobertura."]}),
+    "vulture-henchman": minion("vulture-henchman","Capanga do Abutre",1,{description:"Criminoso equipado com tecnologia aérea derivada do equipamento do Abutre.",health:11,defense:13,speed:8,melee:2,agility:3,resilience:1,vigilance:2,plannedImage:"assets/portraits/minion-03-vulture-henchman.webp",attacks:["Disparo tecnológico: alcance 6, dano 4","Investida aérea: corpo a corpo, dano 5"],skills:["Voo: pode voar.","Ataque rasante: após se mover pelo menos 4 espaços, causa +1 dano no ataque corpo a corpo.","Mobilidade aérea: pode se afastar sem provocar reação de inimigos terrestres uma vez por rodada."]}),
+    "green-goblin-henchman": minion("green-goblin-henchman","Capanga do Duende Verde",1,{description:"Criminoso equipado com tecnologia experimental do Duende Verde.",health:12,defense:12,speed:7,melee:2,agility:2,resilience:2,vigilance:1,plannedImage:"assets/portraits/minion-04-green-goblin-henchman.webp",attacks:["Bomba explosiva: alcance 5, dano 5, área pequena","Lâmina: corpo a corpo, dano 4"],skills:["Arsenal instável: uma vez por rodada pode trocar seu ataque básico por uma bomba.","Equipamento planador: voo limitado.","Caótico: recebe +1 em ataques contra inimigos que estejam cercados por outros aliados."]}),
+    "doctor-octopus-henchman": minion("doctor-octopus-henchman","Capanga do Doutor Octopus",1,{description:"Agente equipado com braços mecânicos ou tecnologia desenvolvida a partir das pesquisas de Otto Octavius.",health:14,defense:12,speed:6,melee:3,agility:1,resilience:2,vigilance:1,plannedImage:"assets/portraits/minion-05-doctor-octopus-henchman.webp",attacks:["Braços mecânicos: corpo a corpo, dano 5","Agarrão mecânico: corpo a corpo, dano 3 + agarrar"],skills:["Quatro braços: pode interagir com objetos ou realizar tarefas enquanto mantém combate.","Alcance mecânico: seus ataques corpo a corpo têm alcance aumentado.","Agarrar: ao acertar o agarrão, pode restringir o movimento do alvo."]}),
+    "mysterio-henchman": minion("mysterio-henchman","Capanga do Mysterio",1,{description:"Criminoso utilizando hologramas, fumaça e dispositivos de ilusão.",health:9,defense:13,speed:6,melee:1,agility:2,resilience:1,vigilance:3,plannedImage:"assets/portraits/minion-06-mysterio-henchman.webp",attacks:["Pistola de gás: alcance 5, dano 3","Bastão elétrico: corpo a corpo, dano 3"],skills:["Ilusão: uma vez por rodada pode criar uma duplicata visual, dando desvantagem ao próximo ataque contra ele.","Fumaça: pode criar uma área obscurecida pequena.","Enganar: +2 em testes para confundir ou distrair."]}),
+    "sinister-follower": minion("sinister-follower","Seguidor do Senhor Sinistro",1,{description:"Mutante ou agente geneticamente modificado a serviço de Sinistro.",health:14,defense:12,speed:6,melee:2,agility:2,resilience:3,vigilance:1,plannedImage:"assets/portraits/minion-07-sinister-follower.webp",attacks:["Golpe mutante: corpo a corpo, dano 5","Rajada genética: alcance 5, dano 4"],skills:["Resistência mutante: reduz em 1 o primeiro dano recebido por rodada.","Mutação: escolha uma característica adicional para a ficha, como garras, salto ou sentidos aprimorados.","Regeneração limitada: recupera 2 de Saúde uma vez por cena."]}),
+    "apocalypse-follower": minion("apocalypse-follower","Seguidor do Apocalipse",1,{description:"Guerreiro aprimorado que serve às forças de Apocalipse.",health:16,defense:13,speed:7,melee:3,agility:2,resilience:3,vigilance:1,plannedImage:"assets/portraits/minion-08-apocalypse-follower.webp",attacks:["Arma energética: alcance 6, dano 5","Espada: corpo a corpo, dano 5"],skills:["Guerreiro aprimorado: +1 em testes físicos.","Determinação: a primeira vez que cair para metade da Saúde, recebe +1 Defesa até o fim da rodada.","Equipamento celestial: escolha uma arma especial antes do combate."]}),
+    "ultron-drone": minion("ultron-drone","Drone de Ultron",1,{description:"Robô humanoide de combate conectado à tecnologia de Ultron.",health:13,defense:12,speed:6,melee:2,agility:2,resilience:3,vigilance:2,plannedImage:"assets/portraits/minion-09-ultron-drone.webp",attacks:["Rajada energética: alcance 6, dano 4","Soco metálico: corpo a corpo, dano 4"],skills:["Corpo robótico: não sofre efeitos de medo.","Voo: pode voar.","Rede de combate: +1 em ataques quando outro Drone de Ultron estiver adjacente ao mesmo alvo."]}),
+    "sentinel": minion("sentinel","Sentinela",2,{description:"Robô gigante de caça a mutantes, industrial, futurista e fortemente armado.",health:30,defense:14,speed:6,melee:4,agility:2,resilience:5,vigilance:3,plannedImage:"assets/portraits/minion-10-sentinel.webp",attacks:["Raio energético: alcance 8, dano 7","Golpe pesado: corpo a corpo, dano 8"],skills:["Voo","Sensor mutante: identifica mutantes próximos.","Blindagem: reduz em 2 o dano físico recebido.","Programação antimutante: +2 nos ataques contra mutantes."]}),
+    "doombot": minion("doombot","Doombot",1,{description:"Robô humanoide blindado de tecnologia medieval/futurista da Latvéria.",health:16,defense:13,speed:6,melee:2,agility:1,resilience:4,vigilance:2,plannedImage:"assets/portraits/minion-11-doombot.webp",attacks:["Rajada de energia: alcance 6, dano 5","Soco metálico: dano 4"],skills:["Armadura pesada: reduz 2 de dano.","Autodestruição: quando destruído, pode causar 3 de dano aos alvos adjacentes.","Voo: pode voar."]}),
+    "deathlok": minion("deathlok","Deathlok",2,{description:"Soldado cibernético com partes humanas e mecânicas, implantes e armamento militar.",health:24,defense:14,speed:7,melee:4,agility:3,resilience:4,vigilance:3,plannedImage:"assets/portraits/minion-12-deathlok.webp",attacks:["Rifle: alcance 8, dano 6","Braço cibernético: corpo a corpo, dano 6"],skills:["Cibernético: resistência a efeitos físicos.","Mira avançada: +1 em ataques à distância.","Interface tática: uma vez por rodada pode conceder +1 ao próximo ataque de um aliado."]}),
+    "skrull": minion("skrull","Skrull",1,{description:"Soldado alienígena Skrull, verde, treinado para combate e infiltração.",health:12,defense:12,speed:6,melee:2,agility:2,resilience:2,vigilance:2,plannedImage:"assets/portraits/minion-13-skrull.webp",attacks:["Arma Skrull: alcance 6, dano 4","Soco: dano 3"],skills:["Metamorfo: pode assumir aparência humanoide.","Infiltrador: +2 em testes para se passar por outra pessoa.","Treinamento alienígena: proficiência com equipamentos Skrull."]}),
+    "kree": minion("kree","Kree",1,{description:"Soldado Kree de elite, azul, com armadura futurista e arma de energia.",health:15,defense:13,speed:6,melee:3,agility:2,resilience:3,vigilance:2,plannedImage:"assets/portraits/minion-14-kree.webp",attacks:["Arma Kree: alcance 7, dano 5","Combate corpo a corpo: dano 4"],skills:["Armadura Kree: reduz 1 de dano.","Disciplina militar: +1 quando auxiliado por outro Kree.","Equipamento avançado: possui comunicação e sensores avançados."]}),
+    "chitauri": minion("chitauri","Chitauri",1,{description:"Soldado Chitauri agressivo com aparência biomecânica e armamento alienígena.",health:13,defense:12,speed:6,melee:3,agility:1,resilience:2,vigilance:1,plannedImage:"assets/portraits/minion-15-chitauri.webp",attacks:["Arma Chitauri: alcance 6, dano 5","Lança: corpo a corpo, dano 4"],skills:["Tática de enxame: +1 em ataques quando houver pelo menos dois Chitauri atacando o mesmo alvo.","Equipamento alienígena: comunicação e sensores.","Montaria aérea: algumas unidades podem possuir equipamento voador."]}),
+    "brood": minion("brood","Brood",1,{description:"Criatura alienígena insetoide predatória, monstruosa e preparada para atacar.",health:14,defense:13,speed:7,melee:3,agility:3,resilience:2,vigilance:2,plannedImage:"assets/portraits/minion-16-brood.webp",attacks:["Garras: dano 5","Mordida: dano 4"],skills:["Escalada","Salto: pode atravessar grandes distâncias.","Instinto predatório: +1 contra inimigos já feridos.","Enxame: recebe +1 Defesa quando adjacente a outro Brood."]}),
+    "badoon": minion("badoon","Badoon",1,{description:"Soldado alienígena reptiliano experiente, equipado para combate espacial.",health:13,defense:12,speed:6,melee:2,agility:2,resilience:2,vigilance:2,plannedImage:"assets/portraits/minion-17-badoon.webp",attacks:["Rifle alienígena: alcance 7, dano 5","Lâmina: dano 4"],skills:["Soldado experiente: +1 em ataques quando estiver em formação.","Equipamento espacial: adequado para combate fora de ambientes terrestres."]}),
+    "shiar": minion("shiar","Shi'ar",1,{description:"Soldado Shi'ar de elite, com armadura futurista e equipamento de voo imperial.",health:14,defense:13,speed:7,melee:2,agility:3,resilience:2,vigilance:2,plannedImage:"assets/portraits/minion-18-shiar.webp",attacks:["Arma Shi'ar: alcance 7, dano 5","Lança energética: dano 4"],skills:["Voo: equipamento ou asas, dependendo da unidade.","Treinamento imperial: +1 em testes militares.","Formação: +1 Defesa quando adjacente a outro Shi'ar."]}),
+    "symbiote": minion("symbiote","Symbiote",1,{description:"Criatura humanoide formada por matéria simbionte orgânica, agressiva e mutável.",health:16,defense:13,speed:7,melee:3,agility:2,resilience:3,vigilance:2,plannedImage:"assets/portraits/minion-19-symbiote.webp",attacks:["Tentáculo: alcance 2, dano 5","Mordida: dano 5"],skills:["Escalada","Regeneração: recupera 2 de Saúde uma vez por rodada.","Forma mutável: pode criar lâminas, tentáculos e outras extensões.","Vulnerabilidade sônica: efeitos sônicos podem causar +2 dano."]}),
+    "morlock": minion("morlock","Morlock",1,{description:"Mutante subterrâneo, sobrevivente de túneis, com roupas improvisadas.",health:11,defense:12,speed:6,melee:2,agility:2,resilience:2,vigilance:2,plannedImage:"assets/portraits/minion-20-morlock.webp",attacks:["Garra: dano 4","Arma improvisada: dano 3"],skills:["Mestre dos túneis: +2 para se esconder em ambientes subterrâneos.","Movimento furtivo: pode se mover silenciosamente.","Mutação: cada Morlock pode possuir uma pequena característica mutante diferente."]}),
+    "reaver": minion("reaver","Reaver",2,{description:"Mercenário cibernético com armas integradas e partes do corpo substituídas por tecnologia.",health:22,defense:14,speed:6,melee:3,agility:3,resilience:4,vigilance:2,plannedImage:"assets/portraits/minion-21-reaver.webp",attacks:["Arma pesada: alcance 7, dano 6","Membro cibernético: dano 6"],skills:["Cibernético: resistência a efeitos físicos.","Arsenal integrado: possui armas incorporadas ao corpo.","Caçador de mutantes: +1 contra mutantes."]}),
+    "latveria-soldier": minion("latveria-soldier","Soldado da Latvéria",1,{description:"Soldado humano disciplinado da força militar tecnológica da Latvéria.",health:15,defense:13,speed:6,melee:2,agility:2,resilience:3,vigilance:2,plannedImage:"assets/portraits/minion-22-latveria-soldier.webp",attacks:["Rifle: alcance 7, dano 5","Bastão: dano 4"],skills:["Armadura Latveriana: reduz 1 de dano.","Disciplina: +1 quando estiver próximo de outro soldado.","Lealdade: não sofre penalidade por medo causado por um aliado."]}),
+    "kyln-guard": minion("kyln-guard","Guarda da Kyln",1,{description:"Agente profissional de segurança da prisão espacial Kyln com equipamento de contenção.",health:14,defense:13,speed:6,melee:2,agility:2,resilience:3,vigilance:3,plannedImage:"assets/portraits/minion-23-kyln-guard.webp",attacks:["Arma de contenção: alcance 5, dano 4","Bastão elétrico: dano 4"],skills:["Contenção: equipamento pode reduzir a velocidade de um alvo atingido.","Treinamento de prisão: +2 para impedir fugas.","Equipamento não letal: pode escolher causar dano reduzido para incapacitar."]}),
+    "vampire": minion("vampire","Vampiro",1,{description:"Predador humanoide sobrenatural com presas, olhos sobrenaturais e roupas escuras.",health:14,defense:13,speed:7,melee:3,agility:2,resilience:2,vigilance:2,plannedImage:"assets/portraits/minion-24-vampire.webp",attacks:["Garras: dano 4","Mordida: dano 5"],skills:["Regeneração: recupera 2 de Saúde após causar dano com mordida.","Sentidos sobrenaturais: +2 para perceber criaturas.","Fraqueza à luz solar: sofre penalidade severa quando exposto diretamente ao sol."]}),
+    "werewolf": minion("werewolf","Lobisomem",1,{description:"Criatura humanoide lupina musculosa, com pelos, garras e presas.",health:18,defense:13,speed:8,melee:4,agility:2,resilience:3,vigilance:3,plannedImage:"assets/portraits/minion-25-werewolf.webp",attacks:["Garras: dano 5","Mordida: dano 5"],skills:["Sentidos aguçados","Regeneração: recupera 2 de Saúde por rodada.","Fúria: quando estiver abaixo da metade da Saúde, recebe +1 Luta."]}),
+    "wendigo": minion("wendigo","Wendigo",2,{description:"Criatura sobrenatural grande, musculosa, de pelos brancos e comportamento selvagem.",health:24,defense:14,speed:8,melee:4,agility:2,resilience:4,vigilance:3,plannedImage:"assets/portraits/minion-26-wendigo.webp",attacks:["Garras: dano 7","Mordida: dano 6"],skills:["Regeneração: recupera 3 de Saúde por rodada.","Predador: +1 contra inimigos feridos.","Escalada","Fúria selvagem: ao ficar abaixo da metade da Saúde, causa +1 dano."]}),
+    "demon": minion("demon","Demônio",1,{description:"Criatura humanoide infernal, monstruosa, com chifres, garras e energia sobrenatural.",health:16,defense:13,speed:6,melee:3,agility:1,resilience:3,vigilance:2,plannedImage:"assets/portraits/minion-27-demon.webp",attacks:["Garras: dano 5","Rajada infernal: alcance 5, dano 4"],skills:["Resistência sobrenatural: reduz 1 de dano não mágico.","Visão sobrenatural","Forma infernal: resistência a condições mundanas comuns."]}),
+    "dormammu-cultist": minion("dormammu-cultist","Cultista de Dormammu",1,{description:"Humano praticante de magia negra a serviço de Dormammu, com roupas de culto e energia mística.",health:10,defense:11,speed:6,melee:1,agility:1,resilience:1,vigilance:3,plannedImage:"assets/portraits/minion-28-dormammu-cultist.webp",attacks:["Adaga ritual: dano 3","Rajada mística: alcance 5, dano 4"],skills:["Magia sombria: pode utilizar pequenos efeitos místicos.","Fanatismo: ignora medo enquanto outro cultista estiver próximo.","Ritual: dois ou mais cultistas podem combinar ações para aumentar o efeito de uma habilidade mística."]}),
     octopus: villain('octopus','Doutor Octopus','Otto Octavius',4,'AMEAÇA',{image:'assets/portraits/villain-octopus.webp',pdf:'assets/pdfs/villain-doutor-octopus.pdf',role:'Cientista / ameaça tática',hook:'Primeiro grande suspeito da conspiração.',maxHealth:90,maxFocus:60,currentHealth:90,currentFocus:60,initiative:'+2',speed:'Correr 5 · Escalar 5 · Nadar 3 · Pular 5',movement:{run:5,climb:5,swim:3,jump:5},occupation:'Cientista',origin:'Alta tecnologia / ciência bizarra',teams:'Sinister Six, Masters of Evil',base:'Nova York',abilities:{Melee:4,Agility:3,Resilience:3,Vigilance:2,Ego:4,Logic:5},traits:['Inventor','Scientific Expertise','Tech Reliance'],tags:['Villainous','Public Identity'],powers:['Membros Adicionais','Golpear Cabeças','Agarrão Esmagador','Alcance Estendido','Pulo 1']}),
     sabretooth: villain('sabretooth','Dentes-de-Sabre','Victor Creed',4,'AMEAÇA',{image:'assets/portraits/villain-sabretooth.webp',pdf:'assets/pdfs/villain-dentes-de-sabre.pdf',role:'Caçador mutante',hook:'Rival pessoal de Wolverine.',maxHealth:180,maxFocus:150,currentHealth:180,currentFocus:150,healthDR:'-1',initiative:'+4E',occupation:'Mercenário',origin:'Mutante / cibernética',teams:'Marauders, Brotherhood',base:'Krakoa / móvel',abilities:{Melee:7,Agility:4,Resilience:6,Vigilance:4,Ego:0,Logic:0},traits:['Battle Ready','Berserker','Combat Reflexes','Stealthy'],tags:['Villainous','X-Gene'],powers:['Fator de Cura','Sentidos Aguçados','Ataque Cruel','Frenesi Giratório','Pulo 1']}),
     crossbones: villain('crossbones','Ossos Cruzados','Brock Rumlow',3,'AMEAÇA',{image:'assets/portraits/villain-crossbones.webp',pdf:'assets/pdfs/villain-ossos-cruzados.pdf',role:'Operativo Hydra',hook:'Ataque tático ligado ao passado de Steve.',maxHealth:90,maxFocus:90,currentHealth:90,currentFocus:90,initiative:'+2E',speed:'Correr 6 · Escalar 3 · Nadar 3 · Pular 3',movement:{run:6,climb:3,swim:3,jump:3},occupation:'Mercenário',origin:'Treinamento especial',teams:'Hydra, Thunderbolts',base:'Móvel',abilities:{Melee:4,Agility:5,Resilience:3,Vigilance:2,Ego:0,Logic:1},traits:['Battle Ready','Combat Expert','Connections: Military'],tags:['Villainous','Signature Weapon'],powers:['Precisão 2','Tiro Duplo','Poder de Parada','Aparar à Queima-Roupa']}),
@@ -200,6 +251,36 @@ const CHARACTER_ASSETS = {
 Object.entries(CHARACTER_ASSETS.heroes).forEach(([id,asset])=>{ if(CHARACTER_LIBRARY.heroes[id]) Object.assign(CHARACTER_LIBRARY.heroes[id], asset); });
 Object.entries(CHARACTER_ASSETS.villains).forEach(([id,asset])=>{ if(CHARACTER_LIBRARY.villains[id]) Object.assign(CHARACTER_LIBRARY.villains[id], asset); });
 
+
+// v49.2 — biblioteca completa do PDF integrada ao catálogo inteligente/responsivo.
+// Perfis do Core Rulebook atualizam dados e PDFs, mas retratos curados do Arachne
+// continuam tendo prioridade quando o personagem já existia no projeto.
+for (const sourceProfile of CORE_RULEBOOK_CHARACTERS) {
+  const id=sourceProfile.id;
+  const existing=CHARACTER_LIBRARY.heroes[id] || CHARACTER_LIBRARY.villains[id] || null;
+  const targetKind=sourceProfile.libraryKind==='villain'?'villains':'heroes';
+  const otherKind=targetKind==='heroes'?'villains':'heroes';
+  const legacyPortrait=(existing?.image&&String(existing.image).startsWith('assets/portraits/'))?existing.image:'';
+  const displayImage=legacyPortrait||sourceProfile.image||sourceProfile.image_url||'';
+  const preserved=existing?{
+    n:existing.n||sourceProfile.n,
+    role:existing.role||sourceProfile.role,
+    hook:existing.hook||sourceProfile.hook,
+    speed:(existing.speed&&existing.speed!=='Ver ficha original')?existing.speed:sourceProfile.speed,
+    movement:existing.movement||sourceProfile.movement
+  }:{};
+  delete CHARACTER_LIBRARY[otherKind][id];
+  CHARACTER_LIBRARY[targetKind][id]={
+    ...existing,
+    ...sourceProfile,
+    ...preserved,
+    image:displayImage,
+    image_url:displayImage,
+    source_image_url:sourceProfile.image_url||sourceProfile.image||'',
+    libraryRevision:LIBRARY_REVISION
+  };
+}
+
 const TEMPLATE_PDFS = {
   arachne:'assets/pdfs/campanha-projeto-arachne.pdf',
   'avengers-doom':'assets/pdfs/campanha-vingadores-protocolo-destino.pdf',
@@ -224,7 +305,8 @@ function getChar(kind,id){
   item.libraryKind=sourceKind;
   item.rosterKind=kind;
   if(sourceKind!==kind){
-    if(item.alignment==='antihero')item.tier='ANTI-HERÓI';
+    if(item.type==='minion')item.tier='LACAIO';
+    else if(item.alignment==='antihero')item.tier='ANTI-HERÓI';
     else if(item.alignment==='wildcard')item.tier='WILDCARD';
     else item.tier=kind==='hero'?'HERÓI':'AMEAÇA';
   }
@@ -241,7 +323,7 @@ const templates = [
   buildTemplate({
     id:'arachne', name:'Projeto Arachne', subtitle:'Conspiração genética em 8 sessões', rank:4, players:3, finalVillain:'Senhor Sinistro', accent:'#ef3340', source:'built-in', campaignPdf:'assets/pdfs/campanha-projeto-arachne.pdf',
     summary:'Três heróis investigam roubos científicos, laboratórios clandestinos e coleta genética que converge para o Projeto Arachne de Nathaniel Essex.',
-    heroIds:['spider','wolverine','cap'], villainIds:['octopus','sabretooth','crossbones','goblin','sinister','hydra-agent','aim-agent'],
+    heroIds:['spider','wolverine','cap'], villainIds:['octopus','sabretooth','crossbones','goblin','sinister','hydra-agent','aim-agent','kingpin-henchman','mercenary','vulture-henchman','green-goblin-henchman','doctor-octopus-henchman','mysterio-henchman','sinister-follower','apocalypse-follower','ultron-drone','sentinel','doombot','deathlok','skrull','kree','chitauri','brood','badoon','shiar','symbiote','morlock','reaver','latveria-soldier','kyln-guard','vampire','werewolf','wendigo','demon','dormammu-cultist'],
     sessions:[
       session(1,'O Roubo','Os heróis investigam roubos diferentes e chegam ao mesmo laboratório. A pista aponta para Otto Octavius.'),
       session(2,'Doutor Octopus','Otto transporta uma amostra crítica. Documentos apontam para Essex.'),

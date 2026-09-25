@@ -289,6 +289,21 @@ O repositório já contém configurações para os ambientes usados pelo projeto
 
 Antes de publicar, revise as URLs e variáveis de ambiente para que apontem para a sua própria infraestrutura.
 
+## Segurança
+
+O projeto mantém no backend operações que não devem ser confiadas ao navegador, incluindo autenticação de sessão, permissões administrativas, regras de movimentação e geração das rolagens D616.
+
+Nunca publique em código cliente:
+
+- `SUPABASE_SERVICE_ROLE_KEY`;
+- `SESSION_SECRET`;
+- senha do Mestre;
+- outras credenciais privadas.
+
 ## Documentação de desenvolvimento
 
 O histórico técnico e as mudanças entre versões ficam nos arquivos de **CHANGELOG** e auditoria do projeto. O README principal é mantido apenas como documentação do estado atual do Arachne.
+
+## Build com 28 capangas integrados
+
+Esta cópia já inclui 28 novos capangas com retratos e fichas internas completas. Os detalhes da integração estão em `CHANGELOG_CAPANGAS.md`.

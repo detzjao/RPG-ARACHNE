@@ -11,7 +11,7 @@ const html=fs.readFileSync(path.join(root,'frontend/index.html'),'utf8');
 
 const portraits=[
   'villain-abomination.webp','villain-ajax.webp','villain-annihilus.webp','villain-zemo.webp','hero-black-panther.webp',
-  'villain-blastaar.webp','hero-captain-marvel.webp','hero-thing.webp','hero-deadpool.webp','hero-daredevil.webp',
+  'villain-blastaar.webp','hero-captain-marvel.webp','hero-thing.webp','hero-deadpool.webp','hero-daredevil-v2.webp',
   'hero-doctor-strange.webp','villain-elektra.webp','hero-scarlet-witch.webp','hero-gambit.webp','hero-hawkeye.webp',
   'villain-molecule-man.webp','hero-hulk.webp','villain-juggernaut.webp','villain-loki.webp','hero-luke-cage.webp',
   'villain-madcap.webp','villain-magneto.webp','hero-war-machine.webp','villain-bullseye.webp','villain-mystique.webp',
@@ -41,7 +41,7 @@ test('casos de corte mais sensíveis possuem focos específicos e CSS é cache-b
   assert.match(css,/img\[src\$="hero-thing\.webp"\]\{--portrait-position:center 80%/);
   assert.match(css,/img\[src\$="villain-elektra\.webp"\]\{--portrait-position:center 12%/);
   assert.match(css,/img\[src\$="villain-kingpin\.webp"\]\{--portrait-position:center 8%/);
-  assert.match(css,/img\[src\$="hero-daredevil\.webp"\]\{--portrait-position:center 44%;--portrait-scale:1\.40/);
+  assert.match(css,/img\[src\$="hero-daredevil-v2\.webp"\]\{--portrait-position:center center;--portrait-scale:1/);
   assert.match(css,/img\[src\$="hero-vision\.webp"\]\{--portrait-position:center 18%;--portrait-scale:1\.25/);
   assert.match(html,/styles\/tailwind\.css/);
   assert.match(html,/styles\/custom\.css/);

@@ -39,6 +39,6 @@ test('v48.5 modal de ficha usa layout próprio e imagem contida',()=>{
 });
 
 test('v48.5 invalida cache antigo de JS e CSS',()=>{
-  assert.match(index,/styles\/custom\.css\?v=48\.8/);
-  assert.match(index,/src\/app\.js\?v=48\.8/);
+  assert.match(index,/styles\/custom\.css\?v=49\.2/);
+  assert.match(index,/src\/app\.js\?v=49\.2/);
 });

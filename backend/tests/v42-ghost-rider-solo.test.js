@@ -33,7 +33,7 @@ test('ficha do Motoqueiro Fantasma preserva os números fornecidos',()=>{
   assert.equal(hero.movement.swim,6);
   assert.equal(damageMultiplierFor(hero,'Melee'),5);
   assert.equal(damageMultiplierFor(hero,'Ego'),5);
-  assert.equal(damageMultiplierFor(hero,'Agility'),null);
+  assert.equal(damageMultiplierFor(hero,'Agility'),5);
 });
 
 test('seed solo carrega modo, PDF completo e retrato no mesmo cenário existente',()=>{

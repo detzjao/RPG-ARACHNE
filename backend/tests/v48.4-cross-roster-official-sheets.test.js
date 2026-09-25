@@ -25,7 +25,7 @@ test('v48.4 importa as fichas oficiais de Juggernaut, Elektra e Kingpin',()=>{
 
   const fisk=getCharacter('villain','kingpin');
   assert.equal(fisk.rank,3); assert.equal(fisk.maxHealth,90); assert.equal(fisk.maxFocus,60); assert.equal(fisk.initiative,'+2');
-  assert.deepEqual(fisk.abilities,{Melee:5,Agility:1,Resilience:3,Vigilance:2,Ego:2,Logic:3});
+  assert.deepEqual(fisk.abilities,{Melee:4,Agility:1,Resilience:3,Vigilance:2,Ego:2,Logic:3});
   assert.deepEqual(fisk.damageMultipliers,{Melee:3,Agility:3,Ego:3,Logic:3});
   assert.deepEqual(fisk.defenses,{Melee:14,Agility:14,Resilience:13,Vigilance:12,Ego:12,Logic:13});
 });
@@ -37,7 +37,7 @@ test('v48.4 adiciona Venom, Ninja da Mão e Agente da SHIELD com dano correto',(
   assert.equal(damageMultiplierFor(venom,'Melee'),6);
 
   const ninja=getCharacter('villain','hand-ninja');
-  assert.equal(ninja.rank,1); assert.equal(ninja.tier,'LACAIO'); assert.equal(ninja.maxHealth,10); assert.equal(ninja.maxFocus,30);
+  assert.equal(ninja.rank,1); assert.equal(ninja.tier,'LACAIO'); assert.equal(ninja.maxHealth,30); assert.equal(ninja.maxFocus,30);
   assert.deepEqual(ninja.damageMultipliers,{Melee:1,Agility:1,Ego:1,Logic:1});
 
   const agent=getCharacter('hero','shield-agent');
@@ -47,7 +47,7 @@ test('v48.4 adiciona Venom, Ninja da Mão e Agente da SHIELD com dano correto',(
 
 test('v48.4 permite qualquer personagem nos dois lados do roster',()=>{
   const elektraHero=getCharacter('hero','elektra');
-  assert.equal(elektraHero.id,'elektra'); assert.equal(elektraHero.rosterKind,'hero'); assert.equal(elektraHero.libraryKind,'villain'); assert.equal(elektraHero.tier,'ANTI-HERÓI');
+  assert.equal(elektraHero.id,'elektra'); assert.equal(elektraHero.rosterKind,'hero'); assert.equal(elektraHero.libraryKind,'hero'); assert.equal(elektraHero.tier,'ANTI-HERÓI');
   const deadpoolVillain=getCharacter('villain','deadpool');
   assert.equal(deadpoolVillain.id,'deadpool'); assert.equal(deadpoolVillain.rosterKind,'villain'); assert.equal(deadpoolVillain.libraryKind,'hero'); assert.equal(deadpoolVillain.tier,'ANTI-HERÓI');
   const jugHero=getCharacter('hero','juggernaut');
@@ -74,7 +74,7 @@ test('v48.4 biblioteca, interface e assets refletem cross-roster e PDFs oficiais
   assert.match(app,/qualquer personagem pode entrar como herói ou vilão/);
   assert.match(app,/libraryKind/);
   assert.match(app,/Defesas oficiais da ficha/);
-  assert.match(index,/src\/app\.js\?v=48\.8/);
+  assert.match(index,/src\/app\.js\?v=49\.2/);
   for(const file of ['hero-venom.pdf','hero-shield-agent.pdf','villain-hand-ninja.pdf','villain-juggernaut.pdf','villain-elektra.pdf','villain-kingpin.pdf']){
     assert.ok(fs.statSync(path.join(root,'frontend/assets/pdfs',file)).size>250_000,file);
   }
