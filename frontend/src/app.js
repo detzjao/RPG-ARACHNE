@@ -181,44 +181,74 @@
     ]);
   }
 
+  function damageProfile(entity){
+    const base=Math.max(1,Number(entity?.rank||1));
+    const profile=entity?.damageMultipliers||{};
+    return Object.fromEntries(['Melee','Agility','Ego','Logic'].map(ability=>[ability,Number.isFinite(Number(profile?.[ability]))?Number(profile[ability]):base]));
+  }
+
   function SheetModal({entity,kind,onClose}){
     if(!entity)return null;
-    const abilities=entity.abilities||{};
-    return h('div',{className:'fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[92vh] w-full max-w-4xl overflow-auto rounded-2xl border border-white/10 bg-[#0d1118] p-5 shadow-2xl'},[
-      h('div',{key:'head',className:'flex items-start gap-4'},[
-        h(Portrait,{key:'p',entity,size:'lg',full:true}),
-        h('div',{key:'c',className:'min-w-0 flex-1'},[h(TinyLabel,{key:'k'},kind==='hero'?'HERÓI':'AMEAÇA'),h('h2',{key:'n',className:'mt-1 text-2xl font-black'},entity.n),h('p',{key:'r',className:'text-sm text-[#8c95a3]'},entity.r||entity.role||''),h('div',{key:'tags',className:'mt-3 flex flex-wrap gap-2'},[entity.rank&&h('span',{key:'rank',className:'rounded-lg border border-white/10 px-2 py-1 text-xs'},`RANK ${entity.rank}`),entity.tier&&h('span',{key:'tier',className:'rounded-lg border border-white/10 px-2 py-1 text-xs'},entity.tier),entity.origin&&h('span',{key:'origin',className:'rounded-lg border border-white/10 px-2 py-1 text-xs'},entity.origin)])]),
-        h(Button,{key:'x',onClick:onClose,className:'px-3'},'×')
+    const abilities=entity.abilities||{},damage=damageProfile(entity),defenses=entity.defenses||{},isHero=kind==='hero';
+    const statCard=(label,value,sub='')=>h('div',{className:'rounded-xl border border-white/10 bg-black/25 p-3'},[h(TinyLabel,{key:'l'},label),h('strong',{key:'v',className:'mt-1 block text-xl'},value??'—'),sub?h('small',{key:'s',className:'mt-1 block text-[10px] text-[#737f8f]'},sub):null]);
+    const chips=(items,tone='normal')=>(items||[]).map((item,i)=>h('span',{key:i,className:cx('rounded-lg border px-2.5 py-1.5 text-[11px]',tone==='power'?'border-[#ef3340]/25 bg-[#ef3340]/5 text-[#f3c4c7]':'border-white/10 bg-white/[.03] text-[#b3bcc8]')},item));
+    return h('div',{className:'fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[94vh] w-full max-w-6xl overflow-auto rounded-2xl border border-white/10 bg-[#0b1017] shadow-2xl'},[
+      h('div',{key:'hero',className:'grid border-b border-white/10 lg:grid-cols-[280px_1fr]'},[
+        h('div',{key:'visual',className:'relative min-h-[250px] overflow-hidden bg-[#070a0f]'},[
+          entity.image?h('img',{key:'img',src:entity.image,alt:'',className:'absolute inset-0 h-full w-full object-cover opacity-85'}):null,
+          h('div',{key:'shade',className:'absolute inset-0 bg-gradient-to-t from-[#090d13] via-transparent to-black/10'}),
+          h('div',{key:'badge',className:'absolute left-4 top-4 rounded-xl border border-[#ef3340]/50 bg-[#090d13]/90 px-3 py-2 text-center shadow-xl'},[h(TinyLabel,{key:'l',className:'text-[#ff7b85]'},'RANK'),h('strong',{key:'v',className:'block text-3xl'},entity.rank??'—')]),
+          h('div',{key:'name',className:'absolute bottom-0 left-0 right-0 p-5'},[h(TinyLabel,{key:'k',className:'text-[#ff7b85]'},isHero?'HERÓI':entity.tier||'AMEAÇA'),h('h2',{key:'n',className:'mt-1 text-3xl font-black tracking-tight'},entity.n),h('p',{key:'r',className:'mt-1 text-sm text-[#c4cbd4]'},entity.r||entity.role||'')])
+        ]),
+        h('div',{key:'info',className:'p-4 sm:p-6'},[
+          h('div',{key:'top',className:'flex items-start justify-between gap-4'},[
+            h('div',{key:'copy',className:'min-w-0'},[h(TinyLabel,{key:'l'},'FICHA DE PERSONAGEM'),h('p',{key:'h',className:'mt-2 max-w-3xl text-sm leading-6 text-[#929dab]'},entity.hook||entity.role||'Dados utilizados pela Central de Ações, combate e cenário.')]),
+            h(Button,{key:'x',onClick:onClose,className:'shrink-0 px-3'},'×')
+          ]),
+          h('div',{key:'vitals',className:'mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-5'},[
+            statCard('HEALTH',`${entity.currentHealth??entity.maxHealth??'—'} / ${entity.maxHealth??'—'}`,`DR ${entity.healthDR??'—'}`),
+            statCard('FOCUS',`${entity.currentFocus??entity.maxFocus??'—'} / ${entity.maxFocus??'—'}`,`DR ${entity.focusDR??'—'}`),
+            statCard('KARMA',entity.karma??'—'),statCard('INICIATIVA',entity.initiative||'—'),statCard('MOVIMENTO',entity.speed||'—')
+          ]),
+          h('div',{key:'profile',className:'mt-4 grid gap-2 text-xs sm:grid-cols-2 xl:grid-cols-4'},[
+            ['Ocupação',entity.occupation],['Origem',entity.origin],['Equipes',entity.teams],['Base',entity.base]
+          ].map(([label,value])=>h('div',{key:label,className:'rounded-xl border border-white/8 bg-white/[.02] p-3'},[h(TinyLabel,{key:'l'},label),h('span',{key:'v',className:'mt-1 block text-[#c3cad4]'},value||'—')])) )
+        ])
       ]),
-      h('div',{key:'vitals',className:'mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[
-        ['Health',`${entity.currentHealth??entity.maxHealth??'—'} / ${entity.maxHealth??'—'}`],['Focus',`${entity.currentFocus??entity.maxFocus??'—'} / ${entity.maxFocus??'—'}`],['Initiative',entity.initiative||'—'],['Movimento',entity.speed||'—']
-      ].map((x,i)=>h('div',{key:i,className:'rounded-xl border border-white/10 bg-black/20 p-3'},[h(TinyLabel,{key:'l'},x[0]),h('b',{key:'v',className:'mt-1 block text-sm'},x[1])]))),
-      h('div',{key:'ab',className:'mt-5'},[h(TinyLabel,{key:'l'},'ABILITIES'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'},ABILITIES.map(a=>h('div',{key:a,className:'rounded-xl border border-white/10 bg-[#111722] p-3'},[h('small',{key:'l',className:'text-[10px] text-[#8993a1]'},a.toUpperCase()),h('strong',{key:'v',className:'mt-1 block text-xl'},abilities[a]??0),h('span',{key:'d',className:'text-[10px] text-[#697382]'},`DEF ${10+Number(abilities[a]||0)}`)]))) ]),
-      (entity.powers||[]).length?h('div',{key:'pw',className:'mt-5'},[h(TinyLabel,{key:'l'},'PODERES'),h('div',{key:'g',className:'mt-2 flex flex-wrap gap-2'},entity.powers.map((p,i)=>h('span',{key:i,className:'rounded-lg border border-white/10 bg-white/[.03] px-3 py-2 text-xs'},p))) ]):null,
-      (entity.traits||[]).length?h('div',{key:'tr',className:'mt-5'},[h(TinyLabel,{key:'l'},'TRAITS'),h('p',{key:'p',className:'mt-2 text-sm leading-6 text-[#a5adba]'},entity.traits.join(' · '))]):null,
-      (entity.tags||[]).length?h('div',{key:'tg',className:'mt-4'},[h(TinyLabel,{key:'l'},'TAGS'),h('p',{key:'p',className:'mt-2 text-sm leading-6 text-[#a5adba]'},entity.tags.join(' · '))]):null,
-      entity.pdf?h('a',{key:'pdf',href:entity.pdf,target:'_blank',rel:'noopener',className:'mt-5 inline-flex min-h-11 items-center rounded-xl border border-[#ef3340]/40 bg-[#ef3340]/10 px-4 text-xs font-black text-white'},'ABRIR PDF DA FICHA'):null
+      h('div',{key:'body',className:'grid gap-4 p-4 sm:p-6 xl:grid-cols-[1.15fr_.85fr]'},[
+        h('div',{key:'left',className:'space-y-4'},[
+          h(Card,{key:'abilities',className:'p-4'},[h('div',{key:'h',className:'flex items-center justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'ABILITIES'),h('b',{key:'b',className:'mt-1 block text-sm'},'Atributos e defesas')]),h('span',{key:'x',className:'text-[10px] text-[#697484]'},Object.keys(defenses).length?'Defesas oficiais da ficha':'DEF = 10 + atributo')]),h('div',{key:'g',className:'mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'},ABILITIES.map(a=>h('div',{key:a,className:'rounded-xl border border-white/10 bg-[#0b0f15] p-3 text-center'},[h('small',{key:'l',className:'text-[9px] font-black text-[#8a95a4]'},a.toUpperCase()),h('strong',{key:'v',className:'mt-1 block text-2xl'},abilities[a]??0),h('span',{key:'d',className:'text-[9px] text-[#697382]'},`DEF ${Number.isFinite(Number(defenses?.[a]))?Number(defenses[a]):10+Number(abilities[a]||0)}`)])))]),
+          h(Card,{key:'damage',className:'p-4'},[h(TinyLabel,{key:'l',className:'text-[#ff7b85]'},'DANO POR HABILIDADE'),h('div',{key:'g',className:'mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4'},['Melee','Agility','Ego','Logic'].map(a=>h('div',{key:a,className:'rounded-xl border border-[#ef3340]/20 bg-[#ef3340]/5 p-3'},[h('small',{key:'l',className:'block text-[9px] font-black uppercase text-[#e7959b]'},a),h('strong',{key:'v',className:'mt-1 block text-lg'},`Marvel × ${damage[a]}`),h('span',{key:'m',className:'text-[10px] text-[#8f99a8]'},`${signed(abilities[a]||0)} habilidade`)])))]),
+          (entity.powers||[]).length?h(Card,{key:'powers',className:'p-4'},[h(TinyLabel,{key:'l'},'PODERES'),h('div',{key:'g',className:'mt-3 flex flex-wrap gap-2'},chips(entity.powers,'power'))]):null
+        ]),
+        h('div',{key:'right',className:'space-y-4'},[
+          (entity.traits||[]).length?h(Card,{key:'traits',className:'p-4'},[h(TinyLabel,{key:'l'},'TRAITS'),h('div',{key:'g',className:'mt-3 flex flex-wrap gap-2'},chips(entity.traits))]):null,
+          (entity.tags||[]).length?h(Card,{key:'tags',className:'p-4'},[h(TinyLabel,{key:'l'},'TAGS'),h('div',{key:'g',className:'mt-3 flex flex-wrap gap-2'},chips(entity.tags))]):null,
+          h(Card,{key:'doc',className:'p-4'},[h(TinyLabel,{key:'l'},'DOCUMENTO'),entity.pdf?h('a',{key:'pdf',href:entity.pdf,target:'_blank',rel:'noopener',className:'mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-[#ef3340]/40 bg-[#ef3340]/10 px-4 text-xs font-black text-white hover:bg-[#ef3340]/15'},'ABRIR PDF ORIGINAL DA FICHA'):h('p',{key:'p',className:'mt-2 text-xs text-[#707b89]'},'Nenhum PDF vinculado a esta ficha.')])
+        ])
+      ])
     ]));
   }
 
 
   function uniqueCharacterLibrary(characters,templates,kind='hero'){
-    const key=kind==='hero'?'heroes':'villains',map=new Map();
-    for(const item of characters?.[key]||[])if(item?.id&&!map.has(item.id))map.set(item.id,item);
-    for(const template of templates||[])for(const item of template?.[key]||[])if(item?.id&&!map.has(item.id))map.set(item.id,item);
+    const map=new Map(),add=(item,libraryKind)=>{if(!item?.id)return;const current=map.get(item.id);if(!current||libraryKind===kind)map.set(item.id,{...item,libraryKind:item.libraryKind||libraryKind});};
+    for(const item of characters?.heroes||[])add(item,'hero');
+    for(const item of characters?.villains||[])add(item,'villain');
+    for(const template of templates||[]){for(const item of template?.heroes||[])add(item,'hero');for(const item of template?.villains||[])add(item,'villain');}
     return [...map.values()].sort((a,b)=>String(a?.n||'').localeCompare(String(b?.n||''),'pt-BR'));
   }
   function blankCharacter(kind='hero'){
     const id=`${kind}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
-    return {id,n:kind==='hero'?'Novo Herói':'Novo Vilão',r:'',rank:4,tier:kind==='hero'?'HERÓI':'AMEAÇA',image:'',pdf:'',role:'',origin:'',initiative:'+0',maxHealth:90,currentHealth:90,maxFocus:90,currentFocus:90,movement:{run:5,climb:3,swim:3,jump:3},speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3',abilities:{Melee:0,Agility:0,Resilience:0,Vigilance:0,Ego:0,Logic:0},traits:[],tags:kind==='hero'?['Heroic']:['Villainous'],powers:[]};
+    return {id,n:kind==='hero'?'Novo Herói':'Novo Vilão',r:'',rank:4,tier:kind==='hero'?'HERÓI':'AMEAÇA',image:'',pdf:'',role:'',origin:'',occupation:'',teams:'',base:'',karma:kind==='hero'?4:'—',healthDR:'—',focusDR:'—',initiative:'+0',maxHealth:90,currentHealth:90,maxFocus:90,currentFocus:90,movement:{run:5,climb:3,swim:3,jump:3},speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3',abilities:{Melee:0,Agility:0,Resilience:0,Vigilance:0,Ego:0,Logic:0},damageMultipliers:{Melee:4,Agility:4,Ego:4,Logic:4},traits:[],tags:kind==='hero'?['Heroic']:['Villainous'],powers:[]};
   }
   function CharacterPickerModal({kind,items,existing,onAdd,onCreate,onClose,search='',onSearch}){
     const term=String(search||'').trim().toLocaleLowerCase('pt-BR');
     const filtered=items.filter(item=>!term||`${item.n||''} ${item.r||''} ${item.role||''}`.toLocaleLowerCase('pt-BR').includes(term));
     return h('div',{className:'fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-[#0d1118] shadow-2xl'},[
-      h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3 border-b border-white/10 p-4 sm:p-5'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'BIBLIOTECA'),h('h2',{key:'n',className:'mt-1 text-xl font-black'},`Adicionar ${kind==='hero'?'herói':'vilão'}`),h('p',{key:'p',className:'mt-1 text-xs text-[#7e8997]'},'Escolha um personagem já cadastrado ou crie uma ficha nova.')]),h(Button,{key:'x',onClick:onClose,className:'px-3'},'×')]),
+      h('div',{key:'h',className:'flex flex-wrap items-center justify-between gap-3 border-b border-white/10 p-4 sm:p-5'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'BIBLIOTECA'),h('h2',{key:'n',className:'mt-1 text-xl font-black'},`Adicionar ${kind==='hero'?'herói':'vilão'}`),h('p',{key:'p',className:'mt-1 text-xs text-[#7e8997]'},'A biblioteca é compartilhada: qualquer personagem pode entrar como herói ou vilão. Anti-heróis mantêm a mesma ficha.')]),h(Button,{key:'x',onClick:onClose,className:'px-3'},'×')]),
       h('div',{key:'search',className:'flex flex-wrap gap-2 border-b border-white/5 p-4'},[h('input',{key:'i',value:search,onChange:e=>onSearch&&onSearch(e.target.value),placeholder:'Buscar por nome...',autoFocus:true,className:'min-h-11 min-w-[220px] flex-1 rounded-xl border border-white/10 bg-black/30 px-4 text-sm outline-none focus:border-[#ef3340]/60'}),h(Button,{key:'new',primary:true,onClick:onCreate},'CRIAR DO ZERO')]),
-      h('div',{key:'g',className:'grid max-h-[62vh] gap-2 overflow-auto p-4 sm:grid-cols-2 lg:grid-cols-3'},filtered.length?filtered.map(item=>{const used=existing.has(item.id);return h('button',{key:item.id,type:'button',disabled:used,onClick:()=>onAdd(item.id),className:cx('flex items-center gap-3 rounded-xl border p-3 text-left',used?'cursor-not-allowed border-white/5 bg-white/[.02] opacity-45':'border-white/10 bg-[#111720] hover:border-[#ef3340]/55')},[h(Portrait,{key:'p',entity:item,size:'sm'}),h('div',{key:'c',className:'min-w-0 flex-1'},[h('b',{key:'n',className:'block truncate text-xs'},item.n),h('small',{key:'r',className:'mt-1 block truncate text-[9px] text-[#778291]'},item.r||item.role||`Rank ${item.rank||4}`),used?h('span',{key:'u',className:'mt-1 block text-[8px] font-black text-emerald-400'},'JÁ NA CAMPANHA'):null])]);}):h('div',{className:'col-span-full py-10 text-center text-sm text-[#74808f]'},'Nenhum personagem encontrado.'))
+      h('div',{key:'g',className:'grid max-h-[62vh] gap-2 overflow-auto p-4 sm:grid-cols-2 lg:grid-cols-3'},filtered.length?filtered.map(item=>{const used=existing.has(item.id);return h('button',{key:item.id,type:'button',disabled:used,onClick:()=>onAdd(item.id),className:cx('flex items-center gap-3 rounded-xl border p-3 text-left',used?'cursor-not-allowed border-white/5 bg-white/[.02] opacity-45':'border-white/10 bg-[#111720] hover:border-[#ef3340]/55')},[h(Portrait,{key:'p',entity:item,size:'sm'}),h('div',{key:'c',className:'min-w-0 flex-1'},[h('div',{key:'top',className:'flex items-center gap-2'},[h('b',{key:'n',className:'block min-w-0 flex-1 truncate text-xs'},item.n),h('span',{key:'src',className:cx('shrink-0 rounded-md border px-1.5 py-0.5 text-[7px] font-black',item.alignment==='antihero'?'border-amber-700/50 text-amber-300':item.alignment==='wildcard'?'border-violet-700/50 text-violet-300':'border-white/10 text-[#7f8997]')},item.alignment==='antihero'?'ANTI-HERÓI':item.alignment==='wildcard'?'WILDCARD':item.libraryKind==='villain'?'VILÃO':'HERÓI')]),h('small',{key:'r',className:'mt-1 block truncate text-[9px] text-[#778291]'},item.r||item.role||`Rank ${item.rank||4}`),used?h('span',{key:'u',className:'mt-1 block text-[8px] font-black text-emerald-400'},'JÁ NESTE LADO'):null])]);}):h('div',{className:'col-span-full py-10 text-center text-sm text-[#74808f]'},'Nenhum personagem encontrado.'))
     ]));
   }
   class CharacterEditorModal extends React.Component {
@@ -228,16 +258,17 @@
     }
     setField(key,value){this.setState(prev=>({draft:{...prev.draft,[key]:value}}));}
     setAbility(ability,value){this.setState(prev=>({draft:{...prev.draft,abilities:{...(prev.draft.abilities||{}),[ability]:clamp(value,-10,20)}}}));}
+    setDamage(ability,value){this.setState(prev=>({draft:{...prev.draft,damageMultipliers:{...(prev.draft.damageMultipliers||{}),[ability]:clamp(value,0,30)}}}));}
     setMove(mode,value){this.setState(prev=>({draft:{...prev.draft,movement:{...(prev.draft.movement||{}),[mode]:clamp(value,0,99)}}}));}
     submit(){
       const {kind,onSave}=this.props,draft=this.state.draft;
       const maxHealth=Math.max(0,Number(draft.maxHealth||0)),maxFocus=Math.max(0,Number(draft.maxFocus||0)),movement={...(draft.movement||{})};
       const speed=Object.entries(movement).filter(([,v])=>Number(v)>0).map(([k,v])=>`${MOVE_META[k]?.label||k} ${v}`).join(' · ');
-      onSave({...draft,n:String(draft.n||'').trim()||(kind==='hero'?'Novo Herói':'Novo Vilão'),r:String(draft.r||'').trim(),rank:clamp(draft.rank,1,6),tier:kind==='hero'?'HERÓI':(draft.tier||'AMEAÇA'),maxHealth,currentHealth:clamp(draft.currentHealth??maxHealth,0,maxHealth),maxFocus,currentFocus:clamp(draft.currentFocus??maxFocus,0,maxFocus),movement,speed,abilities:Object.fromEntries(ABILITIES.map(a=>[a,Number(draft.abilities?.[a]||0)])),powers:Array.isArray(draft.powers)?draft.powers:String(draft.powers||'').split(/\n/).map(x=>x.trim()).filter(Boolean),traits:Array.isArray(draft.traits)?draft.traits:String(draft.traits||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean),tags:Array.isArray(draft.tags)?draft.tags:String(draft.tags||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean)});
+      onSave({...draft,n:String(draft.n||'').trim()||(kind==='hero'?'Novo Herói':'Novo Vilão'),r:String(draft.r||'').trim(),rank:clamp(draft.rank,1,6),tier:draft.tier||(kind==='hero'?'HERÓI':'AMEAÇA'),maxHealth,currentHealth:clamp(draft.currentHealth??maxHealth,0,maxHealth),maxFocus,currentFocus:clamp(draft.currentFocus??maxFocus,0,maxFocus),movement,speed,abilities:Object.fromEntries(ABILITIES.map(a=>[a,Number(draft.abilities?.[a]||0)])),damageMultipliers:Object.fromEntries(['Melee','Agility','Ego','Logic'].map(a=>[a,Number.isFinite(Number(draft.damageMultipliers?.[a]))?clamp(draft.damageMultipliers[a],0,30):clamp(draft.rank,1,6)])),powers:Array.isArray(draft.powers)?draft.powers:String(draft.powers||'').split(/\n/).map(x=>x.trim()).filter(Boolean),traits:Array.isArray(draft.traits)?draft.traits:String(draft.traits||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean),tags:Array.isArray(draft.tags)?draft.tags:String(draft.tags||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean)});
     }
     render(){
       const {kind,isNew,onClose}=this.props,draft=this.state.draft;
-      const set=(key,value)=>this.setField(key,value),setAbility=(ability,value)=>this.setAbility(ability,value),setMove=(mode,value)=>this.setMove(mode,value);
+      const set=(key,value)=>this.setField(key,value),setAbility=(ability,value)=>this.setAbility(ability,value),setDamage=(ability,value)=>this.setDamage(ability,value),setMove=(mode,value)=>this.setMove(mode,value);
       const inputClass='min-h-10 w-full rounded-lg border border-white/10 bg-black/25 px-3 text-sm outline-none focus:border-[#ef3340]/60';
       const listText=value=>Array.isArray(value)?value.join('\n'):String(value||'');
       return h('div',{className:'fixed inset-0 z-[55] flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[94vh] w-full max-w-5xl overflow-auto rounded-2xl border border-white/10 bg-[#0d1118] p-4 shadow-2xl sm:p-6'},[
@@ -246,8 +277,11 @@
           ['Nome','n',draft.n,'text'],['Nome civil / descrição','r',draft.r,'text'],['Rank','rank',draft.rank,'number'],[kind==='hero'?'Função':'Tipo','tier',draft.tier||'','text']
         ].map(([label,key,value,type])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',type,value,onChange:e=>set(key,type==='number'?Number(e.target.value):e.target.value),className:inputClass})]))),
         h('div',{key:'meta',className:'mt-3 grid gap-3 sm:grid-cols-2'},[['Origem','origin',draft.origin||''],['Imagem (URL ou caminho)','image',draft.image||'']].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',value,onChange:e=>set(key,e.target.value),className:inputClass})]))),
+        h('div',{key:'details',className:'mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[['Ocupação','occupation',draft.occupation||''],['Equipes','teams',draft.teams||''],['Base','base',draft.base||''],['Iniciativa','initiative',draft.initiative||'+0']].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',value,onChange:e=>set(key,e.target.value),className:inputClass})]))),
+        h('div',{key:'defense',className:'mt-3 grid gap-3 sm:grid-cols-3'},[['Karma','karma',draft.karma??'—'],['Redução de Health','healthDR',draft.healthDR??'—'],['Redução de Focus','focusDR',draft.focusDR??'—']].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h(TinyLabel,{key:'l'},label),h('input',{key:'i',value,onChange:e=>set(key,e.target.value),className:inputClass})]))),
         h('div',{key:'vitals',className:'mt-5'},[h(TinyLabel,{key:'l'},'RECURSOS'),h('div',{key:'g',className:'mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'},[['Health máximo','maxHealth',draft.maxHealth],['Health atual','currentHealth',draft.currentHealth],['Focus máximo','maxFocus',draft.maxFocus],['Focus atual','currentFocus',draft.currentFocus]].map(([label,key,value])=>h('label',{key,className:'grid gap-1'},[h('span',{key:'l',className:'text-[10px] text-[#8792a1]'},label),h('input',{key:'i',type:'number',min:0,value:value??0,onChange:e=>set(key,Number(e.target.value)),className:inputClass})])))]),
         h('div',{key:'abilities',className:'mt-5'},[h(TinyLabel,{key:'l'},'ABILITIES'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'},ABILITIES.map(a=>h('label',{key:a,className:'rounded-xl border border-white/10 bg-[#111720] p-2'},[h('span',{key:'l',className:'block text-[9px] font-black text-[#8e98a6]'},a.toUpperCase()),h('input',{key:'i',type:'number',value:draft.abilities?.[a]??0,onChange:e=>setAbility(a,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
+        h('div',{key:'damage',className:'mt-5'},[h(TinyLabel,{key:'l'},'MULTIPLICADORES DE DANO'),h('p',{key:'p',className:'mt-1 text-[10px] text-[#727d8b]'},'Usados pela Central para calcular automaticamente o dano da D616.'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4'},['Melee','Agility','Ego','Logic'].map(a=>h('label',{key:a,className:'rounded-xl border border-[#ef3340]/20 bg-[#ef3340]/5 p-2'},[h('span',{key:'l',className:'block text-[9px] font-black text-[#df8d94]'},a.toUpperCase()),h('input',{key:'i',type:'number',min:0,max:30,value:draft.damageMultipliers?.[a]??draft.rank??4,onChange:e=>setDamage(a,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
         h('div',{key:'movement',className:'mt-5'},[h(TinyLabel,{key:'l'},'MOVIMENTO'),h('div',{key:'g',className:'mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7'},['run','climb','swim','jump','flight','glide','swingline'].map(mode=>h('label',{key:mode,className:'rounded-xl border border-white/10 p-2'},[h('span',{key:'l',className:'block text-[9px] text-[#8d97a5]'},MOVE_META[mode]?.label||mode),h('input',{key:'i',type:'number',min:0,value:draft.movement?.[mode]??0,onChange:e=>setMove(mode,e.target.value),className:'mt-1 h-9 w-full rounded-lg bg-black/25 px-2 text-center font-black outline-none'})])))]),
         h('div',{key:'text',className:'mt-5 grid gap-3 lg:grid-cols-3'},[
           ['Poderes (um por linha)','powers',listText(draft.powers)],['Traits (separados por vírgula)','traits',Array.isArray(draft.traits)?draft.traits.join(', '):String(draft.traits||'')],['Tags (separadas por vírgula)','tags',Array.isArray(draft.tags)?draft.tags.join(', '):String(draft.tags||'')]
@@ -313,7 +347,7 @@
   function ActionCenter({entity,category,onCategory,onRoll,roll,animating,onEdge,onFinalize,tn,onTN,power,onPower,edge,trouble,onEdgeChange,onTroubleChange}){
     if(!entity)return h(Card,{className:'p-5'},h('p',{className:'text-sm text-[#7d8796]'},'Selecione um personagem.'));
     let options=[];
-    if(category==='combat') options=Object.entries(COMBAT).map(([ability,meta])=>h('button',{key:ability,onClick:()=>onRoll(ability,true),disabled:animating,className:'rounded-xl border border-white/10 bg-[#121923] p-4 text-left transition hover:border-[#ef3340]/50 hover:bg-[#181a22] disabled:opacity-40'},[h(TinyLabel,{key:'s'},meta.short),h('div',{key:'r',className:'mt-2 flex items-end justify-between gap-3'},[h('b',{key:'l',className:'text-sm'},meta.label),h('strong',{key:'v',className:'text-xl'},signed(entity.abilities?.[ability]||0))]),h('span',{key:'x',className:'mt-3 block text-xs font-black text-[#8d96a4]'},'ROLAR D616')]));
+    if(category==='combat') options=Object.entries(COMBAT).map(([ability,meta])=>h('button',{key:ability,onClick:()=>onRoll(ability,true),disabled:animating,className:'rounded-xl border border-white/10 bg-[#121923] p-4 text-left transition hover:border-[#ef3340]/50 hover:bg-[#181a22] disabled:opacity-40'},[h(TinyLabel,{key:'s'},meta.short),h('div',{key:'r',className:'mt-2 flex items-end justify-between gap-3'},[h('b',{key:'l',className:'text-sm'},meta.label),h('strong',{key:'v',className:'text-xl'},signed(entity.abilities?.[ability]||0))]),h('span',{key:'x',className:'mt-3 block text-xs font-black text-[#8d96a4]'},`DANO ×${damageProfile(entity)[ability]} · ROLAR D616`)]));
     if(category==='test') options=ABILITIES.map(ability=>h('button',{key:ability,onClick:()=>onRoll(ability,false),disabled:animating,className:'rounded-xl border border-white/10 bg-[#121923] p-4 text-left hover:border-white/20 disabled:opacity-40'},[h(TinyLabel,{key:'s'},ability),h('strong',{key:'v',className:'mt-2 block text-2xl'},signed(entity.abilities?.[ability]||0)),h('span',{key:'x',className:'mt-2 block text-xs text-[#7f8998]'},'ROLAR')]));
     if(category==='powers') {
       const powers=entity.powers||[];
@@ -586,7 +620,10 @@
       if(template)this.setState({createMode:'template',createTemplate:template.id,createName:template.name,createHeroIds:(template.heroes||[]).map(x=>x.id),createVillainIds:(template.villains||[]).map(x=>x.id),createRosterKind:'',createRosterSearch:''});
       else this.setState({createMode:'blank',createTemplate:'',createName:'Nova Campanha',createHeroIds:[],createVillainIds:[],createRosterKind:'',createRosterSearch:''});
     }
-    toggleCreationCharacter(kind,id){const key=kind==='hero'?'createHeroIds':'createVillainIds';this.setState(prev=>({[key]:prev[key].includes(id)?prev[key].filter(x=>x!==id):[...prev[key],id]}));}
+    toggleCreationCharacter(kind,id){
+      const key=kind==='hero'?'createHeroIds':'createVillainIds',other=kind==='hero'?'createVillainIds':'createHeroIds';
+      this.setState(prev=>{const removing=prev[key].includes(id);return{[key]:removing?prev[key].filter(x=>x!==id):[...prev[key],id],[other]:removing?prev[other]:prev[other].filter(x=>x!==id)};});
+    }
     async createCampaign(){
       const t=this.state.templates.find(x=>x.id===this.state.createTemplate),mode=this.state.createMode==='template'&&t?'template':'blank',name=(this.state.createName||(mode==='template'?t?.name:'')).trim();
       if(this.state.createHeroIds.length<1){this.setState({error:'Selecione pelo menos um herói para a campanha.'});return;}
@@ -605,9 +642,15 @@
     async uploadCampaignPdf(file){try{const asset=await API.uploadAsset(file);this.toast('PDF enviado. Salve a campanha para concluir.');return asset?.url||'';}catch(e){this.toast(e.message||'Falha ao enviar PDF.');return'';}}
     async addRosterCharacter(kind,id){
       const library=this.creationLibrary(kind),source=library.find(item=>item.id===id);if(!source)return;
-      const key=kind==='hero'?'heroes':'villains';if((this.state.data[key]||[]).some(item=>item.id===id))return;
-      const entity=JSON.parse(JSON.stringify(source));
-      try{if(kind==='hero')await API.saveHero(entity);else await API.saveVillain(entity);this.setState(prev=>({rosterPicker:'',data:{...prev.data,[key]:[...(prev.data[key]||[]),entity],...(kind==='hero'?{playerNotes:{...(prev.data.playerNotes||{}),[entity.id]:''}}:{})}}));this.toast(`${entity.n} adicionado.`);}catch(e){this.toast(e.message||'Não foi possível adicionar o personagem.');}
+      const key=kind==='hero'?'heroes':'villains',otherKey=kind==='hero'?'villains':'heroes';if((this.state.data[key]||[]).some(item=>item.id===id))return;
+      const entity=JSON.parse(JSON.stringify(source));delete entity.libraryKind;entity.rosterKind=kind;
+      if(source.alignment==='antihero')entity.tier='ANTI-HERÓI';else if(source.alignment==='wildcard')entity.tier='WILDCARD';else if(source.libraryKind&&source.libraryKind!==kind)entity.tier=kind==='hero'?'HERÓI':'AMEAÇA';
+      try{
+        let removal=null;if((this.state.data[otherKey]||[]).some(item=>item.id===id))removal=kind==='hero'?await API.deleteVillain(id):await API.deleteHero(id);
+        if(kind==='hero')await API.saveHero(entity);else await API.saveVillain(entity);
+        this.setState(prev=>({rosterPicker:'',data:{...prev.data,[otherKey]:(prev.data[otherKey]||[]).filter(x=>x.id!==id),[key]:[...(prev.data[key]||[]),entity],scenario:normalizedScenario(removal?.scenario||prev.data.scenario),initiative:removal?.initiative||prev.data.initiative,combat:removal?.combat||prev.data.combat,...(kind==='hero'?{playerNotes:{...(removal?.playerNotes||prev.data.playerNotes||{}),[entity.id]:''}}:{})}}));
+        this.toast(`${entity.n} adicionado como ${kind==='hero'?'herói':'vilão'}.`);
+      }catch(e){this.toast(e.message||'Não foi possível adicionar o personagem.');}
     }
     openNewCharacter(kind){this.setState({rosterPicker:'',rosterSearch:'',characterEditor:{kind,entity:blankCharacter(kind),isNew:true}});}
     openCharacterEditor(kind,entity){this.setState({characterEditor:{kind,entity:JSON.parse(JSON.stringify(entity)),isNew:false}});}

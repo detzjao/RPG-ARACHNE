@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 import { config } from './config.js';
 import { createRepository } from './db/index.js';
 import { createSessionToken, verifySessionToken, isHeroId } from './auth.js';
-import { getTemplates, publicTemplate, getTemplate, templateSeed, blankSeed, applyRoster, getCharacterLibrary } from './templates.js';
+import { getTemplates, publicTemplate, getTemplate, templateSeed, blankSeed, applyRoster, getCharacterLibrary, getCharacter, LIBRARY_REVISION } from './templates.js';
 import { saveAsset, importRemoteImage, resolveLocalUpload } from './files.js';
 import { searchCharacterImages } from './image-search.js';
 import { ABILITIES, startD616, applyEdge, publicRoll, historyFromRoll, damageFromRoll } from './gameplay.js';
@@ -22,7 +22,7 @@ const pendingRolls=new Map();
 const CODE_ALPHABET='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function serializeMutation(campaignId,fn){const previous=mutationQueues.get(campaignId)||Promise.resolve();const task=previous.then(fn,fn);mutationQueues.set(campaignId,task.catch(()=>{}));task.finally(()=>{if(mutationQueues.get(campaignId)===task)mutationQueues.delete(campaignId);}).catch(()=>{});return task;}
-function send(res,status,body,headers={}){const isObject=body!==null&&typeof body==='object'&&!Buffer.isBuffer(body);const payload=isObject?Buffer.from(JSON.stringify(body)):Buffer.isBuffer(body)?body:Buffer.from(String(body??''));res.writeHead(status,{'Content-Type':isObject?'application/json; charset=utf-8':'text/plain; charset=utf-8','Content-Length':payload.length,'X-Arachne-Version':'33.5.0',...headers});res.end(payload);}
+function send(res,status,body,headers={}){const isObject=body!==null&&typeof body==='object'&&!Buffer.isBuffer(body);const payload=isObject?Buffer.from(JSON.stringify(body)):Buffer.isBuffer(body)?body:Buffer.from(String(body??''));res.writeHead(status,{'Content-Type':isObject?'application/json; charset=utf-8':'text/plain; charset=utf-8','Content-Length':payload.length,'X-Arachne-Version':'33.7.0',...headers});res.end(payload);}
 function corsHeaders(){return{'Access-Control-Allow-Origin':config.corsOrigin,'Access-Control-Allow-Methods':'GET,POST,PUT,PATCH,DELETE,OPTIONS','Access-Control-Allow-Headers':'Content-Type, Authorization, X-Arachne-Client','Access-Control-Max-Age':'86400'};}
 async function readJson(req,maxBytes=20*1024*1024){return await new Promise((resolve,reject)=>{let size=0;const chunks=[];req.on('data',chunk=>{size+=chunk.length;if(size>maxBytes){reject(new Error('Payload muito grande.'));req.destroy();return;}chunks.push(chunk);});req.on('end',()=>{try{resolve(chunks.length?JSON.parse(Buffer.concat(chunks).toString('utf8')):{});}catch{reject(new Error('JSON inválido.'));}});req.on('error',reject);});}
 function safeStaticPath(urlPath){const pathname=decodeURIComponent(urlPath.split('?')[0]),rel=pathname==='/'?'index.html':pathname.replace(/^\/+/,''),target=path.resolve(config.frontendDir,rel);return target.startsWith(config.frontendDir+path.sep)||target===path.join(config.frontendDir,'index.html')?target:null;}
@@ -72,6 +72,22 @@ setInterval(()=>{for(const[id,sub]of subscribers.entries()){if(sub.res.writableE
 
 async function createUniqueCampaignCode(){for(let i=0;i<20;i++){const code=generateCode();if(!(await repo.getCampaignByCode(code)))return code;}throw new Error('Não foi possível gerar um código de campanha.');}
 function characterCollections(all){return{heroes:Array.isArray(all.heroes)?all.heroes:[],villains:Array.isArray(all.villains)?all.villains:[]};}
+function migrateLibraryRoster(all){
+  const next={...all};let changed=false;
+  for(const [stateKey,kind] of [['heroes','hero'],['villains','villain']]){
+    const list=Array.isArray(all?.[stateKey])?all[stateKey]:[];
+    next[stateKey]=list.map(item=>{
+      if(!item?.id||Number(item.libraryRevision||0)>=LIBRARY_REVISION)return item;
+      const canonical=getCharacter(kind,item.id);if(!canonical)return item;
+      const maxHealth=Math.max(0,Number(canonical.maxHealth||0)),maxFocus=Math.max(0,Number(canonical.maxFocus||0));
+      const currentHealth=Math.max(0,Math.min(maxHealth,Number(item.currentHealth??maxHealth)));
+      const currentFocus=Math.max(0,Math.min(maxFocus,Number(item.currentFocus??maxFocus)));
+      changed=true;
+      return{...canonical,currentHealth,currentFocus,libraryRevision:LIBRARY_REVISION};
+    });
+  }
+  return{all:next,changed};
+}
 const INITIATIVE_NPCS={
   'minion-melee':{id:'minion-melee',n:'Capanga · Curta distância',initiative:'+1',maxHealth:40,currentHealth:40,maxFocus:30,currentFocus:30,movement:{run:5,climb:3,swim:3,jump:3}},
   'minion-ranged':{id:'minion-ranged',n:'Capanga · Longo alcance',initiative:'+2',maxHealth:30,currentHealth:30,maxFocus:30,currentFocus:30,movement:{run:5,climb:3,swim:3,jump:3}},
@@ -135,7 +151,7 @@ async function finalizePendingRoll(key,sourceClientId=''){const pending=pendingR
 async function handleApi(req,res,url){
   const headers=corsHeaders();
   if(req.method==='OPTIONS')return send(res,204,'',headers);
-  if(url.pathname==='/api/health'&&req.method==='GET')return send(res,200,{ok:true,app:'RPG Arachne API',version:'33.5.0',provider:repo.provider,realtime:'sse',multiCampaign:true,templates:true,uploads:true,imageSearch:true},headers);
+  if(url.pathname==='/api/health'&&req.method==='GET')return send(res,200,{ok:true,app:'RPG Arachne API',version:'33.7.0',provider:repo.provider,realtime:'sse',multiCampaign:true,templates:true,uploads:true,imageSearch:true},headers);
   if(url.pathname==='/api/templates'&&req.method==='GET')return send(res,200,{ok:true,data:getTemplates().map(publicTemplate)},headers);
   if(url.pathname==='/api/characters'&&req.method==='GET')return send(res,200,{ok:true,data:getCharacterLibrary('all')},headers);
 
@@ -149,7 +165,7 @@ async function handleApi(req,res,url){
   if(url.pathname==='/api/session/profile'&&req.method==='GET'){const campaign=await repo.getCampaignById(campaignId);return send(res,200,{ok:true,profile:{role:session.role,heroId:session.heroId||null,campaign:await publicCampaignWithRoster(campaign)}},headers);}
   if(url.pathname==='/api/challenge/tn'&&req.method==='PATCH'){const body=await readJson(req),raw=Number(body?.tn);if(!Number.isFinite(raw))return send(res,400,{ok:false,error:'TN inválido.'},headers);const tn=Math.max(1,Math.min(99,Math.round(raw))),challenge=await serializeMutation(campaignId,async()=>{const current=await repo.get(campaignId,'challenge')||{};const next={...current,tn};await repo.set(campaignId,'challenge',next);return next;});broadcastState(campaignId,'challenge',challenge,{sourceClientId});return send(res,200,{ok:true,data:challenge},headers);}
   if(url.pathname==='/api/roll/live'&&req.method==='POST'){if(!requireMaster(session,res))return;const body=await readJson(req);broadcastLiveRoll(campaignId,body,{roles:['player']});return send(res,200,{ok:true},headers);}
-  if(url.pathname==='/api/state'&&req.method==='GET'){const all=await repo.getAll(campaignId);return send(res,200,{ok:true,data:filterStateForSession(all,session)},headers);}
+  if(url.pathname==='/api/state'&&req.method==='GET'){let all=await repo.getAll(campaignId);const migrated=migrateLibraryRoster(all);if(migrated.changed){all=migrated.all;await repo.setMany(campaignId,{heroes:all.heroes,villains:all.villains});}return send(res,200,{ok:true,data:filterStateForSession(all,session)},headers);}
   if(url.pathname==='/api/state'&&req.method==='PUT'){if(!requireMaster(session,res))return;const body=await readJson(req),values=body?.values;if(!values||typeof values!=='object'||Array.isArray(values))return send(res,400,{ok:false,error:'Envie { values: {...} }.'},headers);const sanitized=Object.fromEntries(Object.entries(values).filter(([key])=>allowedKeys.has(key)));if(Object.hasOwn(sanitized,'initiative')&&hasInitiativeDuplicates(sanitized.initiative))return send(res,409,{ok:false,error:'Já está na iniciativa.'},headers);await repo.setMany(campaignId,sanitized);for(const[key,value]of Object.entries(sanitized)){if(key==='playerNotes'){for(const[heroId,note]of Object.entries(value||{}))broadcastState(campaignId,'playerNotes',{heroId,note:String(note||'')},{heroId,sourceClientId});}else broadcastState(campaignId,key,value,{sourceClientId});}return send(res,200,{ok:true,saved:Object.keys(sanitized)},headers);}
 
   if(url.pathname==='/api/images/search'&&req.method==='GET'){if(!requireMaster(session,res))return;const name=String(url.searchParams.get('name')||'').slice(0,80),realName=String(url.searchParams.get('realName')||'').slice(0,100),query=String(url.searchParams.get('q')||'').slice(0,120);if(name.length<2&&!query)return send(res,400,{ok:false,error:'Informe o personagem para pesquisar.'},headers);const data=await searchCharacterImages({name,realName,query});return send(res,200,{ok:true,data,officialSearchUrl:`https://www.marvel.com/search?query=${encodeURIComponent(name||query)}`},headers);}
@@ -356,4 +372,4 @@ async function handleApi(req,res,url){
 }
 
 const server=http.createServer(async(req,res)=>{try{const url=new URL(req.url,`http://${req.headers.host||'localhost'}`);if(url.pathname.startsWith('/api/'))return await handleApi(req,res,url);if(url.pathname.startsWith('/uploads/')){const local=resolveLocalUpload(url.pathname);if(!local||!fs.existsSync(local))return send(res,404,'Arquivo não encontrado.');const data=fs.readFileSync(local),type=MIME[path.extname(local).toLowerCase()]||'application/octet-stream';res.writeHead(200,{'Content-Type':type,'Content-Length':data.length,'Cache-Control':'public, max-age=31536000, immutable'});return res.end(data);}if(!config.serveFrontend)return send(res,404,'Frontend desativado.');const file=safeStaticPath(url.pathname);if(!file||!fs.existsSync(file)||fs.statSync(file).isDirectory())return send(res,404,'Arquivo não encontrado.');const data=fs.readFileSync(file),type=MIME[path.extname(file).toLowerCase()]||'application/octet-stream',ext=path.extname(file).toLowerCase();const cache=['.html','.js','.css'].includes(ext)||url.pathname==='/config.js'?'no-store, no-cache, must-revalidate':url.pathname.startsWith('/assets/portraits/')?'public, max-age=31536000, immutable':['.png','.jpg','.jpeg','.webp','.svg','.pdf'].includes(ext)?'public, max-age=86400':'no-cache';res.writeHead(200,{'Content-Type':type,'Content-Length':data.length,'Cache-Control':cache});res.end(data);}catch(error){console.error(error);if(!res.headersSent)send(res,500,{ok:false,error:error?.message||'Erro interno.'},corsHeaders());else res.end();}});
-server.listen(config.port,()=>{console.log(`[Arachne] http://localhost:${config.port}`);console.log(`[Arachne] banco: ${repo.provider}`);console.log('[Arachne] versão: 33.5.0');console.log('[Arachne] realtime: SSE por campanha');});
+server.listen(config.port,()=>{console.log(`[Arachne] http://localhost:${config.port}`);console.log(`[Arachne] banco: ${repo.provider}`);console.log('[Arachne] versão: 33.7.0');console.log('[Arachne] realtime: SSE por campanha');});

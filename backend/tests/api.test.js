@@ -64,7 +64,7 @@ test.after(async()=>{
 test('health informa versão, realtime e busca de imagens',async()=>{
   const r=await api('/health');
   assert.equal(r.status,200);
-  assert.equal(r.data.version,'33.5.0');
+  assert.equal(r.data.version,'33.7.0');
   assert.equal(r.data.realtime,'sse');
   assert.equal(r.data.imageSearch,true);
 });
@@ -199,6 +199,39 @@ test('campanhas criadas ficam isoladas do estado ARACHNE',async()=>{
   const main=await joinMaster();
   const mainState=await api('/state',{token:main});
   assert.notEqual(mainState.data.data.notesMaster,'SEGREDO-ISOLADO');
+});
+
+test('campanha existente migra fichas antigas e mantém dano calculável para personagens da biblioteca',async()=>{
+  const create=await api('/campaigns',{method:'POST',body:{
+    mode:'blank',name:'Mesa Migração v48.3',masterPassword:'migracao-1234',
+    heroIds:['deadpool','daredevil'],villainIds:['juggernaut','kingpin']
+  }});
+  assert.equal(create.status,201,JSON.stringify(create.data));
+  const token=await joinMaster(create.data.data.code,'migracao-1234');
+  const initial=await api('/state',{token});
+  assert.equal(initial.status,200,JSON.stringify(initial.data));
+  const staleHeroes=initial.data.data.heroes.map(hero=>hero.id==='deadpool'?{...hero,libraryRevision:0,maxHealth:150,currentHealth:150,damageMultipliers:{}}:{...hero,libraryRevision:0});
+  const staleVillains=initial.data.data.villains.map(villain=>villain.id==='juggernaut'?{...villain,libraryRevision:0,damageMultipliers:{}}:{...villain,libraryRevision:0});
+  const saved=await api('/state',{method:'PUT',token,body:{values:{heroes:staleHeroes,villains:staleVillains}}});
+  assert.equal(saved.status,200,JSON.stringify(saved.data));
+
+  const migrated=await api('/state',{token});
+  assert.equal(migrated.status,200,JSON.stringify(migrated.data));
+  const deadpool=migrated.data.data.heroes.find(hero=>hero.id==='deadpool');
+  const juggernaut=migrated.data.data.villains.find(villain=>villain.id==='juggernaut');
+  assert.equal(deadpool.maxHealth,120);
+  assert.equal(deadpool.currentHealth,120);
+  assert.equal(deadpool.libraryRevision,3);
+  assert.equal(deadpool.damageMultipliers.Melee,5);
+  assert.equal(juggernaut.libraryRevision,3);
+  assert.ok(Number(juggernaut.damageMultipliers.Melee)>0);
+
+  const attack=await api('/actions/d616/start',{method:'POST',token,body:{
+    actorId:'deadpool',kind:'hero',ability:'Melee',action:'Ataque de migração',rollType:'attack',tn:1,deferFinalize:true
+  }});
+  assert.equal(attack.status,200,JSON.stringify(attack.data));
+  assert.equal(attack.data.data.snapshot.damageMultiplier,5);
+  assert.equal(attack.data.data.damage.multiplier,5);
 });
 
 test('busca e troca de imagem são administrativas',async()=>{

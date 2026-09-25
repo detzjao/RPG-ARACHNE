@@ -21,7 +21,7 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# HTML/JS/CSS principais devem revalidar a cada deploy. Os URLs também recebem ?v=31.2.0.
+# HTML/JS/CSS principais devem revalidar a cada deploy. Os URLs também recebem ?v=48.4.
 [[headers]]
   for = "/*.js"
   [headers.values]
