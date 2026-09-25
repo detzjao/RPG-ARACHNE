@@ -140,3 +140,14 @@ img[src$="villain-kingpin.webp"]{--portrait-position:center 8%;--portrait-scale:
 .catalog-grid-scroll{scrollbar-gutter:stable;overscroll-behavior:contain}
 @media(min-width:901px){.sheet-visual{min-height:330px!important}.sheet-visual-img{padding:12px}}
 @media(max-width:900px){.sheet-visual-img{padding:6px}}
+
+
+/* v49.6 — retrato da ficha com crop focado no rosto */
+.sheet-visual{background:#05080d!important;min-height:300px!important}
+.sheet-visual::after{inset:46% 0 0!important;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(7,10,15,.12) 20%,rgba(7,10,15,.62) 68%,rgba(7,10,15,.94) 100%)!important}
+.sheet-visual-bg{display:none!important}
+.sheet-visual-img{z-index:1!important;padding:0!important;object-fit:cover!important;object-position:var(--sheet-portrait-position,var(--portrait-position,center 18%))!important;transform:none!important;opacity:1!important}
+.sheet-rank-badge,.sheet-visual-copy{z-index:6!important}
+@media(min-width:901px){.sheet-hero{grid-template-columns:320px minmax(0,1fr)!important}.sheet-visual{min-height:340px!important}}
+@media(max-width:900px){.sheet-visual{height:260px!important;min-height:260px!important}.sheet-visual-img{object-position:var(--sheet-portrait-position,var(--portrait-position,center 15%))!important}}
+@media(max-width:600px){.sheet-visual{height:220px!important;min-height:220px!important}.sheet-visual::after{inset:42% 0 0!important}.sheet-rank-badge{top:10px!important;right:10px!important;left:auto!important}.sheet-visual-copy{padding-right:78px!important}}

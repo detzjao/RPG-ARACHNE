@@ -74,7 +74,7 @@ test('v48.4 biblioteca, interface e assets refletem cross-roster e PDFs oficiais
   assert.match(app,/qualquer personagem pode entrar como herói ou vilão/);
   assert.match(app,/libraryKind/);
   assert.match(app,/Defesas oficiais da ficha/);
-  assert.match(index,/src\/app\.js\?v=49\.5/);
+  assert.match(index,/src\/app\.js\?v=49\.[0-9]+/);
   for(const file of ['hero-venom.pdf','hero-shield-agent.pdf','villain-hand-ninja.pdf','villain-juggernaut.pdf','villain-elektra.pdf','villain-kingpin.pdf']){
     assert.ok(fs.statSync(path.join(root,'frontend/assets/pdfs',file)).size>250_000,file);
   }

@@ -64,6 +64,28 @@
   const signed = n => `${Number(n)>=0?'+':''}${Number(n)||0}`;
   const monogram = name => String(name||'?').split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase();
   const thumb = src => { const value=String(src||''); return value.includes('/portraits/')&&!value.includes('/thumbs/') ? value.replace('/portraits/','/portraits/thumbs/').replace(/\.(png|jpe?g|webp)$/i,'.webp') : value; };
+  const SHEET_PORTRAIT_FOCUS = {
+    'hero-wolverine':'center 14%',
+    'hero-spider':'center 16%',
+    'hero-spider-man':'center 16%',
+    'hero-spider-man-peter-parker':'center 16%',
+    'hero-daredevil-v2':'center 18%',
+    'hero-daredevil':'center 18%',
+    'villain-kingpin':'center 14%',
+    'villain-sabretooth':'center 18%',
+    'villain-goblin':'center 18%',
+    'villain-crossbones':'center 18%',
+    'villain-octopus':'center 18%'
+  };
+  function imageBasename(src){
+    const file=String(src||'').split('?')[0].split('#')[0].split('/').pop()||'';
+    return file.replace(/\.(png|jpe?g|webp)$/i,'').toLowerCase();
+  }
+  function sheetPortraitStyle(entity){
+    const key=imageBasename(entity?.image);
+    const focus=SHEET_PORTRAIT_FOCUS[key] || 'center 18%';
+    return {'--sheet-portrait-position':focus};
+  }
   const scenarioKey=(x,y)=>`${x},${y}`;
   const scenarioSize=scenario=>({w:clamp(scenario?.width||20,8,30),h:clamp(scenario?.height||14,7,24)});
   const scenarioTerrain=(scenario,x,y)=>{const type=scenario?.terrain?.[scenarioKey(x,y)]||scenario?.baseTerrain||'floor';return{type,...(TERRAIN_META[type]||TERRAIN_META.floor)};};
@@ -196,16 +218,15 @@
     const chips=(items,tone='normal')=>(items||[]).map((item,i)=>h('span',{key:i,className:cx('rounded-lg border px-2.5 py-1.5 text-[11px]',tone==='power'?'border-[#ef3340]/25 bg-[#ef3340]/5 text-[#f3c4c7]':'border-white/10 bg-white/[.03] text-[#b3bcc8]')},item));
     return h('div',{className:'sheet-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'sheet-modal w-full max-w-6xl overflow-auto rounded-2xl border border-white/10 bg-[#0b1017] shadow-2xl'},[
       h('div',{key:'hero',className:'sheet-hero grid border-b border-white/10'},[
-        h('div',{key:'visual',className:'sheet-visual relative overflow-hidden bg-[#070a0f]'},[
-          entity.image?h('img',{key:'bg',src:entity.image,alt:'',className:'sheet-visual-bg absolute inset-0 h-full w-full'}):null,
-          entity.image?h('img',{key:'img',src:entity.image,alt:entity.n||'Retrato do personagem',className:'sheet-visual-img absolute inset-0 h-full w-full'}):null,
+        h('div',{key:'visual',className:'sheet-visual relative overflow-hidden bg-[#070a0f]',style:sheetPortraitStyle(entity)},[
+          entity.image?h('img',{key:'img',src:entity.image,alt:entity.n||'Retrato do personagem',className:'sheet-visual-img absolute inset-0 h-full w-full',decoding:'async'}):null,
           h('div',{key:'shade',className:'sheet-visual-shade absolute inset-0 bg-gradient-to-t from-[#090d13] via-transparent to-black/10'}),
           h('div',{key:'badge',className:'sheet-rank-badge'},[h(TinyLabel,{key:'l',className:'sheet-rank-label text-[#ff7b85]'},'RANK'),h('strong',{key:'v',className:'sheet-rank-value'},entity.rank??'—')]),
           h('div',{key:'name',className:'sheet-visual-copy'},[h(TinyLabel,{key:'k',className:'sheet-visual-category text-[#ff7b85]'},isHero?'HERÓI':entity.tier||'AMEAÇA'),h('h2',{key:'n',className:'sheet-visual-name'},entity.n),h('p',{key:'r',className:'sheet-visual-realname'},entity.r||entity.role||'')])
         ]),
         h('div',{key:'info',className:'sheet-info p-4 sm:p-6'},[
           h('div',{key:'top',className:'flex items-start justify-between gap-4'},[
-            h('div',{key:'copy',className:'min-w-0'},[h(TinyLabel,{key:'l'},'FICHA DE PERSONAGEM'),h('p',{key:'h',className:'mt-2 max-w-3xl text-sm leading-6 text-[#929dab]'},entity.hook||entity.role||'Dados utilizados pela Central de Ações, combate e cenário.')]),
+            h('div',{key:'copy',className:'min-w-0'},[h(TinyLabel,{key:'l'},'FICHA DE PERSONAGEM'),h('p',{key:'h',className:'mt-2 max-w-3xl text-sm leading-6 text-[#929dab]'},'Dados mecânicos, poderes e perfil do personagem.')]),
             h(Button,{key:'x',onClick:onClose,className:'shrink-0 px-3'},'×')
           ]),
           h('div',{key:'vitals',className:'mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'},[

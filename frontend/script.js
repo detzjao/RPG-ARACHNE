@@ -1272,7 +1272,7 @@
         <div><small>FOCUS ATUAL</small><b>${heroCurrentFocus(hero)} / ${heroMaxFocus(hero)}</b>${focusButtons}</div>
       </div>
       <div class="sheet villain-sheet">${heroAbilityCards(hero)}<div><small>RED. HEALTH</small><b>${escapeHTML(hero.healthDR || '—')}</b></div><div><small>RED. FOCUS</small><b>${escapeHTML(hero.focusDR || '—')}</b></div><div><small>INICIATIVA</small><b>${escapeHTML(hero.initiative || '+0')}</b></div><div><small>KARMA</small><b>${heroKarma(hero)}</b></div></div>
-      <div class="dossier-grid"><div><h3>Perfil</h3><p><b>Ocupação:</b> ${escapeHTML(hero.occupation || '—')}</p><p><b>Origem:</b> ${escapeHTML(hero.origin || '—')}</p><p><b>Equipes:</b> ${escapeHTML(hero.teams || '—')}</p><p><b>Base:</b> ${escapeHTML(hero.base || '—')}</p></div><div><h3>Função na campanha</h3><p>${escapeHTML(hero.role || '—')}</p><p>${escapeHTML(hero.hook || '—')}</p><p><b>Velocidade:</b> ${escapeHTML(hero.speed || '—')}</p></div></div>
+      <div class="dossier-grid"><div><h3>Perfil</h3><p><b>Ocupação:</b> ${escapeHTML(hero.occupation || '—')}</p><p><b>Origem:</b> ${escapeHTML(hero.origin || '—')}</p><p><b>Equipes:</b> ${escapeHTML(hero.teams || '—')}</p><p><b>Base:</b> ${escapeHTML(hero.base || '—')}</p></div><div><h3>Perfil de combate</h3><p>${escapeHTML(hero.role || '—')}</p><p><b>Velocidade:</b> ${escapeHTML(hero.speed || '—')}</p></div></div>
       <h3>Poderes</h3><div class="chips power-chips">${(hero.powers || []).map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div>
       <div class="dossier-grid"><div><h3>Traits</h3><ul>${hero.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div><div><h3>Tags</h3><ul>${hero.tags.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div></div>
       <div class="editbuttons"><button class="savebtn" type="button" data-action="view-hero-pdf" data-index="${index}">VISUALIZAR FICHA COMPLETA</button>${edit}</div>`);
@@ -1298,8 +1298,7 @@
       <label>Red. dano Health<input id="h-e-health-dr" value="${escapeHTML(hero.healthDR || '—')}"></label><label>Red. dano Focus<input id="h-e-focus-dr" value="${escapeHTML(hero.focusDR || '—')}"></label>
       <label>Velocidade<input id="h-e-speed" value="${escapeHTML(hero.speed || '')}"></label><label>Ocupação<input id="h-e-occupation" value="${escapeHTML(hero.occupation || '')}"></label>
       <label>Origem<input id="h-e-origin" value="${escapeHTML(hero.origin || '')}"></label><label>Equipes<input id="h-e-teams" value="${escapeHTML(hero.teams || '')}"></label>
-      <label>Base<input id="h-e-base" value="${escapeHTML(hero.base || '')}"></label><label class="full">Função na campanha<input id="h-e-role" value="${escapeHTML(hero.role || '')}"></label>
-      <label class="full">Gancho<input id="h-e-hook" value="${escapeHTML(hero.hook || '')}"></label>
+      <label>Base<input id="h-e-base" value="${escapeHTML(hero.base || '')}"></label><label class="full">Perfil / função<input id="h-e-role" value="${escapeHTML(hero.role || '')}"></label>
       <div class="full ability-editor"><small>HABILIDADES (MARVEL)</small>${abilityInputs}</div>
       <label class="full">Poderes — separados por vírgula<textarea id="h-e-powers">${escapeHTML((hero.powers || []).join(', '))}</textarea></label>
       <label class="full">Traits — separados por vírgula<textarea id="h-e-traits">${escapeHTML(hero.traits.join(', '))}</textarea></label>
@@ -1332,7 +1331,6 @@
     hero.teams = $('h-e-teams').value.trim();
     hero.base = $('h-e-base').value.trim();
     hero.role = $('h-e-role').value.trim();
-    hero.hook = $('h-e-hook').value.trim();
     ABILITIES.forEach(name => { hero.abilities[name] = clamp($(`h-e-ability-${name}`).value,-20,30); });
     hero.powers = $('h-e-powers').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,60);
     hero.traits = $('h-e-traits').value.split(',').map(x => x.trim()).filter(Boolean).slice(0,40);
@@ -1384,7 +1382,7 @@
         <div><small>FOCUS ATUAL</small><b>${villain.currentFocus} / ${villain.maxFocus}</b><div><button type="button" data-action="adjust-villain" data-resource="focus" data-delta="-10" data-index="${index}">−10</button><button type="button" data-action="adjust-villain" data-resource="focus" data-delta="-5" data-index="${index}">−5</button><button type="button" data-action="adjust-villain" data-resource="focus" data-delta="5" data-index="${index}">+5</button><button type="button" data-action="adjust-villain" data-resource="focus" data-delta="10" data-index="${index}">+10</button></div></div>
       </div>
       <div class="sheet villain-sheet">${abilityCards}${minionDefense}<div><small>RED. HEALTH</small><b>${escapeHTML(villain.healthDR)}</b></div><div><small>RED. FOCUS</small><b>${escapeHTML(villain.focusDR)}</b></div><div><small>INICIATIVA</small><b>${escapeHTML(villain.initiative)}</b></div></div>
-      <div class="dossier-grid"><div><h3>Perfil</h3><p><b>Ocupação:</b> ${escapeHTML(villain.occupation)}</p><p><b>Origem:</b> ${escapeHTML(villain.origin)}</p><p><b>Equipes:</b> ${escapeHTML(villain.teams)}</p><p><b>Base:</b> ${escapeHTML(villain.base)}</p></div><div><h3>Função na campanha</h3><p>${escapeHTML(villain.role)}</p><p>${escapeHTML(villain.hook)}</p><p><b>Velocidade:</b> ${escapeHTML(villain.speed)}</p></div></div>
+      <div class="dossier-grid"><div><h3>Perfil</h3><p><b>Ocupação:</b> ${escapeHTML(villain.occupation)}</p><p><b>Origem:</b> ${escapeHTML(villain.origin)}</p><p><b>Equipes:</b> ${escapeHTML(villain.teams)}</p><p><b>Base:</b> ${escapeHTML(villain.base)}</p></div><div><h3>Perfil de combate</h3><p>${escapeHTML(villain.role)}</p><p><b>Velocidade:</b> ${escapeHTML(villain.speed)}</p></div></div>
       ${attackList || specialList ? `<div class="dossier-grid">${attackList}${specialList}</div>` : ''}
       <h3>Poderes</h3><div class="chips power-chips">${villain.powers.map(item => `<span class="chip">${escapeHTML(item)}</span>`).join('')}</div>
       <div class="dossier-grid"><div><h3>Traits</h3><ul>${villain.traits.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div><div><h3>Tags</h3><ul>${villain.tags.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul></div></div>
@@ -1417,7 +1415,7 @@
       <label>Iniciativa<input id="v-e-init" value="${escapeHTML(villain.initiative)}"></label><label>Velocidade<input id="v-e-speed" value="${escapeHTML(villain.speed)}"></label>
       <label>Ocupação<input id="v-e-occupation" value="${escapeHTML(villain.occupation)}"></label><label>Origem<input id="v-e-origin" value="${escapeHTML(villain.origin)}"></label>
       <label>Equipes<input id="v-e-teams" value="${escapeHTML(villain.teams)}"></label><label>Base<input id="v-e-base" value="${escapeHTML(villain.base)}"></label>
-      <label class="full">Função na campanha<input id="v-e-role" value="${escapeHTML(villain.role)}"></label><label class="full">Gancho<input id="v-e-hook" value="${escapeHTML(villain.hook)}"></label>
+      <label class="full">Perfil / função<input id="v-e-role" value="${escapeHTML(villain.role)}"></label>
       <div class="full ability-editor"><small>HABILIDADES (MARVEL)</small>${abilityInputs}</div>
       <label class="full">Poderes — separados por vírgula<textarea id="v-e-powers">${escapeHTML(villain.powers.join(', '))}</textarea></label>
       <label class="full">Traits — separados por vírgula<textarea id="v-e-traits">${escapeHTML(villain.traits.join(', '))}</textarea></label>
@@ -1434,7 +1432,7 @@
     villain.maxHealth = clamp($('v-e-health').value,0,9999); villain.maxFocus = clamp($('v-e-focus').value,0,9999);
     villain.currentHealth = Math.min(clamp($('v-e-current-health').value,0,9999),villain.maxHealth); villain.currentFocus = Math.min(clamp($('v-e-current-focus').value,0,9999),villain.maxFocus);
     villain.healthDR = $('v-e-health-dr').value.trim() || '—'; villain.focusDR = $('v-e-focus-dr').value.trim() || '—'; villain.initiative = $('v-e-init').value.trim() || '+0'; villain.speed = $('v-e-speed').value.trim();
-    villain.occupation = $('v-e-occupation').value.trim(); villain.origin = $('v-e-origin').value.trim(); villain.teams = $('v-e-teams').value.trim(); villain.base = $('v-e-base').value.trim(); villain.role = $('v-e-role').value.trim(); villain.hook = $('v-e-hook').value.trim();
+    villain.occupation = $('v-e-occupation').value.trim(); villain.origin = $('v-e-origin').value.trim(); villain.teams = $('v-e-teams').value.trim(); villain.base = $('v-e-base').value.trim(); villain.role = $('v-e-role').value.trim();
     ABILITIES.forEach(name => { villain.abilities[name] = clamp($(`v-e-ability-${name}`).value,-20,30); });
     villain.powers = $('v-e-powers').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,60); villain.traits = $('v-e-traits').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,40); villain.tags = $('v-e-tags').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,40);
     const imageFile=$('v-e-image-file')?.files?.[0],pdfFile=$('v-e-pdf-file')?.files?.[0];
