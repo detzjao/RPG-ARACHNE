@@ -118,3 +118,15 @@ img[src$="villain-kingpin.webp"]{--portrait-position:center 8%;--portrait-scale:
 .board-cell.selected-piece .board-token{box-shadow:0 0 0 4px rgba(244,63,94,.13),0 4px 10px rgba(0,0,0,.55)!important}
 .cell-tooltip{display:none!important}
 .scenario-board-card{content-visibility:auto;contain-intrinsic-size:720px}
+
+
+/* v48.5 — ficha responsiva + retrato contido */
+.sheet-overlay{overflow:hidden}
+.sheet-modal{width:min(1152px,calc(100vw - 24px))!important;max-height:94vh!important;overflow:auto!important;overscroll-behavior:contain}
+.sheet-hero{display:grid!important;grid-template-columns:280px minmax(0,1fr)!important}
+.sheet-visual{position:relative!important;min-height:300px!important;overflow:hidden!important;isolation:isolate}
+.sheet-visual-img{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:var(--portrait-position,center center)!important;transform:none!important;transform-origin:center!important;opacity:.86}
+.sheet-info{min-width:0!important}
+.sheet-body{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr)!important;align-items:start}
+@media(max-width:900px){.sheet-modal{width:min(760px,calc(100vw - 16px))!important;max-height:96vh!important}.sheet-hero{grid-template-columns:1fr!important}.sheet-visual{min-height:260px!important;max-height:38vh!important}.sheet-body{grid-template-columns:1fr!important}}
+@media(max-width:520px){.sheet-overlay{padding:4px!important}.sheet-modal{width:calc(100vw - 8px)!important;max-height:calc(100vh - 8px)!important;border-radius:14px!important}.sheet-visual{min-height:220px!important;max-height:32vh!important}}

@@ -37,9 +37,21 @@ export function rollMath(roll){const dice=(roll.values||[]).reduce((sum,value,in
 export function evaluateRoll(roll){const total=rollMath(roll).total,tn=Number(roll.snapshot?.tn||0),fantastic=isFantastic(roll.values);if(fantastic)return{key:total>=tn?'fantastic-success':'fantastic-failure',label:total>=tn?'FANTASTIC SUCCESS':'FANTASTIC FAILURE',success:total>=tn,fantastic};return{key:total>=tn?'success':'failure',label:total>=tn?'SUCESSO':'FALHA',success:total>=tn,fantastic:false};}
 
 export function damageMultiplierFor(actor,ability){
+  // Fonte autoritativa: o multiplicador salvo na própria ficha do personagem.
+  // Isso cobre campanhas customizadas, cross-roster e anti-heróis.
+  const explicit=actor?.damageMultipliers?.[ability];
+  if(explicit!==null&&explicit!==''&&explicit!==undefined&&Number.isFinite(Number(explicit))){
+    return Math.max(0,Math.min(30,Number(explicit)));
+  }
+  // Compatibilidade com personagens antigos que ainda dependem da tabela legada.
   const id=String(actor?.id||'');
-  const value=DAMAGE_MULTIPLIERS[id]?.[ability];
-  return Number.isFinite(Number(value))?Number(value):null;
+  const legacy=DAMAGE_MULTIPLIERS[id]?.[ability];
+  if(legacy!==null&&legacy!==''&&legacy!==undefined&&Number.isFinite(Number(legacy))){
+    return Math.max(0,Math.min(30,Number(legacy)));
+  }
+  // Último fallback para personagem criado manualmente: Rank base.
+  const rank=Number(actor?.rank);
+  return Number.isFinite(rank)&&rank>0?Math.max(1,Math.min(30,rank)):null;
 }
 
 export function damageFromRoll(roll){

@@ -192,15 +192,15 @@
     const abilities=entity.abilities||{},damage=damageProfile(entity),defenses=entity.defenses||{},isHero=kind==='hero';
     const statCard=(label,value,sub='')=>h('div',{className:'rounded-xl border border-white/10 bg-black/25 p-3'},[h(TinyLabel,{key:'l'},label),h('strong',{key:'v',className:'mt-1 block text-xl'},value??'—'),sub?h('small',{key:'s',className:'mt-1 block text-[10px] text-[#737f8f]'},sub):null]);
     const chips=(items,tone='normal')=>(items||[]).map((item,i)=>h('span',{key:i,className:cx('rounded-lg border px-2.5 py-1.5 text-[11px]',tone==='power'?'border-[#ef3340]/25 bg-[#ef3340]/5 text-[#f3c4c7]':'border-white/10 bg-white/[.03] text-[#b3bcc8]')},item));
-    return h('div',{className:'fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[94vh] w-full max-w-6xl overflow-auto rounded-2xl border border-white/10 bg-[#0b1017] shadow-2xl'},[
-      h('div',{key:'hero',className:'grid border-b border-white/10 lg:grid-cols-[280px_1fr]'},[
-        h('div',{key:'visual',className:'relative min-h-[250px] overflow-hidden bg-[#070a0f]'},[
-          entity.image?h('img',{key:'img',src:entity.image,alt:'',className:'absolute inset-0 h-full w-full object-cover opacity-85'}):null,
+    return h('div',{className:'sheet-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'sheet-modal w-full max-w-6xl overflow-auto rounded-2xl border border-white/10 bg-[#0b1017] shadow-2xl'},[
+      h('div',{key:'hero',className:'sheet-hero grid border-b border-white/10'},[
+        h('div',{key:'visual',className:'sheet-visual relative overflow-hidden bg-[#070a0f]'},[
+          entity.image?h('img',{key:'img',src:entity.image,alt:'',className:'sheet-visual-img absolute inset-0 h-full w-full object-cover'}):null,
           h('div',{key:'shade',className:'absolute inset-0 bg-gradient-to-t from-[#090d13] via-transparent to-black/10'}),
           h('div',{key:'badge',className:'absolute left-4 top-4 rounded-xl border border-[#ef3340]/50 bg-[#090d13]/90 px-3 py-2 text-center shadow-xl'},[h(TinyLabel,{key:'l',className:'text-[#ff7b85]'},'RANK'),h('strong',{key:'v',className:'block text-3xl'},entity.rank??'—')]),
           h('div',{key:'name',className:'absolute bottom-0 left-0 right-0 p-5'},[h(TinyLabel,{key:'k',className:'text-[#ff7b85]'},isHero?'HERÓI':entity.tier||'AMEAÇA'),h('h2',{key:'n',className:'mt-1 text-3xl font-black tracking-tight'},entity.n),h('p',{key:'r',className:'mt-1 text-sm text-[#c4cbd4]'},entity.r||entity.role||'')])
         ]),
-        h('div',{key:'info',className:'p-4 sm:p-6'},[
+        h('div',{key:'info',className:'sheet-info p-4 sm:p-6'},[
           h('div',{key:'top',className:'flex items-start justify-between gap-4'},[
             h('div',{key:'copy',className:'min-w-0'},[h(TinyLabel,{key:'l'},'FICHA DE PERSONAGEM'),h('p',{key:'h',className:'mt-2 max-w-3xl text-sm leading-6 text-[#929dab]'},entity.hook||entity.role||'Dados utilizados pela Central de Ações, combate e cenário.')]),
             h(Button,{key:'x',onClick:onClose,className:'shrink-0 px-3'},'×')
@@ -215,7 +215,7 @@
           ].map(([label,value])=>h('div',{key:label,className:'rounded-xl border border-white/8 bg-white/[.02] p-3'},[h(TinyLabel,{key:'l'},label),h('span',{key:'v',className:'mt-1 block text-[#c3cad4]'},value||'—')])) )
         ])
       ]),
-      h('div',{key:'body',className:'grid gap-4 p-4 sm:p-6 xl:grid-cols-[1.15fr_.85fr]'},[
+      h('div',{key:'body',className:'sheet-body grid gap-4 p-4 sm:p-6'},[
         h('div',{key:'left',className:'space-y-4'},[
           h(Card,{key:'abilities',className:'p-4'},[h('div',{key:'h',className:'flex items-center justify-between gap-3'},[h('div',{key:'t'},[h(TinyLabel,{key:'l'},'ABILITIES'),h('b',{key:'b',className:'mt-1 block text-sm'},'Atributos e defesas')]),h('span',{key:'x',className:'text-[10px] text-[#697484]'},Object.keys(defenses).length?'Defesas oficiais da ficha':'DEF = 10 + atributo')]),h('div',{key:'g',className:'mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'},ABILITIES.map(a=>h('div',{key:a,className:'rounded-xl border border-white/10 bg-[#0b0f15] p-3 text-center'},[h('small',{key:'l',className:'text-[9px] font-black text-[#8a95a4]'},a.toUpperCase()),h('strong',{key:'v',className:'mt-1 block text-2xl'},abilities[a]??0),h('span',{key:'d',className:'text-[9px] text-[#697382]'},`DEF ${Number.isFinite(Number(defenses?.[a]))?Number(defenses[a]):10+Number(abilities[a]||0)}`)])))]),
           h(Card,{key:'damage',className:'p-4'},[h(TinyLabel,{key:'l',className:'text-[#ff7b85]'},'DANO POR HABILIDADE'),h('div',{key:'g',className:'mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4'},['Melee','Agility','Ego','Logic'].map(a=>h('div',{key:a,className:'rounded-xl border border-[#ef3340]/20 bg-[#ef3340]/5 p-3'},[h('small',{key:'l',className:'block text-[9px] font-black uppercase text-[#e7959b]'},a),h('strong',{key:'v',className:'mt-1 block text-lg'},`Marvel × ${damage[a]}`),h('span',{key:'m',className:'text-[10px] text-[#8f99a8]'},`${signed(abilities[a]||0)} habilidade`)])))]),

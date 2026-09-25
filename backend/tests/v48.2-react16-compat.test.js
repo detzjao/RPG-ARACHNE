@@ -13,5 +13,5 @@ const react=fs.readFileSync(path.join(root,'frontend/vendor/react.production.min
 test('frontend permanece compatível com o React empacotado e não abre tela preta',()=>{
   assert.match(react,/React v16\.0\.0/);
   assert.doesNotMatch(app,/React\.(?:useState|useEffect|useMemo|useCallback|useRef|memo)\b/);
-  assert.match(index,/src\/app\.js\?v=48\.4/);
+  assert.match(index,/src\/app\.js\?v=48\.5/);
 });

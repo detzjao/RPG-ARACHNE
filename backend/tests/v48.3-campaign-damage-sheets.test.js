@@ -48,7 +48,7 @@ test('v48.3 ficha visual mostra dano e editor permite configurar multiplicadores
   assert.match(app,/damageMultipliers/);
   assert.match(app,/DANO ×/);
   assert.match(api,/applyAttackDamage/);
-  assert.match(index,/src\/app\.js\?v=48\.4/);
+  assert.match(index,/src\/app\.js\?v=48\.5/);
 });
 
 test('PDFs oficiais enviados substituem as fichas antigas de Deadpool e Demolidor',()=>{
