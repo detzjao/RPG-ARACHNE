@@ -49,5 +49,5 @@ test('v50 frontend possui API dedicada de NPC e cache atualizado',()=>{
   assert.match(api,/async function saveNpc\(/);
   assert.match(api,/async function deleteNpc\(/);
   assert.match(index,/src\/api\.js\?v=50\.0/);
-  assert.match(index,/src\/app\.js\?v=50\.0/);
+  assert.match(index,/src\/app\.js\?v=50\.[0-9]+/);
 });

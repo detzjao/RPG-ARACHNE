@@ -458,11 +458,12 @@ export function getCharacterLibrary(kind='all'){ return characterList(kind); }
 export function getCharacter(kind,id){ return getChar(kind,id); }
 export function applyRoster(seed,{heroIds=[],npcIds=[],villainIds=[]}={}){
   const next = clone(seed || blankSeed('Nova Campanha'));
-  const heroes=[...new Set(Array.isArray(heroIds)?heroIds:[])];
-  const heroSet=new Set(heroes);
-  const npcs=[...new Set(Array.isArray(npcIds)?npcIds:[])].filter(id=>!heroSet.has(id));
-  const npcSet=new Set(npcs);
-  const villains=[...new Set(Array.isArray(villainIds)?villainIds:[])].filter(id=>!heroSet.has(id)&&!npcSet.has(id));
+  const unique=value=>[...new Set(Array.isArray(value)?value:[])];
+  const isMinionId=id=>{const item=getChar('hero',id)||getChar('villain',id);return Boolean(item&&(item.generic===true||item.type==='minion'||['CAPANGA','LACAIO'].includes(String(item.tier||'').toUpperCase())));};
+  const heroes=unique(heroIds);
+  const villains=unique(villainIds).filter(id=>isMinionId(id)||!heroes.includes(id));
+  const occupiedNormal=new Set([...heroes,...villains].filter(id=>!isMinionId(id)));
+  const npcs=unique(npcIds).filter(id=>isMinionId(id)||!occupiedNormal.has(id));
   if(Array.isArray(heroIds)) next.heroes = heroes.map(id=>getChar('hero',id)).filter(Boolean);
   if(Array.isArray(npcIds)) next.npcs = npcs.map(id=>{const item=getChar('hero',id)||getChar('villain',id);return item?{...item,campaignRole:'npc',sourceCharacterId:item.sourceCharacterId||item.baseId||item.id,rosterKind:'npc'}:null;}).filter(Boolean);
   if(Array.isArray(villainIds)) next.villains = villains.map(id=>getChar('villain',id)).filter(Boolean);

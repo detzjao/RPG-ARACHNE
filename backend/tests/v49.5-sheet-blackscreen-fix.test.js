@@ -15,5 +15,5 @@ test('v49.5 ficha não usa React.Fragment incompatível com React 16.0.0',()=>{
 });
 
 test('v49.5 força novo app.js para evitar cache da ficha quebrada',()=>{
-  assert.match(index,/src\/app\.js\?v=(?:49\.[0-9]+|50\.0)/);
+  assert.match(index,/src\/app\.js\?v=(?:49\.[0-9]+|50\.[0-9]+)/);
 });

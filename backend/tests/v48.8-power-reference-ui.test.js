@@ -25,8 +25,8 @@ test('v48.8 powers tab is reference-only and combat cards are cleaner',()=>{
 test('v48.8 index loads the power rule catalog before app.js',()=>{
   const html=fs.readFileSync(indexPath,'utf8');
   assert.match(html,/power-rules\.js\?v=49\.4/);
-  assert.match(html,/app\.js\?v=(?:49\.[0-9]+|50\.0)/);
-  assert.ok(html.indexOf('power-rules.js?v=49.4') < html.search(/app\.js\?v=(?:49\.[0-9]+|50\.0)/));
+  assert.match(html,/app\.js\?v=(?:49\.[0-9]+|50\.[0-9]+)/);
+  assert.ok(html.indexOf('power-rules.js?v=49.4') < html.search(/app\.js\?v=(?:49\.[0-9]+|50\.[0-9]+)/));
 });
 
 test('all powers used by registered heroes resolve to a Portuguese description',()=>{
