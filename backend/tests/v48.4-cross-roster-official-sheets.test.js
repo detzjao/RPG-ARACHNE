@@ -66,7 +66,7 @@ test('v48.4 impede o mesmo id nos dois lados ao criar a campanha',()=>{
 });
 
 test('v48.4 biblioteca, interface e assets refletem cross-roster e PDFs oficiais',()=>{
-  assert.equal(LIBRARY_REVISION,3);
+  assert.equal(LIBRARY_REVISION,4);
   const library=getCharacterLibrary('all');
   assert.ok(library.heroes.some(x=>x.id==='venom'));
   assert.ok(library.heroes.some(x=>x.id==='shield-agent'));

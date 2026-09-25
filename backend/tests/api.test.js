@@ -221,9 +221,9 @@ test('campanha existente migra fichas antigas e mantém dano calculável para pe
   const juggernaut=migrated.data.data.villains.find(villain=>villain.id==='juggernaut');
   assert.equal(deadpool.maxHealth,120);
   assert.equal(deadpool.currentHealth,120);
-  assert.equal(deadpool.libraryRevision,3);
+  assert.equal(deadpool.libraryRevision,4);
   assert.equal(deadpool.damageMultipliers.Melee,5);
-  assert.equal(juggernaut.libraryRevision,3);
+  assert.equal(juggernaut.libraryRevision,4);
   assert.ok(Number(juggernaut.damageMultipliers.Melee)>0);
 
   const attack=await api('/actions/d616/start',{method:'POST',token,body:{

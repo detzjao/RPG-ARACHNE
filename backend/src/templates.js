@@ -1,5 +1,5 @@
 const baseAbilities = { Melee:0, Agility:0, Resilience:0, Vigilance:0, Ego:0, Logic:0 };
-const LIBRARY_REVISION = 3;
+const LIBRARY_REVISION = 4;
 const baseDamage = rank => ({ Melee:Number(rank)||1, Agility:Number(rank)||1, Ego:Number(rank)||1, Logic:Number(rank)||1 });
 const clone = value => JSON.parse(JSON.stringify(value));
 const session = (id, title, text) => ({ id:String(id).padStart(2,'0'), title, text });
@@ -157,11 +157,11 @@ const CHARACTER_ASSETS = {
     'invisible-woman': { image:'assets/portraits/hero-invisible-woman.webp', pdf:'assets/pdfs/hero-invisible-woman.pdf' },
     'human-torch': { image:'assets/portraits/hero-human-torch.webp', pdf:'assets/pdfs/hero-human-torch.pdf' },
     thing: { image:'assets/portraits/hero-thing.webp', pdf:'assets/pdfs/hero-thing.pdf' },
-    daredevil: { image:'assets/portraits/hero-daredevil.webp', pdf:'assets/pdfs/hero-daredevil.pdf' },
+    daredevil: { image:'assets/portraits/hero-daredevil.webp', pdf:'assets/pdfs/hero-daredevil.pdf?v=48.6' },
     'luke-cage': { image:'assets/portraits/hero-luke-cage.webp', pdf:'assets/pdfs/hero-luke-cage.pdf' },
-    deadpool: { image:'assets/portraits/hero-deadpool.webp', pdf:'assets/pdfs/hero-deadpool.pdf' },
-    venom: { image:'assets/portraits/hero-venom.webp', pdf:'assets/pdfs/hero-venom.pdf' },
-    "shield-agent": { image:'assets/portraits/hero-shield-agent.webp', pdf:'assets/pdfs/hero-shield-agent.pdf' },
+    deadpool: { image:'assets/portraits/hero-deadpool.webp', pdf:'assets/pdfs/hero-deadpool.pdf?v=48.6' },
+    venom: { image:'assets/portraits/hero-venom.webp', pdf:'assets/pdfs/hero-venom.pdf?v=48.6' },
+    "shield-agent": { image:'assets/portraits/hero-shield-agent.webp', pdf:'assets/pdfs/hero-shield-agent.pdf?v=48.6' },
     "black-panther": { image:"assets/portraits/hero-black-panther.webp", pdf:"assets/pdfs/hero-black-panther.pdf" },
     "captain-marvel": { image:"assets/portraits/hero-captain-marvel.webp", pdf:"assets/pdfs/hero-captain-marvel.pdf" },
     "doctor-strange": { image:"assets/portraits/hero-doctor-strange.webp", pdf:"assets/pdfs/hero-doctor-strange.pdf" },
@@ -181,20 +181,20 @@ const CHARACTER_ASSETS = {
     enchantress: { image:'assets/portraits/villain-enchantress.webp', pdf:'assets/pdfs/villain-enchantress.pdf' },
     apocalypse: { image:'assets/portraits/villain-apocalypse.webp', pdf:'assets/pdfs/villain-apocalypse.pdf' },
     mystique: { image:'assets/portraits/villain-mystique.webp', pdf:'assets/pdfs/villain-mystique.pdf' },
-    juggernaut: { image:'assets/portraits/villain-juggernaut.webp', pdf:'assets/pdfs/villain-juggernaut.pdf' },
+    juggernaut: { image:'assets/portraits/villain-juggernaut.webp', pdf:'assets/pdfs/villain-juggernaut.pdf?v=48.6' },
     magneto: { image:'assets/portraits/villain-magneto.webp', pdf:'assets/pdfs/villain-magneto.pdf' },
     annihilus: { image:'assets/portraits/villain-annihilus.webp', pdf:'assets/pdfs/villain-annihilus.pdf' },
     'super-skrull': { image:'assets/portraits/villain-super-skrull.webp', pdf:'assets/pdfs/villain-super-skrull.pdf' },
     blastaar: { image:'assets/portraits/villain-blastaar.webp', pdf:'assets/pdfs/villain-blastaar.pdf' },
     'molecule-man': { image:'assets/portraits/villain-molecule-man.webp', pdf:'assets/pdfs/villain-molecule-man.pdf' },
-    kingpin: { image:'assets/portraits/villain-kingpin.webp', pdf:'assets/pdfs/villain-kingpin.pdf' },
+    kingpin: { image:'assets/portraits/villain-kingpin.webp', pdf:'assets/pdfs/villain-kingpin.pdf?v=48.6' },
     bullseye: { image:'assets/portraits/villain-bullseye.webp', pdf:'assets/pdfs/villain-bullseye.pdf' },
     ajax: { image:'assets/portraits/villain-ajax.webp', pdf:'assets/pdfs/villain-ajax.pdf' },
     tombstone: { image:'assets/portraits/villain-tombstone.webp', pdf:'assets/pdfs/villain-tombstone.pdf' },
     madcap: { image:'assets/portraits/villain-madcap.webp', pdf:'assets/pdfs/villain-madcap.pdf' },
     't-ray': { image:'assets/portraits/villain-t-ray.webp', pdf:'assets/pdfs/villain-t-ray.pdf' },
-    elektra: { image:'assets/portraits/villain-elektra.webp', pdf:'assets/pdfs/villain-elektra.pdf' },
-    'hand-ninja': { image:'assets/portraits/villain-hand-ninja.webp', pdf:'assets/pdfs/villain-hand-ninja.pdf' }
+    elektra: { image:'assets/portraits/villain-elektra.webp', pdf:'assets/pdfs/villain-elektra.pdf?v=48.6' },
+    'hand-ninja': { image:'assets/portraits/villain-hand-ninja.webp', pdf:'assets/pdfs/villain-hand-ninja.pdf?v=48.6' }
   }
 };
 Object.entries(CHARACTER_ASSETS.heroes).forEach(([id,asset])=>{ if(CHARACTER_LIBRARY.heroes[id]) Object.assign(CHARACTER_LIBRARY.heroes[id], asset); });
