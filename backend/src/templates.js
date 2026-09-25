@@ -1,5 +1,5 @@
 const baseAbilities = { Melee:0, Agility:0, Resilience:0, Vigilance:0, Ego:0, Logic:0 };
-const LIBRARY_REVISION = 4;
+const LIBRARY_REVISION = 5;
 const baseDamage = rank => ({ Melee:Number(rank)||1, Agility:Number(rank)||1, Ego:Number(rank)||1, Logic:Number(rank)||1 });
 const clone = value => JSON.parse(JSON.stringify(value));
 const session = (id, title, text) => ({ id:String(id).padStart(2,'0'), title, text });
@@ -157,7 +157,7 @@ const CHARACTER_ASSETS = {
     'invisible-woman': { image:'assets/portraits/hero-invisible-woman.webp', pdf:'assets/pdfs/hero-invisible-woman.pdf' },
     'human-torch': { image:'assets/portraits/hero-human-torch.webp', pdf:'assets/pdfs/hero-human-torch.pdf' },
     thing: { image:'assets/portraits/hero-thing.webp', pdf:'assets/pdfs/hero-thing.pdf' },
-    daredevil: { image:'assets/portraits/hero-daredevil.webp', pdf:'assets/pdfs/hero-daredevil.pdf?v=48.6' },
+    daredevil: { image:'assets/portraits/hero-daredevil-v2.webp', pdf:'assets/pdfs/hero-daredevil.pdf?v=48.6' },
     'luke-cage': { image:'assets/portraits/hero-luke-cage.webp', pdf:'assets/pdfs/hero-luke-cage.pdf' },
     deadpool: { image:'assets/portraits/hero-deadpool.webp', pdf:'assets/pdfs/hero-deadpool.pdf?v=48.6' },
     venom: { image:'assets/portraits/hero-venom.webp', pdf:'assets/pdfs/hero-venom.pdf?v=48.6' },

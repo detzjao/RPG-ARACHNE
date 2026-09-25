@@ -63,7 +63,7 @@
     'invisible-woman':{src:'assets/portraits/hero-invisible-woman.webp', position:'center center'},
     'human-torch':{src:'assets/portraits/hero-human-torch.webp', position:'center 18%'},
     thing:{src:'assets/portraits/hero-thing.webp', position:'center 20%'},
-    daredevil:{src:'assets/portraits/hero-daredevil.webp', position:'center 24%'},
+    daredevil:{src:'assets/portraits/hero-daredevil-v2.webp', position:'center center'},
     'luke-cage':{src:'assets/portraits/hero-luke-cage.webp', position:'center 18%'},
     deadpool:{src:'assets/portraits/hero-deadpool.webp', position:'center 18%'},
     doom:{src:'assets/portraits/villain-doom.webp', position:'center 16%'},
