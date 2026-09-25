@@ -11,7 +11,7 @@ const frontend=path.resolve(here,'../../frontend');
 const exists = rel => fs.existsSync(path.join(frontend,String(rel||'').replace(/^\/+/,'')));
 
 test('v49.1 keeps curated legacy portraits for characters that already existed',()=>{
-  assert.equal(LIBRARY_REVISION,9);
+  assert.equal(LIBRARY_REVISION,11);
   const expected={
     spider:'assets/portraits/hero-spider.webp',
     wolverine:'assets/portraits/hero-wolverine.webp',

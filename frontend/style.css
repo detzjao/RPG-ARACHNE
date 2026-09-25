@@ -1930,3 +1930,64 @@ input,select,textarea,button{min-width:0}
   .support-damage-result{grid-template-columns:auto auto;}
   .support-damage-result span{grid-column:1/-1;}
 }
+
+
+/* v49.7 — premium portrait crop overrides for cards and character sheets */
+img[src$="hero-black-panther.webp"]{--portrait-position:52% 22%;--portrait-scale:1.14;--sheet-portrait-position:52% 18%}
+img[src$="hero-cap.webp"]{--portrait-position:42% 18%;--portrait-scale:1.12;--sheet-portrait-position:42% 14%}
+img[src$="hero-captain-marvel.webp"]{--portrait-position:50% 20%;--portrait-scale:1.10;--sheet-portrait-position:50% 16%}
+img[src$="hero-cyclops.webp"]{--portrait-position:30% 22%;--portrait-scale:1.12;--sheet-portrait-position:30% 18%}
+img[src$="hero-daredevil-v2.webp"]{--portrait-position:54% 18%;--portrait-scale:1.14;--sheet-portrait-position:54% 16%}
+img[src$="hero-daredevil.webp"]{--portrait-position:54% 18%;--portrait-scale:1.14;--sheet-portrait-position:54% 16%}
+img[src$="hero-deadpool.webp"]{--portrait-position:50% 18%;--portrait-scale:1.12;--sheet-portrait-position:50% 15%}
+img[src$="hero-doctor-strange.webp"]{--portrait-position:42% 18%;--portrait-scale:1.10;--sheet-portrait-position:42% 16%}
+img[src$="hero-gambit.webp"]{--portrait-position:30% 22%;--portrait-scale:1.14;--sheet-portrait-position:30% 18%}
+img[src$="hero-ghost-rider.webp"]{--portrait-position:54% 18%;--portrait-scale:1.10;--sheet-portrait-position:54% 14%}
+img[src$="hero-hawkeye.webp"]{--portrait-position:54% 24%;--portrait-scale:1.10;--sheet-portrait-position:54% 18%}
+img[src$="hero-hulk.webp"]{--portrait-position:68% 22%;--portrait-scale:1.08;--sheet-portrait-position:68% 18%}
+img[src$="hero-human-torch.webp"]{--portrait-position:52% 26%;--portrait-scale:1.10;--sheet-portrait-position:52% 18%}
+img[src$="hero-iceman.webp"]{--portrait-position:56% 20%;--portrait-scale:1.08;--sheet-portrait-position:56% 16%}
+img[src$="hero-invisible-woman.webp"]{--portrait-position:52% 18%;--portrait-scale:1.10;--sheet-portrait-position:52% 15%}
+img[src$="hero-iron-man.webp"]{--portrait-position:78% 18%;--portrait-scale:1.14;--sheet-portrait-position:78% 14%}
+img[src$="hero-luke-cage.webp"]{--portrait-position:48% 20%;--portrait-scale:1.10;--sheet-portrait-position:48% 16%}
+img[src$="hero-mr-fantastic.webp"]{--portrait-position:42% 24%;--portrait-scale:1.12;--sheet-portrait-position:42% 18%}
+img[src$="hero-scarlet-witch.webp"]{--portrait-position:52% 18%;--portrait-scale:1.14;--sheet-portrait-position:52% 15%}
+img[src$="hero-shang-chi.webp"]{--portrait-position:76% 20%;--portrait-scale:1.12;--sheet-portrait-position:76% 16%}
+img[src$="hero-she-hulk.webp"]{--portrait-position:46% 22%;--portrait-scale:1.10;--sheet-portrait-position:46% 18%}
+img[src$="hero-shield-agent.webp"]{--portrait-position:32% 22%;--portrait-scale:1.10;--sheet-portrait-position:32% 18%}
+img[src$="hero-spider.webp"]{--portrait-position:72% 18%;--portrait-scale:1.16;--sheet-portrait-position:72% 14%}
+img[src$="hero-storm.webp"]{--portrait-position:82% 18%;--portrait-scale:1.15;--sheet-portrait-position:82% 14%}
+img[src$="hero-thing.webp"]{--portrait-position:18% 28%;--portrait-scale:1.12;--sheet-portrait-position:18% 18%}
+img[src$="hero-thor.webp"]{--portrait-position:50% 20%;--portrait-scale:1.10;--sheet-portrait-position:50% 16%}
+img[src$="hero-venom.webp"]{--portrait-position:64% 18%;--portrait-scale:1.14;--sheet-portrait-position:64% 14%}
+img[src$="hero-vision.webp"]{--portrait-position:82% 18%;--portrait-scale:1.18;--sheet-portrait-position:82% 14%}
+img[src$="hero-war-machine.webp"]{--portrait-position:52% 20%;--portrait-scale:1.10;--sheet-portrait-position:52% 16%}
+img[src$="hero-wolverine.webp"]{--portrait-position:58% 18%;--portrait-scale:1.16;--sheet-portrait-position:58% 14%}
+img[src$="villain-abomination.webp"]{--portrait-position:52% 20%;--portrait-scale:1.12;--sheet-portrait-position:52% 15%}
+img[src$="villain-aim-agent.webp"]{--portrait-position:76% 20%;--portrait-scale:1.12;--sheet-portrait-position:76% 15%}
+img[src$="villain-ajax.webp"]{--portrait-position:72% 18%;--portrait-scale:1.10;--sheet-portrait-position:72% 14%}
+img[src$="villain-annihilus.webp"]{--portrait-position:38% 22%;--portrait-scale:1.10;--sheet-portrait-position:38% 16%}
+img[src$="villain-apocalypse.webp"]{--portrait-position:56% 18%;--portrait-scale:1.14;--sheet-portrait-position:56% 14%}
+img[src$="villain-blastaar.webp"]{--portrait-position:56% 20%;--portrait-scale:1.10;--sheet-portrait-position:56% 15%}
+img[src$="villain-bullseye.webp"]{--portrait-position:30% 20%;--portrait-scale:1.12;--sheet-portrait-position:30% 16%}
+img[src$="villain-crossbones.webp"]{--portrait-position:28% 18%;--portrait-scale:1.12;--sheet-portrait-position:28% 14%}
+img[src$="villain-doom.webp"]{--portrait-position:38% 20%;--portrait-scale:1.12;--sheet-portrait-position:38% 15%}
+img[src$="villain-elektra.webp"]{--portrait-position:56% 18%;--portrait-scale:1.12;--sheet-portrait-position:56% 14%}
+img[src$="villain-enchantress.webp"]{--portrait-position:22% 18%;--portrait-scale:1.10;--sheet-portrait-position:22% 14%}
+img[src$="villain-goblin.webp"]{--portrait-position:64% 22%;--portrait-scale:1.14;--sheet-portrait-position:64% 16%}
+img[src$="villain-hand-ninja.webp"]{--portrait-position:48% 20%;--portrait-scale:1.10;--sheet-portrait-position:48% 14%}
+img[src$="villain-hydra-agent.webp"]{--portrait-position:74% 22%;--portrait-scale:1.12;--sheet-portrait-position:74% 16%}
+img[src$="villain-juggernaut.webp"]{--portrait-position:34% 18%;--portrait-scale:1.12;--sheet-portrait-position:34% 14%}
+img[src$="villain-kingpin.webp"]{--portrait-position:50% 12%;--portrait-scale:1.08;--sheet-portrait-position:50% 10%}
+img[src$="villain-loki.webp"]{--portrait-position:50% 22%;--portrait-scale:1.10;--sheet-portrait-position:50% 16%}
+img[src$="villain-madcap.webp"]{--portrait-position:34% 22%;--portrait-scale:1.12;--sheet-portrait-position:34% 16%}
+img[src$="villain-magneto.webp"]{--portrait-position:54% 18%;--portrait-scale:1.12;--sheet-portrait-position:54% 14%}
+img[src$="villain-molecule-man.webp"]{--portrait-position:62% 20%;--portrait-scale:1.14;--sheet-portrait-position:62% 16%}
+img[src$="villain-mystique.webp"]{--portrait-position:54% 20%;--portrait-scale:1.10;--sheet-portrait-position:54% 14%}
+img[src$="villain-octopus.webp"]{--portrait-position:62% 22%;--portrait-scale:1.14;--sheet-portrait-position:62% 16%}
+img[src$="villain-sabretooth.webp"]{--portrait-position:26% 20%;--portrait-scale:1.14;--sheet-portrait-position:26% 14%}
+img[src$="villain-sinister.webp"]{--portrait-position:48% 18%;--portrait-scale:1.10;--sheet-portrait-position:48% 14%}
+img[src$="villain-super-skrull.webp"]{--portrait-position:58% 22%;--portrait-scale:1.10;--sheet-portrait-position:58% 16%}
+img[src$="villain-t-ray.webp"]{--portrait-position:70% 16%;--portrait-scale:1.10;--sheet-portrait-position:70% 12%}
+img[src$="villain-tombstone.webp"]{--portrait-position:78% 20%;--portrait-scale:1.12;--sheet-portrait-position:78% 16%}
+img[src$="villain-zemo.webp"]{--portrait-position:30% 20%;--portrait-scale:1.10;--sheet-portrait-position:30% 15%}

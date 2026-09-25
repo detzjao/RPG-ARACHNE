@@ -1,6 +1,6 @@
 import { CORE_RULEBOOK_CHARACTERS } from './core-rulebook-library.js';
 const baseAbilities = { Melee:0, Agility:0, Resilience:0, Vigilance:0, Ego:0, Logic:0 };
-const LIBRARY_REVISION = 9;
+const LIBRARY_REVISION = 11;
 const baseDamage = rank => ({ Melee:Number(rank)||1, Agility:Number(rank)||1, Ego:Number(rank)||1, Logic:Number(rank)||1 });
 const clone = value => JSON.parse(JSON.stringify(value));
 const session = (id, title, text) => ({ id:String(id).padStart(2,'0'), title, text });
@@ -53,8 +53,8 @@ const CHARACTER_LIBRARY = {
     cap: hero('cap','Capitão América','Steve Rogers',4,{image:'assets/portraits/hero-cap.webp',pdf:'assets/pdfs/hero-capitao-america.pdf',role:'Líder tático',hook:'Hydra e Ossos Cruzados ligam Steve ao conflito principal.',maxHealth:90,maxFocus:120,currentHealth:90,currentFocus:120,karma:4,initiative:'+2E',occupation:'Soldado',origin:'Humano aprimorado',teams:'Avengers, Invaders',base:'Nova York',stats:[['Health',90],['Focus',120],['Karma',4]],abilities:{Melee:6,Agility:4,Resilience:3,Vigilance:3,Ego:2,Logic:2},traits:['Battle Ready','Combat Expert','Combat Reflexes','Public Speaking','Situational Awareness'],tags:['Heroic','Public Identity'],powers:['Escudo Ricochete','Bloqueio com Escudo','Liderança Inspiradora','Truque de Combate','Golpe Brutal','Arremesso Rápido']}),
     'iron-man': hero('iron-man','Homem de Ferro','Tony Stark',4,{image:'assets/portraits/hero-iron-man.webp',role:'Artilharia / tecnologia',hook:'A tecnologia Stark é um dos pilares do conflito.',maxHealth:120,maxFocus:120,currentHealth:120,currentFocus:120,karma:4,initiative:'+2E',speed:'Correr 5 · Voo 18',movement:{run:5,flight:18},occupation:'Inventor / CEO',origin:'Armadura de alta tecnologia',teams:'Avengers',base:'Nova York',stats:[['Health',120],['Focus',120],['Karma',4]],abilities:{Melee:4,Agility:4,Resilience:4,Vigilance:3,Ego:3,Logic:7},traits:['Celebrity','Inventor','Scientific Expertise','Tech Reliance'],tags:['Heroic','Public Identity'],powers:['Rajada Repulsora','Voo','Sensores de Armadura','Mísseis','Unibeam','Campos de Força','Brilhantismo 2']}),
     thor: hero('thor','Thor','Thor Odinson',4,{image:'assets/portraits/hero-thor.webp',role:'Tanque / energia',hook:'A energia asgardiana desequilibra a campanha.',maxHealth:180,maxFocus:90,currentHealth:180,currentFocus:90,karma:4,initiative:'+2',speed:'Correr 5 · Voo 20 · Pular 5',movement:{run:5,flight:20,jump:5},occupation:'Príncipe guerreiro',origin:'Asgardiano',teams:'Avengers',base:'Asgard / Terra',stats:[['Health',180],['Focus',90],['Karma',4]],abilities:{Melee:7,Agility:2,Resilience:6,Vigilance:2,Ego:3,Logic:1},traits:['Battle Ready','Famous','Mythic','Strong Willed'],tags:['Heroic','Public Identity'],powers:['Mjolnir','Voo','Trovão','Poderoso 2','Ataque de Área','Arremesso de Mjolnir','Invulnerabilidade Parcial']}),
-    cyclops: hero('cyclops','Ciclope','Scott Summers',4,{image:'assets/portraits/hero-cyclops.webp',role:'Líder / precisão',hook:'Coordena a equipe sob pressão constante.',maxHealth:90,maxFocus:120,currentHealth:90,currentFocus:120,karma:4,initiative:'+2E',occupation:'Líder dos X-Men',origin:'Mutante',teams:'X-Men',base:'Krakoa / móvel',stats:[['Health',90],['Focus',120],['Karma',4]],abilities:{Melee:4,Agility:4,Resilience:3,Vigilance:4,Ego:2,Logic:3},traits:['Battle Ready','Combat Reflexes','Leadership','Situational Awareness'],tags:['Heroic','X-Gene'],powers:['Rajada Óptica','Rajada Precisa','Rajada de Supressão','Comando de Campo','Disparo Ricochete']}),
-    storm: hero('storm','Tempestade','Ororo Munroe',4,{image:'assets/portraits/hero-storm.webp',role:'Controle de campo / clima',hook:'Manipula a batalha em larga escala.',maxHealth:90,maxFocus:120,currentHealth:90,currentFocus:120,karma:4,initiative:'+2',speed:'Correr 5 · Voo 12',movement:{run:5,flight:12},occupation:'Rainha / heroína',origin:'Mutante',teams:'X-Men',base:'Krakoa / móvel',stats:[['Health',90],['Focus',120],['Karma',4]],abilities:{Melee:3,Agility:4,Resilience:3,Vigilance:3,Ego:4,Logic:2},traits:['Empathic','Leadership','Weather Sense'],tags:['Heroic','X-Gene'],powers:['Controle Climático','Raio','Ventos Cortantes','Voo','Névoa','Tempestade em Área']}),
+    cyclops: hero('cyclops','Ciclope','Scott Summers',4,{image:'assets/portraits/hero-cyclops-v4991.webp',role:'Líder / precisão',hook:'Coordena a equipe sob pressão constante.',maxHealth:90,maxFocus:120,currentHealth:90,currentFocus:120,karma:4,initiative:'+2E',occupation:'Líder dos X-Men',origin:'Mutante',teams:'X-Men',base:'Krakoa / móvel',stats:[['Health',90],['Focus',120],['Karma',4]],abilities:{Melee:4,Agility:4,Resilience:3,Vigilance:4,Ego:2,Logic:3},traits:['Battle Ready','Combat Reflexes','Leadership','Situational Awareness'],tags:['Heroic','X-Gene'],powers:['Rajada Óptica','Rajada Precisa','Rajada de Supressão','Comando de Campo','Disparo Ricochete']}),
+    storm: hero('storm','Tempestade','Ororo Munroe',4,{image:'assets/portraits/hero-storm-v4991.webp',role:'Controle de campo / clima',hook:'Manipula a batalha em larga escala.',maxHealth:90,maxFocus:120,currentHealth:90,currentFocus:120,karma:4,initiative:'+2',speed:'Correr 5 · Voo 12',movement:{run:5,flight:12},occupation:'Rainha / heroína',origin:'Mutante',teams:'X-Men',base:'Krakoa / móvel',stats:[['Health',90],['Focus',120],['Karma',4]],abilities:{Melee:3,Agility:4,Resilience:3,Vigilance:3,Ego:4,Logic:2},traits:['Empathic','Leadership','Weather Sense'],tags:['Heroic','X-Gene'],powers:['Controle Climático','Raio','Ventos Cortantes','Voo','Névoa','Tempestade em Área']}),
     "iceman": hero("iceman","Homem de Gelo","Bobby Drake",4,{"role":"Controle de área / defesa","hook":"Bobby trava corredores, ergue coberturas e desacelera tropas inteiras com gelo instantâneo.","maxHealth":120,"maxFocus":90,"currentHealth":120,"currentFocus":90,"karma":4,"healthDR":"—","focusDR":"—","initiative":"+1","speed":"Correr 5 · Deslizar 12 · Escalar 3","movement":{"run":5,"slide":12,"climb":3},"occupation":"Herói mutante","origin":"Mutante","teams":"X-Men, X-Factor, Champions","base":"Krakoa / móvel","stats":[["Health",120],["Focus",90],["Karma",4]],"abilities":{"Melee":3,"Agility":4,"Resilience":4,"Vigilance":2,"Ego":1,"Logic":2},"traits":["Cool Under Pressure","Creative","Team Player"],"tags":["Heroic","X-Gene"],"powers":["Construtos de Gelo","Deslizamento no Gelo","Muralha de Gelo","Rajada Congelante","Prisão de Gelo","Congelar Superfícies","Forma de Gelo"]}),
     gambit: hero('gambit','Gambit','Remy LeBeau',4,{image:'assets/portraits/hero-gambit.webp',role:'Mobilidade / dano explosivo',hook:'Rouba, engana e resolve situações improváveis.',maxHealth:90,maxFocus:90,currentHealth:90,currentFocus:90,karma:4,initiative:'+3',speed:'Correr 6 · Escalar 4 · Pular 4',movement:{run:6,climb:4,jump:4,swim:3},occupation:'Ladrão / aventureiro',origin:'Mutante',teams:'X-Men',base:'Móvel',stats:[['Health',90],['Focus',90],['Karma',4]],abilities:{Melee:4,Agility:6,Resilience:3,Vigilance:2,Ego:2,Logic:2},traits:['Beguiling','Criminal Connections','Free Running','Lucky'],tags:['Heroic','X-Gene'],powers:['Cartas Cinéticas','Bastão de Combate','Acrobacia','Explosão Cinética','Arremesso Preciso']}),
     "mr-fantastic": hero("mr-fantastic","Senhor Fantástico","Reed Richards",4,{"role":"Gênio tático / controle elástico","hook":"Reed estabiliza portais, analisa ameaças cósmicas e vira a mente científica da equipe.","maxHealth":120,"maxFocus":120,"currentHealth":120,"currentFocus":120,"karma":4,"healthDR":"—","focusDR":"—","initiative":"+1","speed":"Correr 5 · Escalar 3 · Nadar 3 · Pular 3 · Alongamento 8","movement":{"run":5,"climb":3,"swim":3,"jump":3},"occupation":"Cientista / líder explorador","origin":"Mutação cósmica","teams":"Fantastic Four, Illuminati","base":"Edifício Baxter","stats":[["Health",120],["Focus",120],["Karma",4]],"abilities":{"Melee":3,"Agility":2,"Resilience":4,"Vigilance":3,"Ego":2,"Logic":7},"traits":["Brilliant","Inventor","Leadership","Scientific Expertise"],"tags":["Heroic","Public Identity","Lab Access"],"powers":["Elasticidade","Alongamento Extremo","Imobilização Elástica","Golpe Alongado","Defesa Flexível","Rebote Elástico","Mente Científica"]}),
@@ -200,8 +200,8 @@ const CHARACTER_ASSETS = {
   heroes: {
     'iron-man': { image:'assets/portraits/hero-iron-man.webp', pdf:'assets/pdfs/hero-iron-man.pdf' },
     thor: { image:'assets/portraits/hero-thor.webp', pdf:'assets/pdfs/hero-thor.pdf' },
-    cyclops: { image:'assets/portraits/hero-cyclops.webp', pdf:'assets/pdfs/hero-cyclops.pdf' },
-    storm: { image:'assets/portraits/hero-storm.webp', pdf:'assets/pdfs/hero-storm.pdf' },
+    cyclops: { image:'assets/portraits/hero-cyclops-v4991.webp', pdf:'assets/pdfs/hero-cyclops.pdf' },
+    storm: { image:'assets/portraits/hero-storm-v4991.webp', pdf:'assets/pdfs/hero-storm.pdf' },
     iceman: { image:'assets/portraits/hero-iceman.webp', pdf:'assets/pdfs/hero-iceman.pdf' },
     gambit: { image:'assets/portraits/hero-gambit.webp', pdf:'assets/pdfs/hero-gambit.pdf' },
     'mr-fantastic': { image:'assets/portraits/hero-mr-fantastic.webp', pdf:'assets/pdfs/hero-mr-fantastic.pdf' },
@@ -456,12 +456,15 @@ export function getTemplates(){ return templates.map(clone); }
 export function getTemplate(id){ const found = templates.find(t=>t.id===id); return found ? clone(found) : null; }
 export function getCharacterLibrary(kind='all'){ return characterList(kind); }
 export function getCharacter(kind,id){ return getChar(kind,id); }
-export function applyRoster(seed,{heroIds=[],villainIds=[]}={}){
+export function applyRoster(seed,{heroIds=[],npcIds=[],villainIds=[]}={}){
   const next = clone(seed || blankSeed('Nova Campanha'));
   const heroes=[...new Set(Array.isArray(heroIds)?heroIds:[])];
   const heroSet=new Set(heroes);
-  const villains=[...new Set(Array.isArray(villainIds)?villainIds:[])].filter(id=>!heroSet.has(id));
+  const npcs=[...new Set(Array.isArray(npcIds)?npcIds:[])].filter(id=>!heroSet.has(id));
+  const npcSet=new Set(npcs);
+  const villains=[...new Set(Array.isArray(villainIds)?villainIds:[])].filter(id=>!heroSet.has(id)&&!npcSet.has(id));
   if(Array.isArray(heroIds)) next.heroes = heroes.map(id=>getChar('hero',id)).filter(Boolean);
+  if(Array.isArray(npcIds)) next.npcs = npcs.map(id=>{const item=getChar('hero',id)||getChar('villain',id);return item?{...item,campaignRole:'npc',sourceCharacterId:item.sourceCharacterId||item.baseId||item.id,rosterKind:'npc'}:null;}).filter(Boolean);
   if(Array.isArray(villainIds)) next.villains = villains.map(id=>getChar('villain',id)).filter(Boolean);
   next.playerNotes = Object.fromEntries((next.heroes||[]).map(hero=>[hero.id, next.playerNotes?.[hero.id] || '']));
   next.campaignContent = { ...(next.campaignContent||{}), players:(next.heroes||[]).length };
@@ -475,6 +478,7 @@ export function templateSeed(id){
   const t=getTemplate(id); if(!t) return null;
   return {
     heroes: clone(t.heroes),
+    npcs: [],
     villains: clone(t.villains),
     campaign: Object.fromEntries(t.sessions.map(s=>[s.id,'todo'])),
     campaignContent:{ title:t.name, subtitle:t.subtitle, summary:t.summary, rank:t.rank, players:t.players, finalVillain:t.finalVillain, accent:t.accent, mode:t.mode||'group', sessions:clone(t.sessions), documentMode:t.campaignPdf?'pdf':'editor', campaignPdf:t.campaignPdf||'', editorText:t.summary, templateId:t.id, templateName:t.name },
@@ -485,7 +489,7 @@ export function templateSeed(id){
 }
 export function blankSeed(name='Nova Campanha'){
   return {
-    heroes:[], villains:[], campaign:{},
+    heroes:[], npcs:[], villains:[], campaign:{},
     campaignContent:{ title:name, subtitle:'Campanha personalizada', summary:'', rank:4, players:0, finalVillain:'', accent:'#ef3340', mode:'group', sessions:[], documentMode:'editor', campaignPdf:'', editorText:'', templateId:'blank', templateName:'Em branco' },
     dice:[], challenge:{ action:'Ação sem título', tn:14, edge:0, trouble:0, source:'hero', actor:'', threatTier:'minion', threatChoice:'minion-melee', ability:'Agility', extra:0 },
     scenario:{ preset:'empty', environment:'lab', width:20, height:14, baseTerrain:'floor', selectedTool:'select', selectedPiece:null, selectedMode:'run', zoom:1, obstacles:{}, terrain:{}, decor:{}, turnMovement:{}, movementSpent:{}, pieces:[] },

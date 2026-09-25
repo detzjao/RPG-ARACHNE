@@ -221,9 +221,9 @@ test('campanha existente migra fichas antigas e mantém dano calculável para pe
   const juggernaut=migrated.data.data.villains.find(villain=>villain.id==='juggernaut');
   assert.equal(deadpool.maxHealth,120);
   assert.equal(deadpool.currentHealth,120);
-  assert.equal(deadpool.libraryRevision,9);
+  assert.equal(deadpool.libraryRevision,11);
   assert.equal(deadpool.damageMultipliers.Melee,5);
-  assert.equal(juggernaut.libraryRevision,9);
+  assert.equal(juggernaut.libraryRevision,11);
   assert.ok(Number(juggernaut.damageMultipliers.Melee)>0);
 
   const attack=await api('/actions/d616/start',{method:'POST',token,body:{
@@ -232,6 +232,49 @@ test('campanha existente migra fichas antigas e mantém dano calculável para pe
   assert.equal(attack.status,200,JSON.stringify(attack.data));
   assert.equal(attack.data.data.snapshot.damageMultiplier,5);
   assert.equal(attack.data.data.damage.multiplier,5);
+});
+
+test('v50 NPCs são separados, Mestre controla e jogador não acessa o roster privado',async()=>{
+  const create=await api('/campaigns',{method:'POST',body:{
+    mode:'blank',name:'Mesa NPC v50',masterPassword:'npc-v50-test',
+    heroIds:['spider'],npcIds:['nick-fury-jr'],villainIds:['octopus']
+  }});
+  assert.equal(create.status,201,JSON.stringify(create.data));
+  const code=create.data.data.code;
+  const master=await joinMaster(code,'npc-v50-test');
+  const player=await joinPlayer('spider',code);
+
+  const masterState=await api('/state',{token:master});
+  assert.equal(masterState.status,200,JSON.stringify(masterState.data));
+  assert.ok(Array.isArray(masterState.data.data.npcs));
+  const npc=masterState.data.data.npcs.find(item=>item.id==='nick-fury-jr');
+  assert.ok(npc,'Nick Fury Jr. deveria existir como NPC');
+  assert.equal(npc.campaignRole,'npc');
+  assert.equal(npc.sourceCharacterId,'nick-fury-jr');
+  assert.equal(masterState.data.data.villains.some(item=>item.id==='nick-fury-jr'),false);
+
+  const playerState=await api('/state',{token:player});
+  assert.equal(playerState.status,200,JSON.stringify(playerState.data));
+  assert.equal('npcs' in playerState.data.data,false,'Roster NPC deve ser privado do Mestre');
+
+  const forbidden=await api('/characters/npc/nick-fury-jr/resources',{method:'PATCH',token:player,body:{healthDelta:-1}});
+  assert.equal(forbidden.status,403);
+  const changed=await api('/characters/npc/nick-fury-jr/resources',{method:'PATCH',token:master,body:{healthDelta:-1}});
+  assert.equal(changed.status,200,JSON.stringify(changed.data));
+  assert.equal(changed.data.data.currentHealth,Math.max(0,npc.currentHealth-1));
+
+  const initiative=await api('/initiative/participants',{method:'POST',token:master,body:{baseId:'nick-fury-jr'}});
+  assert.equal(initiative.status,201,JSON.stringify(initiative.data));
+  assert.equal(initiative.data.data.participant.kind,'npc');
+  assert.equal(initiative.data.data.piece.kind,'npc');
+  assert.equal(initiative.data.data.piece.characterId,'nick-fury-jr');
+
+  const deleted=await api('/npcs/nick-fury-jr',{method:'DELETE',token:master,body:{}});
+  assert.equal(deleted.status,200,JSON.stringify(deleted.data));
+  const after=await api('/state',{token:master});
+  assert.equal(after.data.data.npcs.some(item=>item.id==='nick-fury-jr'),false);
+  assert.equal((after.data.data.initiative||[]).some(item=>item.baseId==='nick-fury-jr'),false);
+  assert.equal((after.data.data.scenario?.pieces||[]).some(item=>String(item.characterId||item.baseId)==='nick-fury-jr'),false);
 });
 
 test('busca e troca de imagem são administrativas',async()=>{

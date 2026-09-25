@@ -72,6 +72,8 @@
   async function adjustResources(kind,id,values) { return (await request(`/characters/${kind}/${encodeURIComponent(id)}/resources`, {method:'PATCH', body:JSON.stringify(values || {})})).data; }
   async function saveHero(hero) { return (await request(`/heroes/${encodeURIComponent(hero.id)}`, {method:'PUT', body:JSON.stringify({hero})})).data; }
   async function deleteHero(id) { return (await request(`/heroes/${encodeURIComponent(id)}`, {method:'DELETE'})).data; }
+  async function saveNpc(npc) { return (await request(`/npcs/${encodeURIComponent(npc.id)}`, {method:'PUT', body:JSON.stringify({npc})})).data; }
+  async function deleteNpc(id) { return (await request(`/npcs/${encodeURIComponent(id)}`, {method:'DELETE'})).data; }
   async function saveVillain(villain) { return (await request(`/villains/${encodeURIComponent(villain.id)}`, {method:'PUT', body:JSON.stringify({villain})})).data; }
   async function deleteVillain(id) { return (await request(`/villains/${encodeURIComponent(id)}`, {method:'DELETE'})).data; }
   async function uploadAsset(file) {
@@ -109,7 +111,7 @@
 
   window.ArachneAPI2 = {
     CLIENT_ID, health, lookupCampaigns, lookupCampaign, getTemplates, getCharacters, createCampaign, updateCampaignMeta, join, profileSession, loadAll,
-    saveMany, saveState, setChallengeTN, adjustResources, saveHero, deleteHero, saveVillain, deleteVillain, uploadAsset,
+    saveMany, saveState, setChallengeTN, adjustResources, saveHero, deleteHero, saveNpc, deleteNpc, saveVillain, deleteVillain, uploadAsset,
     startActionRoll, useActionEdge, finalizeActionRoll, applyAttackDamage,
     addInitiativeParticipant, removeInitiativeParticipant, clearInitiativeParticipants, rollInitiativeParticipant,
     moveScenarioPiece, resetScenarioMovement, savePlayerNote,
