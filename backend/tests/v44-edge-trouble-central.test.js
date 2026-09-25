@@ -11,7 +11,7 @@ test('Central React exibe controles compactos de Edge e Trouble junto ao TN',()=
   assert.match(app,/function RollModifierControl/);
   assert.match(app,/label:'EDGE'/);
   assert.match(app,/label:'TROUBLE'/);
-  assert.match(app,/category!==['"]movement['"]/);
+  assert.match(app,/const isRollCategory=category==='combat'\|\|category==='test'/);
 });
 
 test('toda rolagem da Central envia Edge e Trouble selecionados',()=>{

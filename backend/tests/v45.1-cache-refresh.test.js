@@ -10,9 +10,9 @@ const index=fs.readFileSync(path.join(root,'frontend/index.html'),'utf8');
 const server=fs.readFileSync(path.join(root,'backend/src/server.js'),'utf8');
 
 test('frontend força atualização dos assets sem reutilizar JS/CSS da versão anterior',()=>{
-  assert.match(index,/styles\/tailwind\.css\?v=48\.5/);
-  assert.match(index,/styles\/custom\.css\?v=48\.5/);
-  assert.match(index,/src\/api\.js\?v=48\.5/);
-  assert.match(index,/src\/app\.js\?v=48\.5/);
+  assert.match(index,/styles\/tailwind\.css\?v=48\.8/);
+  assert.match(index,/styles\/custom\.css\?v=48\.8/);
+  assert.match(index,/src\/api\.js\?v=48\.8/);
+  assert.match(index,/src\/app\.js\?v=48\.8/);
   assert.match(server,/no-store, no-cache, must-revalidate/);
 });

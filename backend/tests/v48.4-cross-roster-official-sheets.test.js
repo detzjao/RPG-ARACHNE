@@ -66,7 +66,7 @@ test('v48.4 impede o mesmo id nos dois lados ao criar a campanha',()=>{
 });
 
 test('v48.4 biblioteca, interface e assets refletem cross-roster e PDFs oficiais',()=>{
-  assert.equal(LIBRARY_REVISION,4);
+  assert.ok(LIBRARY_REVISION>=5);
   const library=getCharacterLibrary('all');
   assert.ok(library.heroes.some(x=>x.id==='venom'));
   assert.ok(library.heroes.some(x=>x.id==='shield-agent'));
@@ -74,7 +74,7 @@ test('v48.4 biblioteca, interface e assets refletem cross-roster e PDFs oficiais
   assert.match(app,/qualquer personagem pode entrar como herói ou vilão/);
   assert.match(app,/libraryKind/);
   assert.match(app,/Defesas oficiais da ficha/);
-  assert.match(index,/src\/app\.js\?v=48\.5/);
+  assert.match(index,/src\/app\.js\?v=48\.8/);
   for(const file of ['hero-venom.pdf','hero-shield-agent.pdf','villain-hand-ninja.pdf','villain-juggernaut.pdf','villain-elektra.pdf','villain-kingpin.pdf']){
     assert.ok(fs.statSync(path.join(root,'frontend/assets/pdfs',file)).size>250_000,file);
   }

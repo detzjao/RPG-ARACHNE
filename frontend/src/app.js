@@ -344,32 +344,51 @@
     ]);
   }
 
+  function PowerRulePanel({power}){
+    if(!power)return h('div',{className:'rounded-xl border border-dashed border-white/10 bg-black/10 p-5 text-center text-sm text-[#6f7b8b]'},'Clique em um poder para abrir a descrição.');
+    const info=typeof window.ArachnePowerInfo==='function'?window.ArachnePowerInfo(power):{title:power,description:'Descrição não carregada.',ruleName:power,official:false};
+    const source=info.page?`Core Rulebook · Capítulo 7 · PDF p. ${info.page}`:'Core Rulebook / ficha do personagem';
+    return h('article',{className:'power-rule-card rounded-2xl border border-[#ef3340]/25 bg-[#0c121b] p-4 sm:p-5'},[
+      h('div',{key:'top',className:'flex flex-wrap items-start justify-between gap-3'},[
+        h('div',{key:'title'},[h(TinyLabel,{key:'k',className:'text-[#ff7b85]'},'DESCRIÇÃO DO PODER'),h('h3',{key:'h',className:'mt-1 text-lg font-black text-white'},power)]),
+        info.official?h('span',{key:'badge',className:'rounded-full border border-emerald-900/50 bg-emerald-950/30 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-emerald-300'},'REGRA DO LIVRO'):h('span',{key:'badge',className:'rounded-full border border-amber-900/50 bg-amber-950/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-amber-300'},'ADAPTAÇÃO DA FICHA')
+      ]),
+      info.ruleName&&info.ruleName!==power?h('p',{key:'base',className:'mt-3 text-xs text-[#98a5b6]'},[h('b',{key:'b',className:'text-[#c6ced9]'},'Regra-base: '),info.ruleName]):null,
+      h('p',{key:'desc',className:'mt-3 text-sm leading-6 text-[#d5dbe4]'},info.description),
+      info.note?h('p',{key:'note',className:'mt-3 rounded-xl border border-white/8 bg-white/[.025] px-3 py-2 text-xs leading-5 text-[#8d98a8]'},info.note):null,
+      h('div',{key:'src',className:'mt-4 border-t border-white/8 pt-3 text-[10px] font-bold uppercase tracking-wider text-[#697587]'},source)
+    ]);
+  }
+
   function ActionCenter({entity,category,onCategory,onRoll,roll,animating,onEdge,onFinalize,tn,onTN,power,onPower,edge,trouble,onEdgeChange,onTroubleChange}){
     if(!entity)return h(Card,{className:'p-5'},h('p',{className:'text-sm text-[#7d8796]'},'Selecione um personagem.'));
     let options=[];
-    if(category==='combat') options=Object.entries(COMBAT).map(([ability,meta])=>h('button',{key:ability,onClick:()=>onRoll(ability,true),disabled:animating,className:'rounded-xl border border-white/10 bg-[#121923] p-4 text-left transition hover:border-[#ef3340]/50 hover:bg-[#181a22] disabled:opacity-40'},[h(TinyLabel,{key:'s'},meta.short),h('div',{key:'r',className:'mt-2 flex items-end justify-between gap-3'},[h('b',{key:'l',className:'text-sm'},meta.label),h('strong',{key:'v',className:'text-xl'},signed(entity.abilities?.[ability]||0))]),h('span',{key:'x',className:'mt-3 block text-xs font-black text-[#8d96a4]'},`DANO ×${damageProfile(entity)[ability]} · ROLAR D616`)]));
+    if(category==='combat') options=Object.entries(COMBAT).map(([ability,meta])=>h('button',{key:ability,onClick:()=>onRoll(ability,true),disabled:animating,className:'rounded-xl border border-white/10 bg-[#121923] p-4 text-left transition hover:border-[#ef3340]/50 hover:bg-[#181a22] disabled:opacity-40'},[h(TinyLabel,{key:'s'},meta.short),h('div',{key:'r',className:'mt-2 flex items-end justify-between gap-3'},[h('b',{key:'l',className:'text-sm'},meta.label),h('strong',{key:'v',className:'text-xl'},signed(entity.abilities?.[ability]||0))])]));
     if(category==='test') options=ABILITIES.map(ability=>h('button',{key:ability,onClick:()=>onRoll(ability,false),disabled:animating,className:'rounded-xl border border-white/10 bg-[#121923] p-4 text-left hover:border-white/20 disabled:opacity-40'},[h(TinyLabel,{key:'s'},ability),h('strong',{key:'v',className:'mt-2 block text-2xl'},signed(entity.abilities?.[ability]||0)),h('span',{key:'x',className:'mt-2 block text-xs text-[#7f8998]'},'ROLAR')]));
     if(category==='powers') {
       const powers=entity.powers||[];
-      options=h('div',{className:'space-y-3'},[
-        h('div',{key:'p',className:'flex flex-wrap gap-2'},powers.length?powers.map((p,i)=>h('button',{key:i,onClick:()=>onPower(p),className:cx('rounded-lg border px-3 py-2 text-xs font-bold',power===p?'border-[#ef3340] bg-[#ef3340]/10':'border-white/10 bg-[#111720]')},p)):h('span',{className:'text-sm text-[#707a89]'},'Nenhum poder cadastrado.')),
-        power?h('div',{key:'a',className:'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'},ABILITIES.map(ability=>h('button',{key:ability,onClick:()=>onRoll(ability,false),className:'rounded-xl border border-white/10 bg-[#121923] p-3 text-left'},[h(TinyLabel,{key:'l'},ability),h('strong',{key:'v',className:'mt-1 block text-xl'},signed(entity.abilities?.[ability]||0))]))):null
+      options=h('div',{className:'space-y-4'},[
+        h('div',{key:'p',className:'flex flex-wrap gap-2'},powers.length?powers.map((p,i)=>h('button',{key:i,type:'button',onClick:()=>onPower(p),className:cx('rounded-lg border px-3 py-2 text-left text-xs font-bold transition',power===p?'border-[#ef3340] bg-[#ef3340]/10 text-white':'border-white/10 bg-[#111720] text-[#d1d7df] hover:border-white/25')},p)):h('span',{className:'text-sm text-[#707a89]'},'Nenhum poder cadastrado.')),
+        powers.length?h(PowerRulePanel,{key:'info',power}):null
       ]);
     }
     if(category==='movement') options=h('div',{className:'grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6'},Object.entries(entity.movement||{}).map(([mode,value])=>h('div',{key:mode,className:'rounded-xl border border-white/10 bg-[#121923] p-4'},[h(TinyLabel,{key:'l'},MOVE_LABEL[mode]||mode),h('strong',{key:'v',className:'mt-2 block text-2xl'},value)])));
+    const isRollCategory=category==='combat'||category==='test';
+    const heading=category==='powers'?'Consulte os poderes':category==='movement'?'Movimentação':'O que você quer rolar?';
+    const sectionLabel=category==='powers'?'ESCOLHA UM PODER':category==='movement'?'MOVIMENTOS':'ESCOLHA A AÇÃO';
     return h(Card,{className:'p-4 sm:p-5'},[
       h('div',{key:'head',className:'flex flex-wrap items-center justify-between gap-3'},[
-        h('div',{key:'t'},[h(TinyLabel,{key:'s'},'CENTRAL DE AÇÕES'),h('h2',{key:'h',className:'mt-1 text-xl font-black'},'O que você quer rolar?')]),
-        h('div',{key:'controls',className:'flex flex-wrap items-center gap-2'},[
+        h('div',{key:'t'},[h(TinyLabel,{key:'s'},category==='powers'?'REFERÊNCIA DE REGRAS':'CENTRAL DE AÇÕES'),h('h2',{key:'h',className:'mt-1 text-xl font-black'},heading)]),
+        isRollCategory?h('div',{key:'controls',className:'flex flex-wrap items-center gap-2'},[
           h(TNControl,{key:'tn',tn,onChange:onTN}),
-          category!=='movement'?h(RollModifierControl,{key:'edge',label:'EDGE',value:edge,onChange:onEdgeChange,tone:'edge'}):null,
-          category!=='movement'?h(RollModifierControl,{key:'trouble',label:'TROUBLE',value:trouble,onChange:onTroubleChange,tone:'trouble'}):null
-        ])
+          h(RollModifierControl,{key:'edge',label:'EDGE',value:edge,onChange:onEdgeChange,tone:'edge'}),
+          h(RollModifierControl,{key:'trouble',label:'TROUBLE',value:trouble,onChange:onTroubleChange,tone:'trouble'})
+        ]):null
       ]),
       h('div',{key:'tabs',className:'mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4'},[['combat','⚔','COMBATE'],['test','◉','TESTES'],['powers','✦','PODERES'],['movement','↗','MOVIMENTO']].map(x=>h('button',{key:x[0],onClick:()=>onCategory(x[0]),className:cx('min-h-12 rounded-xl border text-xs font-black',category===x[0]?'border-[#ef3340] bg-[#ef3340]/10 text-white':'border-white/10 bg-[#0f141b] text-[#8d96a4]')},`${x[1]} ${x[2]}`))),
-      h('div',{key:'label',className:'mt-5'},h(TinyLabel,null,category==='movement'?'MOVIMENTOS':'ESCOLHA A AÇÃO')),
+      h('div',{key:'label',className:'mt-5'},h(TinyLabel,null,sectionLabel)),
       h('div',{key:'opts',className:category==='combat'?'mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4':category==='test'?'mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6':'mt-3'},options),
-      category!=='movement'?h(RollResult,{key:'r',roll,animating,onEdge,onFinalize}):null
+      isRollCategory?h(RollResult,{key:'r',roll,animating,onEdge,onFinalize}):null
     ]);
   }
 
