@@ -66,7 +66,7 @@ test('v49: todos os personagens da biblioteca possuem ao menos uma conexao intel
 
 test('v49: frontend carrega o motor de inteligencia antes do app',()=>{
   const html=fs.readFileSync(path.join(root,'frontend/index.html'),'utf8');
-  assert.match(html,/character-intelligence\.js\?v=49\.2/);
+  assert.match(html,/character-intelligence\.js\?v=49\.3/);
   assert.ok(html.indexOf('character-intelligence.js')<html.indexOf('src/app.js'));
   const app=fs.readFileSync(path.join(root,'frontend/src/app.js'),'utf8');
   assert.match(app,/PERSONAGENS POR CATEGORIA/);

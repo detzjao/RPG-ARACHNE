@@ -192,12 +192,14 @@
     if(!entity)return null;
     const abilities=entity.abilities||{},damage=damageProfile(entity),defenses=entity.defenses||{},isHero=kind==='hero';
     const statCard=(label,value,sub='')=>h('div',{className:'rounded-xl border border-white/10 bg-black/25 p-3'},[h(TinyLabel,{key:'l'},label),h('strong',{key:'v',className:'mt-1 block text-xl'},value??'—'),sub?h('small',{key:'s',className:'mt-1 block text-[10px] text-[#737f8f]'},sub):null]);
+    const damageReductionLabel=value=>{const raw=String(value??'').trim();if(!raw||raw==='—'||raw==='-'||raw==='0')return'';const m=raw.match(/-?\d+(?:\.\d+)?/);return m?`Redução de dano: ${Math.abs(Number(m[0]))}`:`Redução de dano: ${raw}`;};
     const chips=(items,tone='normal')=>(items||[]).map((item,i)=>h('span',{key:i,className:cx('rounded-lg border px-2.5 py-1.5 text-[11px]',tone==='power'?'border-[#ef3340]/25 bg-[#ef3340]/5 text-[#f3c4c7]':'border-white/10 bg-white/[.03] text-[#b3bcc8]')},item));
     return h('div',{className:'sheet-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'sheet-modal w-full max-w-6xl overflow-auto rounded-2xl border border-white/10 bg-[#0b1017] shadow-2xl'},[
       h('div',{key:'hero',className:'sheet-hero grid border-b border-white/10'},[
         h('div',{key:'visual',className:'sheet-visual relative overflow-hidden bg-[#070a0f]'},[
-          entity.image?h('img',{key:'img',src:entity.image,alt:'',className:'sheet-visual-img absolute inset-0 h-full w-full object-cover'}):null,
-          h('div',{key:'shade',className:'absolute inset-0 bg-gradient-to-t from-[#090d13] via-transparent to-black/10'}),
+          entity.image?h('img',{key:'bg',src:entity.image,alt:'',className:'sheet-visual-bg absolute inset-0 h-full w-full'}):null,
+          entity.image?h('img',{key:'img',src:entity.image,alt:entity.n||'Retrato do personagem',className:'sheet-visual-img absolute inset-0 h-full w-full'}):null,
+          h('div',{key:'shade',className:'sheet-visual-shade absolute inset-0 bg-gradient-to-t from-[#090d13] via-transparent to-black/10'}),
           h('div',{key:'badge',className:'sheet-rank-badge'},[h(TinyLabel,{key:'l',className:'sheet-rank-label text-[#ff7b85]'},'RANK'),h('strong',{key:'v',className:'sheet-rank-value'},entity.rank??'—')]),
           h('div',{key:'name',className:'sheet-visual-copy'},[h(TinyLabel,{key:'k',className:'sheet-visual-category text-[#ff7b85]'},isHero?'HERÓI':entity.tier||'AMEAÇA'),h('h2',{key:'n',className:'sheet-visual-name'},entity.n),h('p',{key:'r',className:'sheet-visual-realname'},entity.r||entity.role||'')])
         ]),
@@ -206,9 +208,10 @@
             h('div',{key:'copy',className:'min-w-0'},[h(TinyLabel,{key:'l'},'FICHA DE PERSONAGEM'),h('p',{key:'h',className:'mt-2 max-w-3xl text-sm leading-6 text-[#929dab]'},entity.hook||entity.role||'Dados utilizados pela Central de Ações, combate e cenário.')]),
             h(Button,{key:'x',onClick:onClose,className:'shrink-0 px-3'},'×')
           ]),
-          h('div',{key:'vitals',className:'mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-6'},[
-            statCard('HEALTH',`${entity.currentHealth??entity.maxHealth??'—'} / ${entity.maxHealth??'—'}`,`DR ${entity.healthDR??'—'}`),
-            statCard('FOCUS',`${entity.currentFocus??entity.maxFocus??'—'} / ${entity.maxFocus??'—'}`,`DR ${entity.focusDR??'—'}`),
+          h('div',{key:'vitals',className:'mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'},[
+            statCard('RANK',entity.rank??'—'),
+            statCard('HEALTH',`${entity.currentHealth??entity.maxHealth??'—'} / ${entity.maxHealth??'—'}`,damageReductionLabel(entity.healthDR)),
+            statCard('FOCUS',`${entity.currentFocus??entity.maxFocus??'—'} / ${entity.maxFocus??'—'}`,damageReductionLabel(entity.focusDR)),
             Number.isFinite(Number(entity.defense))?statCard('DEFESA',entity.defense,'Defesa base'):null,
             statCard('KARMA',entity.karma??'—'),statCard('INICIATIVA',entity.initiative||'—'),statCard('MOVIMENTO',entity.speed||'—')
           ].filter(Boolean)),
@@ -257,20 +260,29 @@
   function categoryTone(category){return category==='hero'?'border-white/10 text-[#7f8997]':category==='antihero'?'border-amber-700/50 text-amber-300':category==='minion'?'border-violet-700/50 text-violet-300':'border-[#ef3340]/40 text-[#ff7b85]';}
   function filteredCategoryItems(items,category){return(items||[]).filter(item=>catalogCategory(item)===category);}
   function allSelectedCharacterIds(state){return[...(state?.createHeroIds||[]),...(state?.createVillainIds||[])];}
+  const CAPANGA_PACK_28_IDS=new Set([
+    'kingpin-henchman','mercenary','vulture-henchman','green-goblin-henchman','doctor-octopus-henchman','mysterio-henchman',
+    'sinister-follower','apocalypse-follower','ultron-drone','sentinel','doombot','deathlok','skrull','kree','chitauri','brood',
+    'badoon','shiar','symbiote','morlock','reaver','latveria-soldier','kyln-guard','vampire','werewolf','wendigo','demon','dormammu-cultist'
+  ]);
+  const isCapangaPack28=item=>CAPANGA_PACK_28_IDS.has(String(item?.id||''));
 
   function blankCharacter(kind='hero'){
     const id=`${kind}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
     return {id,n:kind==='hero'?'Novo Herói':'Novo Vilão',r:'',rank:4,tier:kind==='hero'?'HERÓI':'AMEAÇA',image:'',pdf:'',role:'',origin:'',occupation:'',teams:'',base:'',karma:kind==='hero'?4:'—',healthDR:'—',focusDR:'—',initiative:'+0',maxHealth:90,currentHealth:90,maxFocus:90,currentFocus:90,movement:{run:5,climb:3,swim:3,jump:3},speed:'Correr 5 · Escalar 3 · Nadar 3 · Pular 3',abilities:{Melee:0,Agility:0,Resilience:0,Vigilance:0,Ego:0,Logic:0},damageMultipliers:{Melee:4,Agility:4,Ego:4,Logic:4},traits:[],tags:kind==='hero'?['Heroic']:['Villainous'],powers:[]};
   }
-  function CharacterPickerModal({kind,items,existing,onAdd,onCreate,onClose,search='',onSearch,category='',onCategory,group='',onGroup,selectedIds=[],focusId='',templates=[]}){
+  function CharacterPickerModal({kind,items,existing,onAdd,onCreate,onClose,search='',onSearch,category='',onCategory,group='',onGroup,selectedIds=[],campaignItems=[],focusId='',templates=[]}){
     const allowed=['hero','antihero','villain','minion'];
     const activeCategory=allowed.includes(category)?category:allowed[0];
     const term=String(search||'').trim().toLocaleLowerCase('pt-BR');
     const groups=INTEL?.collectGroups?INTEL.collectGroups(items,{categoryKey:activeCategory}):[];
     const ranked=INTEL?.rankItems?INTEL.rankItems(items,{focusId,selectedIds,templates}):(items||[]).map(item=>({item,score:0,reasons:[]}));
-    const filtered=ranked.filter(row=>catalogCategory(row.item)===activeCategory)
+    let filtered=ranked.filter(row=>catalogCategory(row.item)===activeCategory)
       .filter(row=>!group||(INTEL?.matchesGroup?INTEL.matchesGroup(row.item,group):String(row.item?.teams||'').split(',').map(x=>x.trim()).includes(group)))
       .filter(row=>!term||`${row.item.n||''} ${row.item.r||''} ${row.item.role||''} ${row.item.teams||''}`.toLocaleLowerCase('pt-BR').includes(term));
+    if(activeCategory==='minion')filtered=[...filtered].sort((a,b)=>(b.score-a.score)||((isCapangaPack28(b.item)?1:0)-(isCapangaPack28(a.item)?1:0))||String(a.item?.n||'').localeCompare(String(b.item?.n||''),'pt-BR'));
+    const minionPackVisible=activeCategory==='minion'?filtered.filter(row=>isCapangaPack28(row.item)).length:0;
+    const minionPackTotal=activeCategory==='minion'?(items||[]).filter(item=>isCapangaPack28(item)).length:0;
     const focus=(items||[]).find(item=>item.id===focusId)||null;
     const title=`Adicionar ao lado ${kind==='hero'?'Jogáveis':'Ameaças'}`;
     return h('div',{className:'fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3',onMouseDown:e=>{if(e.target===e.currentTarget)onClose();}},h('div',{className:'max-h-[94vh] w-full max-w-6xl overflow-hidden rounded-2xl border border-white/10 bg-[#0d1118] shadow-2xl'},[
@@ -284,13 +296,17 @@
         ]),
         focus?h('div',{key:'focus',className:'flex flex-wrap items-center gap-3 rounded-xl border border-[#ef3340]/25 bg-[#ef3340]/5 p-3'},[h(Portrait,{key:'p',entity:focus,size:'sm'}),h('div',{key:'c',className:'min-w-0 flex-1'},[h(TinyLabel,{key:'l',className:'text-[#ff7a84]'},'RELAÇÕES PRIORIZADAS'),h('b',{key:'n',className:'mt-1 block truncate text-sm'},`Foco: ${focus.n}`),h('span',{key:'s',className:'mt-1 block text-[10px] text-[#929dab]'},'Os personagens mais conectados a este foco aparecem primeiro. A relação também considera todos os personagens já selecionados.')])]):null
       ]),
-      h('div',{key:'g',className:'grid max-h-[62vh] gap-2 overflow-auto p-4 sm:grid-cols-2 lg:grid-cols-3'},filtered.length?filtered.map(row=>{const item=row.item,used=existing.has(item.id),reasons=row.reasons||[],officialGroups=INTEL?.officialGroups?INTEL.officialGroups(item):String(item.teams||'').split(',').map(x=>x.trim()).filter(Boolean);return h('button',{key:item.id,type:'button',disabled:used,onClick:()=>onAdd(item.id,activeCategory),className:cx('relative flex items-center gap-3 rounded-xl border p-3 text-left transition',used?'cursor-not-allowed border-white/5 bg-white/[.02] opacity-45':row.score>0?'border-[#ef3340]/25 bg-[#171d27] hover:border-[#ef3340]/55':'border-white/10 bg-[#111720] hover:border-[#ef3340]/55')},[
+      activeCategory==='minion'?h('div',{key:'minionSummary',className:'flex flex-wrap items-center justify-between gap-2 border-b border-white/5 bg-black/15 px-4 py-2 text-[10px] text-[#8d98a6]'},[
+        h('span',{key:'count'},`${filtered.length} capangas encontrados`),
+        h('span',{key:'pack',className:'font-black text-[#e5b2b6]'},`${minionPackVisible}/${minionPackTotal} do pacote de 28 capangas${term||group?' neste filtro':''}`)
+      ]):null,
+      h('div',{key:'g',className:'catalog-grid-scroll grid max-h-[62vh] gap-2 overflow-y-auto p-4 sm:grid-cols-2 lg:grid-cols-3'},filtered.length?filtered.map(row=>{const item=row.item,isRepeatableMinion=activeCategory==='minion',instanceCount=isRepeatableMinion?(campaignItems||[]).filter(x=>String(x?.sourceCharacterId||x?.baseId||x?.id||'')===String(item.id||'')).length:0,used=!isRepeatableMinion&&existing.has(item.id),reasons=row.reasons||[],officialGroups=INTEL?.officialGroups?INTEL.officialGroups(item):String(item.teams||'').split(',').map(x=>x.trim()).filter(Boolean);return h('button',{key:item.id,type:'button',disabled:used,onClick:()=>onAdd(item.id,activeCategory),className:cx('relative flex items-center gap-3 rounded-xl border p-3 text-left transition',used?'cursor-not-allowed border-white/5 bg-white/[.02] opacity-45':row.score>0?'border-[#ef3340]/25 bg-[#171d27] hover:border-[#ef3340]/55':'border-white/10 bg-[#111720] hover:border-[#ef3340]/55')},[
         row.score>0&&!used?h('span',{key:'rel',className:'shrink-0 rounded-md border border-[#ef3340]/25 bg-[#ef3340]/10 px-1.5 py-0.5 text-[7px] font-black text-[#ff7b85]'},'RELACIONADO'):null,
         h(Portrait,{key:'p',entity:item,size:'sm'}),h('div',{key:'c',className:'min-w-0 flex-1'},[
           h('div',{key:'top',className:'flex items-center gap-2'},[h('b',{key:'n',className:'block min-w-0 flex-1 truncate text-xs'},item.n),h('span',{key:'src',className:cx('shrink-0 rounded-md border px-1.5 py-0.5 text-[7px] font-black',categoryTone(catalogCategory(item)))},catalogCategoryLabel(catalogCategory(item),true).toUpperCase())]),
           h('small',{key:'r',className:'mt-1 block truncate text-[9px] text-[#778291]'},item.r||item.role||`Rank ${item.rank||4}`),
           reasons.length?h('span',{key:'why',className:'mt-1 block truncate text-[8px] font-bold text-[#e7959b]'},reasons.join(' · ')):officialGroups.length?h('span',{key:'team',className:'mt-1 block truncate text-[8px] text-[#697587]'},officialGroups.slice(0,2).map(g=>INTEL?.labelGroup?INTEL.labelGroup(g):g).join(' · ')):null,
-          used?h('span',{key:'u',className:'mt-1 block text-[8px] font-black text-emerald-400'},'JÁ NA CAMPANHA'):null
+          isRepeatableMinion?h('span',{key:'u',className:'mt-1 block text-[8px] font-black text-violet-300'},instanceCount?`${instanceCount} NA CAMPANHA · PODE REPETIR`:'PODE REPETIR'):used?h('span',{key:'u',className:'mt-1 block text-[8px] font-black text-emerald-400'},'JÁ NA CAMPANHA'):null
         ])
       ]);}):h('div',{className:'col-span-full py-10 text-center text-sm text-[#74808f]'},'Nenhum personagem encontrado nesta categoria / grupo.'))
     ]));
@@ -571,7 +587,7 @@
 
   function ScenarioBuilder({scenario,heroes,villains,selected,onSelect,onMove,zoom,onZoom,onReset,onResetPiece,moveMode,onMoveMode,tool,onTool,preset,onPreset,onApplyPreset,onGenerate,onClear,onResize,onEnvironment,pieceChoice,onPieceChoice,qty,onQty,onAddPieces,onEditCell,onRemovePiece,group='terrain',onGroup,moving=false}){
     const current=normalizedScenario(scenario);
-    const actorOptions=[...(heroes||[]).map(e=>({key:`hero|${e.id}`,label:`Herói · ${e.n}`})),...(villains||[]).map(e=>({key:`villain|${e.id}`,label:`Vilão · ${e.n}`})),...Object.values(MINIONS).map(e=>({key:`other|${e.id}`,label:`Capanga · ${e.n.replace(/^Capanga · /,'')}`}))];
+    const actorOptions=[...(heroes||[]).map(e=>({key:`hero|${e.id}`,label:`Herói · ${e.n}`})),...(villains||[]).map(e=>({key:`villain|${e.id}`,label:`Ameaça · ${e.n}`}))];
     const groupDefs=[['terrain','▦','TERRENO'],['structure','🧱','ESTRUTURAS'],['objects','📦','OBJETOS'],['decor','✦','DETALHES']];
     const groupItems=group==='terrain'?[['base',scenarioToolInfo('base',current)],...Array.from(TERRAIN_TOOLS).map(id=>[id,scenarioToolInfo(id,current)])]:group==='decor'?Object.keys(DECOR_META).map(id=>[`decor-${id}`,scenarioToolInfo(`decor-${id}`,current)]):Object.entries(OBSTACLE_META).filter(([,meta])=>(meta.group||'objects')===group).map(([id])=>[id,scenarioToolInfo(id,current)]);
     const active=scenarioToolInfo(tool,current);
@@ -661,7 +677,6 @@
       const d=this.state.data,solo=d.campaignContent?.mode==='solo'; const out=[];
       if(solo)(d.heroes||[]).forEach(e=>out.push({key:`hero|${e.id}`,kind:'hero',entity:e,label:e.n}));
       (d.villains||[]).forEach(e=>out.push({key:`villain|${e.id}`,kind:'villain',entity:e,label:e.n}));
-      Object.values(MINIONS).forEach(base=>{const vit=d.scenario?.minionVitals?.[base.id]||{};out.push({key:`other|${base.id}`,kind:'other',entity:{...base,...vit},label:base.n});});
       return out;
     }
     currentEntity(){
@@ -706,14 +721,26 @@
     async uploadCampaignPdf(file){try{const asset=await API.uploadAsset(file);this.toast('PDF enviado. Salve a campanha para concluir.');return asset?.url||'';}catch(e){this.toast(e.message||'Falha ao enviar PDF.');return'';}}
     async addRosterCharacter(kind,id,category=''){
       const library=this.creationLibrary(kind),source=library.find(item=>item.id===id);if(!source)return;
-      const key=kind==='hero'?'heroes':'villains',otherKey=kind==='hero'?'villains':'heroes';if((this.state.data[key]||[]).some(item=>item.id===id))return;
+      const key=kind==='hero'?'heroes':'villains',otherKey=kind==='hero'?'villains':'heroes';
+      const isRepeatableMinion=category==='minion'||catalogCategory(source)==='minion'||source.generic===true||['CAPANGA','LACAIO'].includes(String(source.tier||'').toUpperCase());
+      const allCampaign=[...(this.state.data.heroes||[]),...(this.state.data.villains||[])];
+      const sameSource=allCampaign.filter(item=>String(item?.sourceCharacterId||item?.baseId||item?.id||'')===String(source.id));
+      if(!isRepeatableMinion&&(this.state.data[key]||[]).some(item=>item.id===id))return;
       const entity=JSON.parse(JSON.stringify(source));delete entity.libraryKind;entity.rosterKind=kind;
-      if(source.alignment==='antihero')entity.tier='ANTI-HERÓI';else if(source.alignment==='wildcard')entity.tier='WILDCARD';else if(source.libraryKind&&source.libraryKind!==kind)entity.tier=kind==='hero'?'HERÓI':'AMEAÇA';
+      if(isRepeatableMinion){
+        const instanceNumber=sameSource.reduce((max,item)=>Math.max(max,Number(item?.instanceNumber||0)),0)+1;
+        const stamp=Date.now().toString(36),rand=Math.random().toString(36).slice(2,6),prefix=String(source.id||'capanga').replace(/[^a-z0-9_-]/gi,'-').slice(0,52);
+        entity.id=`${prefix}-inst-${instanceNumber}-${stamp}-${rand}`.slice(0,80);
+        entity.baseId=source.id;entity.sourceCharacterId=source.id;entity.instanceNumber=instanceNumber;entity.repeatable=true;entity.generic=true;entity.type='minion';entity.tier='CAPANGA';
+        entity.n=`${source.n} #${instanceNumber}`;entity.currentHealth=Number(entity.maxHealth||0);entity.currentFocus=Number(entity.maxFocus||0);
+      }else{
+        if(source.alignment==='antihero')entity.tier='ANTI-HERÓI';else if(source.alignment==='wildcard')entity.tier='WILDCARD';else if(source.libraryKind&&source.libraryKind!==kind)entity.tier=kind==='hero'?'HERÓI':'AMEAÇA';
+      }
       try{
-        let removal=null;if((this.state.data[otherKey]||[]).some(item=>item.id===id))removal=kind==='hero'?await API.deleteVillain(id):await API.deleteHero(id);
+        let removal=null;if(!isRepeatableMinion&&(this.state.data[otherKey]||[]).some(item=>item.id===id))removal=kind==='hero'?await API.deleteVillain(id):await API.deleteHero(id);
         if(kind==='hero')await API.saveHero(entity);else await API.saveVillain(entity);
-        this.setState(prev=>({rosterFocusCharacterId:id,rosterCategory:category||prev.rosterCategory||catalogCategory(entity),data:{...prev.data,[otherKey]:(prev.data[otherKey]||[]).filter(x=>x.id!==id),[key]:[...(prev.data[key]||[]),entity],scenario:normalizedScenario(removal?.scenario||prev.data.scenario),initiative:removal?.initiative||prev.data.initiative,combat:removal?.combat||prev.data.combat,...(kind==='hero'?{playerNotes:{...(removal?.playerNotes||prev.data.playerNotes||{}),[entity.id]:''}}:{})}}));
-        this.toast(`${entity.n} adicionado como ${kind==='hero'?'herói':'vilão'}.`);
+        this.setState(prev=>({rosterFocusCharacterId:source.id,rosterCategory:category||prev.rosterCategory||catalogCategory(entity),data:{...prev.data,[otherKey]:isRepeatableMinion?(prev.data[otherKey]||[]):(prev.data[otherKey]||[]).filter(x=>x.id!==id),[key]:[...(prev.data[key]||[]),entity],scenario:normalizedScenario(removal?.scenario||prev.data.scenario),initiative:removal?.initiative||prev.data.initiative,combat:removal?.combat||prev.data.combat,...(kind==='hero'?{playerNotes:{...(removal?.playerNotes||prev.data.playerNotes||{}),[entity.id]:''}}:{})}}));
+        this.toast(isRepeatableMinion?`${entity.n} adicionado. Você pode adicionar quantos precisar.`:`${entity.n} adicionado como ${kind==='hero'?'herói':'vilão'}.`);
       }catch(e){this.toast(e.message||'Não foi possível adicionar o personagem.');}
     }
     openNewCharacter(kind,category=''){
@@ -827,7 +854,7 @@
       this.queueScenarioSave(next);
     }
     async addScenarioPieces(){
-      const current=normalizedScenario(this.state.data.scenario),fallback=(this.state.data.heroes||[])[0]?`hero|${this.state.data.heroes[0].id}`:(this.state.data.villains||[])[0]?`villain|${this.state.data.villains[0].id}`:'other|minion-melee',choice=this.state.scenarioPieceChoice||fallback,[kind,id]=choice.split('|');let entity=null;if(kind==='hero')entity=(this.state.data.heroes||[]).find(e=>e.id===id);else if(kind==='villain')entity=(this.state.data.villains||[]).find(e=>e.id===id);else entity=MINIONS[id];if(!entity)return this.toast('Escolha um personagem.');
+      const current=normalizedScenario(this.state.data.scenario),fallback=(this.state.data.heroes||[])[0]?`hero|${this.state.data.heroes[0].id}`:(this.state.data.villains||[])[0]?`villain|${this.state.data.villains[0].id}`:'',choice=this.state.scenarioPieceChoice||fallback;if(!choice)return this.toast('Adicione um personagem à campanha primeiro.');const[kind,id]=choice.split('|');let entity=null;if(kind==='hero')entity=(this.state.data.heroes||[]).find(e=>e.id===id);else if(kind==='villain')entity=(this.state.data.villains||[]).find(e=>e.id===id);if(!entity)return this.toast('Escolha um personagem.');
       const qty=clamp(this.state.scenarioQty,1,20),next=normalizedScenario(current);let added=0;
       if(kind==='hero'&&next.pieces.some(p=>p.kind==='hero'&&String(p.characterId||p.baseId)===String(entity.id)))return this.toast(`${entity.n} já está no cenário.`);
       const occupied=new Set(next.pieces.map(p=>scenarioKey(Number(p.x),Number(p.y)))),spots=safePlacementCells(next).filter(c=>!occupied.has(scenarioKey(c.x,c.y)));let cursor=Math.min(spots.length,Math.max(0,Math.floor(spots.length*.12)));
@@ -935,7 +962,7 @@
           h('h1',{key:'h',className:'mt-1 text-3xl font-black'},entity?.n||'Personagem'),
           h('p',{key:'p',className:'mt-1 text-sm text-[#7f8997]'},'Rolagens e controle rápido do seu personagem.')
         ]),
-        isMaster?h(InitiativePanel,{key:'init',initiative:d.initiative||[],choices:[...(d.heroes||[]),...(d.villains||[]),...Object.values(MINIONS)],onAdd:id=>this.initAdd(id),onRemove:id=>this.initRemove(id),onRoll:id=>this.initRoll(id),onRollAll:()=>this.initRollAll(),lastRoll:s.initiativeRoll,animating:s.initiativeAnimating}):null,
+        isMaster?h(InitiativePanel,{key:'init',initiative:d.initiative||[],choices:[...(d.heroes||[]),...(d.villains||[])],onAdd:id=>this.initAdd(id),onRemove:id=>this.initRemove(id),onRoll:id=>this.initRoll(id),onRollAll:()=>this.initRollAll(),lastRoll:s.initiativeRoll,animating:s.initiativeAnimating}):null,
         identityPanel,
         h(ActionCenter,{key:'act',entity:actorItem?.entity||entity,category:s.category,onCategory:category=>this.setState({category,power:'',roll:null}),onRoll:(a,c)=>this.runAction(a,c),roll:s.roll,animating:s.rollAnimating,onEdge:i=>this.useEdge(i),onFinalize:()=>this.finalizeRoll(),tn:s.tn,onTN:tn=>this.updateTN(tn),power:s.power,onPower:power=>this.setState({power,roll:null}),edge:s.edge,trouble:s.trouble,onEdgeChange:edge=>this.setState({edge}),onTroubleChange:trouble=>this.setState({trouble})}),
         h('div',{key:'board'},h(MemoBoard,{scenario:d.scenario,heroes:d.heroes,villains:d.villains,role:s.profile.role,heroId:s.profile.heroId,selected:s.selectedPiece,onSelect:id=>this.setState({selectedPiece:id}),onMove:(x,y,mode,pieceId)=>this.movePiece(x,y,mode,pieceId),zoom:s.zoom,onZoom:zoom=>this.setState({zoom}),onReset:()=>this.resetMovement('',isMaster),onResetPiece:id=>this.resetMovement(id,false),moveMode:s.moveMode,onMoveMode:moveMode=>this.setState({moveMode}),moving:s.scenarioMoveBusy})),
@@ -987,7 +1014,7 @@
         h('div',{key:'content',className:'mx-auto max-w-[1500px] p-4 sm:p-6'},this.renderPage())
       ]),
       s.sheet?h(SheetModal,{key:'sheet',entity:s.sheet.entity,kind:s.sheet.kind,onClose:()=>this.setState({sheet:null})}):null,
-      s.rosterPicker?h(CharacterPickerModal,{key:'picker',kind:s.rosterPicker,items:this.creationLibrary(s.rosterPicker),existing:new Set((s.rosterPicker==='hero'?s.data.heroes:s.data.villains).map(item=>item.id)),search:s.rosterSearch,onSearch:rosterSearch=>this.setState({rosterSearch}),category:s.rosterCategory|| (s.rosterPicker==='hero'?'hero':'villain'),onCategory:rosterCategory=>this.setState({rosterCategory,rosterGroup:''}),group:s.rosterGroup,onGroup:rosterGroup=>this.setState({rosterGroup}),selectedIds:[...(s.data.heroes||[]),...(s.data.villains||[])].map(item=>item.id),focusId:s.rosterFocusCharacterId,templates:s.templates,onAdd:(id,category)=>this.addRosterCharacter(s.rosterPicker,id,category),onCreate:()=>this.openNewCharacter(s.rosterPicker,s.rosterCategory|| (s.rosterPicker==='hero'?'hero':'villain')),onClose:()=>this.setState({rosterPicker:'',rosterSearch:'',rosterGroup:''})}):null,
+      s.rosterPicker?h(CharacterPickerModal,{key:'picker',kind:s.rosterPicker,items:this.creationLibrary(s.rosterPicker),existing:new Set((s.rosterPicker==='hero'?s.data.heroes:s.data.villains).map(item=>item.id)),search:s.rosterSearch,onSearch:rosterSearch=>this.setState({rosterSearch}),category:s.rosterCategory|| (s.rosterPicker==='hero'?'hero':'villain'),onCategory:rosterCategory=>this.setState({rosterCategory,rosterGroup:''}),group:s.rosterGroup,onGroup:rosterGroup=>this.setState({rosterGroup}),selectedIds:[...(s.data.heroes||[]),...(s.data.villains||[])].map(item=>item.id),campaignItems:[...(s.data.heroes||[]),...(s.data.villains||[])],focusId:s.rosterFocusCharacterId,templates:s.templates,onAdd:(id,category)=>this.addRosterCharacter(s.rosterPicker,id,category),onCreate:()=>this.openNewCharacter(s.rosterPicker,s.rosterCategory|| (s.rosterPicker==='hero'?'hero':'villain')),onClose:()=>this.setState({rosterPicker:'',rosterSearch:'',rosterGroup:''})}):null,
       s.characterEditor?h(CharacterEditorModal,{key:'editor',kind:s.characterEditor.kind,entity:s.characterEditor.entity,isNew:s.characterEditor.isNew,onSave:entity=>this.saveCharacterEditor(entity),onClose:()=>this.setState({characterEditor:null})}):null,
       s.toast?h('div',{key:'toast',className:'fixed bottom-5 right-5 z-[60] max-w-sm rounded-xl border border-white/10 bg-[#151b24] px-4 py-3 text-sm shadow-2xl'},s.toast):null
     ]);}

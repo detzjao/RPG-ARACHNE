@@ -49,7 +49,7 @@ test('v49 preserves exact source-page metadata for known profiles',()=>{
 });
 
 test('v49 source library is merged into the existing cross-roster library',()=>{
-  assert.equal(LIBRARY_REVISION,8);
+  assert.equal(LIBRARY_REVISION,9);
   const all=getCharacterLibrary('all');
   const sourceIds=new Set([...all.heroes,...all.villains].filter(x=>x.sourcePdf==='Marvel_Multiverse_RPG_Todos_Personagens.pdf').map(x=>x.id));
   assert.equal(sourceIds.size,128);
@@ -63,5 +63,5 @@ test('v49 UI opens only the isolated character sheet PDF',()=>{
   assert.match(app,/VER FICHA COMPLETA EM PDF/);
   assert.match(app,/entity\.sheet_pdf_url\|\|entity\.pdf/);
   const index=fs.readFileSync(path.join(frontend,'index.html'),'utf8');
-  assert.match(index,/v=49\.2/);
+  assert.match(index,/v=49\.3/);
 });

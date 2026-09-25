@@ -1,6 +1,6 @@
 import { CORE_RULEBOOK_CHARACTERS } from './core-rulebook-library.js';
 const baseAbilities = { Melee:0, Agility:0, Resilience:0, Vigilance:0, Ego:0, Logic:0 };
-const LIBRARY_REVISION = 8;
+const LIBRARY_REVISION = 9;
 const baseDamage = rank => ({ Melee:Number(rank)||1, Agility:Number(rank)||1, Ego:Number(rank)||1, Logic:Number(rank)||1 });
 const clone = value => JSON.parse(JSON.stringify(value));
 const session = (id, title, text) => ({ id:String(id).padStart(2,'0'), title, text });
@@ -279,6 +279,31 @@ for (const sourceProfile of CORE_RULEBOOK_CHARACTERS) {
     source_image_url:sourceProfile.image_url||sourceProfile.image||'',
     libraryRevision:LIBRARY_REVISION
   };
+}
+
+
+// v49.3 — os 28 capangas originais do Arachne permanecem explicitamente
+// classificados e com seus retratos próprios, mesmo quando existe perfil oficial no livro.
+const CAPANGA_PACK_28 = {
+  'kingpin-henchman':'minion-01-kingpin-henchman.webp','mercenary':'minion-02-mercenary.webp',
+  'vulture-henchman':'minion-03-vulture-henchman.webp','green-goblin-henchman':'minion-04-green-goblin-henchman.webp',
+  'doctor-octopus-henchman':'minion-05-doctor-octopus-henchman.webp','mysterio-henchman':'minion-06-mysterio-henchman.webp',
+  'sinister-follower':'minion-07-sinister-follower.webp','apocalypse-follower':'minion-08-apocalypse-follower.webp',
+  'ultron-drone':'minion-09-ultron-drone.webp','sentinel':'minion-10-sentinel.webp','doombot':'minion-11-doombot.webp',
+  'deathlok':'minion-12-deathlok.webp','skrull':'minion-13-skrull.webp','kree':'minion-14-kree.webp',
+  'chitauri':'minion-15-chitauri.webp','brood':'minion-16-brood.webp','badoon':'minion-17-badoon.webp',
+  'shiar':'minion-18-shiar.webp','symbiote':'minion-19-symbiote.webp','morlock':'minion-20-morlock.webp',
+  'reaver':'minion-21-reaver.webp','latveria-soldier':'minion-22-latveria-soldier.webp','kyln-guard':'minion-23-kyln-guard.webp',
+  'vampire':'minion-24-vampire.webp','werewolf':'minion-25-werewolf.webp','wendigo':'minion-26-wendigo.webp',
+  'demon':'minion-27-demon.webp','dormammu-cultist':'minion-28-dormammu-cultist.webp'
+};
+for(const [id,file] of Object.entries(CAPANGA_PACK_28)){
+  const entity=CHARACTER_LIBRARY.villains[id]||CHARACTER_LIBRARY.heroes[id];
+  if(!entity)continue;
+  if(CHARACTER_LIBRARY.heroes[id]){delete CHARACTER_LIBRARY.heroes[id];CHARACTER_LIBRARY.villains[id]=entity;}
+  entity.tier='CAPANGA'; entity.generic=true; entity.type='minion'; entity.catalogPack='arachne-28-minions';
+  entity.tags=[...new Set([...(entity.tags||[]),'Villainous','Capanga'])];
+  entity.image=`assets/portraits/${file}`; entity.image_url=entity.image; entity.libraryRevision=LIBRARY_REVISION;
 }
 
 const TEMPLATE_PDFS = {

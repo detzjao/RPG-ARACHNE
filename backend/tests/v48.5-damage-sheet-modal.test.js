@@ -34,11 +34,11 @@ test('v48.5 modal de ficha usa layout próprio e imagem contida',()=>{
   assert.match(app,/sheet-hero/);
   assert.match(app,/sheet-visual-img/);
   assert.match(css,/\.sheet-hero\{[^}]*grid-template-columns:280px minmax\(0,1fr\)!important/);
-  assert.match(css,/\.sheet-visual-img\{[^}]*width:100%!important;[^}]*height:100%!important;[^}]*object-fit:cover!important;[^}]*transform:none!important/);
+  assert.match(css,/\.sheet-visual-img\{[^}]*object-fit:contain!important;[^}]*transform:none!important/);
   assert.match(css,/\.sheet-modal\{[^}]*max-height:94vh!important/);
 });
 
 test('v48.5 invalida cache antigo de JS e CSS',()=>{
-  assert.match(index,/styles\/custom\.css\?v=49\.2/);
-  assert.match(index,/src\/app\.js\?v=49\.2/);
+  assert.match(index,/styles\/custom\.css\?v=49\.4/);
+  assert.match(index,/src\/app\.js\?v=49\.5/);
 });
